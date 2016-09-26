@@ -1,0 +1,4 @@
+description = 'Core module for WeTrack Backend, containing all the model' +
+        'and util classes that shared by both `client` and `service` module'
+
+dependencies {}
