@@ -1,10 +1,8 @@
 rootProject.name = 'parent'
 
-include 'core'
 include 'service'
 include 'client'
 
-project(':core').projectDir = "$rootDir/core" as File
 project(':service').projectDir = "$rootDir/service" as File
 project(':client').projectDir = "$rootDir/client" as File
 

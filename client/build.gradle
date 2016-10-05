@@ -2,6 +2,5 @@ description = 'Client module, can be used by Android client to access the REST s
         ' published by `service` module'
 
 dependencies {
-    compile project(':core')
     compile "org.glassfish.jersey.core:jersey-client:$jerseyVersion"
 }
