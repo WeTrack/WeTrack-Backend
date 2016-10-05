@@ -1,11 +1,11 @@
 package com.wetrack.dao.morphia;
 
 import com.wetrack.dao.Repository;
-import com.wetrack.model.Entity;
+import com.wetrack.model.DbEntity;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
-public abstract class MorphiaRepository<T extends Entity> implements Repository<T> {
+public abstract class MorphiaRepository<T extends DbEntity> implements Repository<T> {
 
     private Datastore datastore;
 

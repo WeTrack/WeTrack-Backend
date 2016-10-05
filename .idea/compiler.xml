@@ -19,14 +19,14 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="client_main" target="1.7" />
-      <module name="client_test" target="1.7" />
+      <module name="client_main" target="1.8" />
+      <module name="client_test" target="1.8" />
       <module name="core_main" target="1.7" />
       <module name="core_test" target="1.7" />
       <module name="parent_main" target="1.5" />
       <module name="parent_test" target="1.5" />
-      <module name="service_main" target="1.7" />
-      <module name="service_test" target="1.7" />
+      <module name="service_main" target="1.8" />
+      <module name="service_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

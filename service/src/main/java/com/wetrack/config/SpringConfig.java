@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class SpringMongoConfig {
+public class SpringConfig {
 
     /** Name of the database */
     public static final String DATABASE_NAME = "wetrack";

@@ -1,6 +1,6 @@
 package com.wetrack.model;
 
-public interface Entity<T> {
+public interface DbEntity<T> {
     T getId();
     void setId(T id);
 }
