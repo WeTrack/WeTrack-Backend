@@ -7,12 +7,11 @@ allprojects {
 
 ext {
     jerseyVersion = '2.23.2'
+    springVersion = '4.3.3.RELEASE'
 }
 
 subprojects {
     apply plugin: 'java'
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
 
     repositories {
         mavenCentral()
