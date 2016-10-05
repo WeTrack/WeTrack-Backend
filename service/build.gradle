@@ -3,9 +3,8 @@ description = 'Service module, which contains all the REST service classes for W
 apply plugin: 'war'
 
 dependencies {
-    compile project(":core")
     compile "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion"
-    compile 'org.springframework:spring-core:4.3.3.RELEASE'
+    compile group: 'org.springframework', name: 'spring-web', version: '4.3.3.RELEASE'
     compile 'org.mongodb.morphia:morphia:1.2.1'
 
     testCompile 'com.github.fakemongo:fongo:2.0.7'
