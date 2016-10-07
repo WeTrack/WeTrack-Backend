@@ -1,8 +1,12 @@
 # Entries for IntelliJ
-.idea/workspace.xml
-.idea/libraries
+.idea/
+**.iml
 **/out/
+
 
 # Entries for Gradle
 **/build/
 .gradle/
+gradle/
+gradlew
+gradlew.bat
