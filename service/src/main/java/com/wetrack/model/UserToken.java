@@ -23,7 +23,8 @@ public class UserToken implements DbEntity<String> {
     public UserToken(String username, LocalDateTime expireTime) {
         this.username = username;
         this.expireTime = expireTime;
-        this.token = new Md5Hash(String.format("%s:%s:%d", username, expireTime, random.nextInt())).toHex();
+        this.token = new Md5Hash(String.format("%d-%s:%d-%s:%d",
+                random.nextInt(), username, random.nextInt(), expireTime, random.nextInt())).toHex();
     }
 
     public UserToken(String username, long durationAmount, TemporalUnit durationUnit) {

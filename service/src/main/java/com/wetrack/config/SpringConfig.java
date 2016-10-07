@@ -7,6 +7,7 @@ import com.wetrack.dao.morphia.UserRepositoryImpl;
 import com.wetrack.dao.morphia.UserTokenRepositoryImpl;
 import com.wetrack.morphia.converter.EnumOrdinalConverter;
 import com.wetrack.morphia.converter.LocalDateConverter;
+import com.wetrack.service.AuthenService;
 import com.wetrack.service.UserService;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
@@ -63,10 +64,22 @@ public class SpringConfig {
     }
 
     @Bean
-    public UserService userService(UserRepository userRepository) {
+    public UserService userService(UserRepository userRepository,
+                                   UserTokenRepository userTokenRepository) {
         UserService userService = new UserService();
         userService.setUserRepository(userRepository);
+        userService.setUserTokenRepository(userTokenRepository);
 
         return userService;
+    }
+
+    @Bean
+    public AuthenService authenService(UserRepository userRepository,
+                                       UserTokenRepository userTokenRepository) {
+        AuthenService authenService = new AuthenService();
+        authenService.setUserRepository(userRepository);
+        authenService.setUserTokenRepository(userTokenRepository);
+
+        return authenService;
     }
 }
