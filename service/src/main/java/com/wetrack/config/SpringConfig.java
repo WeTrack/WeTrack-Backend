@@ -2,7 +2,9 @@ package com.wetrack.config;
 
 import com.mongodb.MongoClient;
 import com.wetrack.dao.UserRepository;
+import com.wetrack.dao.UserTokenRepository;
 import com.wetrack.dao.morphia.UserRepositoryImpl;
+import com.wetrack.dao.morphia.UserTokenRepositoryImpl;
 import com.wetrack.morphia.converter.EnumOrdinalConverter;
 import com.wetrack.morphia.converter.LocalDateConverter;
 import com.wetrack.service.UserService;
@@ -18,7 +20,7 @@ public class SpringConfig {
     /** Name of the database */
     public static final String DATABASE_NAME = "wetrack";
     /** Name of package where the mapping classes are */
-    public static final String PACKAGE_NAME = "com.wetrack.model.mophia";
+    public static final String PACKAGE_NAME = "com.wetrack.model";
 
     @Bean
     public Morphia morphia() {
@@ -50,6 +52,14 @@ public class SpringConfig {
         userRepository.setDatastore(datastore);
 
         return userRepository;
+    }
+
+    @Bean
+    public UserTokenRepository userTokenRepository(Datastore datastore) {
+        UserTokenRepositoryImpl userTokenRepository = new UserTokenRepositoryImpl();
+        userTokenRepository.setDatastore(datastore);
+
+        return userTokenRepository;
     }
 
     @Bean

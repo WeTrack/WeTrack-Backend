@@ -1,29 +1,27 @@
-package com.wetrack.dao;
+package com.wetrack.dao.morphia;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.wetrack.config.SpringConfig;
-import com.wetrack.config.SpringTestConfig;
+import com.wetrack.dao.Repository;
+import com.wetrack.dao.UserRepository;
+import com.wetrack.dao.WeTrackSpringTest;
 import com.wetrack.model.DbEntity;
 import com.wetrack.model.User;
 import org.bson.Document;
-import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.time.LocalDate;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SpringTestConfig.class)
-public class UserRepositoryTest {
+public class UserRepositoryTest extends WeTrackSpringTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -44,7 +42,7 @@ public class UserRepositoryTest {
 
     @After
     public void cleanUp() {
-        // Delete the inserted user
+        // Delete the inserted user token
         users.deleteOne(new Document("_id", username));
     }
 
@@ -91,7 +89,7 @@ public class UserRepositoryTest {
      * Unit test for {@link Repository#findById(Object)} on {@link User} type
      */
     @Test
-    public void testUserFindById() {
+    public void testUserQuery() {
         User user = new User(username, password, nickname);
         user.setEmail(email);
         user.setBirthDate(LocalDate.now());

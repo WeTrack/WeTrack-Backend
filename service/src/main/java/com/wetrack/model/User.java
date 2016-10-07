@@ -1,8 +1,9 @@
 package com.wetrack.model;
 
-import org.joda.time.LocalDate;
 import org.mongodb.morphia.annotations.*;
 import org.mongodb.morphia.utils.IndexType;
+
+import java.time.LocalDate;
 
 @Entity(value = "users", noClassnameStored = true)
 @Indexes({

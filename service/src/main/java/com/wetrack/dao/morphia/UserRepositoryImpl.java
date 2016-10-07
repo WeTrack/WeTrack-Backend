@@ -17,6 +17,11 @@ public class UserRepositoryImpl extends MorphiaRepository<User> implements UserR
     }
 
     @Override
+    public long countByUsername(String username) {
+        return createQuery().field("_id").equal(username).countAll();
+    }
+
+    @Override
     public Iterator<User> findAllByNickname(String nickname) {
         return createQuery().search(nickname).iterator();
     }

@@ -7,6 +7,7 @@ import java.util.Iterator;
 public interface UserRepository extends Repository<User> {
 
     User findByUsername(String username);
+    long countByUsername(String username);
 
     /**
      * Find all {@link User} that have the similar nickname
