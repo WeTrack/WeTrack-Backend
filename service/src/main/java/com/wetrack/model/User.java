@@ -1,5 +1,6 @@
 package com.wetrack.model;
 
+import org.joda.time.LocalDate;
 import org.mongodb.morphia.annotations.*;
 import org.mongodb.morphia.utils.IndexType;
 
@@ -14,8 +15,9 @@ public class User implements DbEntity<String> {
     private String password;
     private String nickname;
     private String iconUrl;
-
-    private UserInfo info;
+    private String email;
+    private Gender gender;
+    private LocalDate birthDate;
 
     public User() {}
 
@@ -50,11 +52,23 @@ public class User implements DbEntity<String> {
     public void setUsername(String username) {
         this.username = username;
     }
-    public UserInfo getInfo() {
-        return info;
+    public String getEmail() {
+        return email;
     }
-    public void setInfo(UserInfo info) {
-        this.info = info;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public Gender getGender() {
+        return gender;
+    }
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     @Override
@@ -66,4 +80,7 @@ public class User implements DbEntity<String> {
         this.username = id;
     }
 
+    public enum Gender {
+        Male, Female
+    }
 }
