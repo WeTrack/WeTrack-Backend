@@ -1,37 +1,31 @@
 package com.wetrack.model;
 
-import org.joda.time.LocalDate;
 import org.mongodb.morphia.annotations.*;
 import org.mongodb.morphia.utils.IndexType;
 
 @Entity(value = "users", noClassnameStored = true)
 @Indexes({
-        @Index(fields = @Field(value = "email", type = IndexType.TEXT))
+        @Index(fields = @Field(value = "nickname", type = IndexType.TEXT))
 })
 public class User implements DbEntity<String> {
 
     @Id
-    private String email;
+    private String username;
     private String password;
     private String nickname;
     private String iconUrl;
-    private Gender gender;
-    private LocalDate birthDate;
+
+    private UserInfo info;
 
     public User() {}
 
-    public User(String email, String nickname, String password) {
-        this.email = email;
+    public User(String username, String password, String nickname) {
+        this.username = username;
         this.password = password;
         this.nickname = nickname;
     }
 
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    // Getters and Setters
     public String getPassword() {
         return password;
     }
@@ -50,30 +44,26 @@ public class User implements DbEntity<String> {
     public void setIconUrl(String iconUrl) {
         this.iconUrl = iconUrl;
     }
-    public Gender getGender() {
-        return gender;
+    public String getUsername() {
+        return username;
     }
-    public void setGender(Gender gender) {
-        this.gender = gender;
+    public void setUsername(String username) {
+        this.username = username;
     }
-    public LocalDate getBirthDate() {
-        return birthDate;
+    public UserInfo getInfo() {
+        return info;
     }
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
+    public void setInfo(UserInfo info) {
+        this.info = info;
     }
 
     @Override
     public String getId() {
-        return email;
+        return username;
     }
     @Override
     public void setId(String id) {
-        this.email = id;
-    }
-
-    public enum Gender {
-        Male, Female
+        this.username = id;
     }
 
 }

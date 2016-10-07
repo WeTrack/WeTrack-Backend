@@ -12,8 +12,8 @@ public class UserRepositoryImpl extends MorphiaRepository<User> implements UserR
     }
 
     @Override
-    public User findByEmail(String email) {
-        return findById(email);
+    public User findByUsername(String username) {
+        return findById(username);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.wetrack.dao.UserRepository;
 import com.wetrack.dao.morphia.UserRepositoryImpl;
 import com.wetrack.morphia.converter.EnumOrdinalConverter;
 import com.wetrack.morphia.converter.LocalDateConverter;
+import com.wetrack.service.UserService;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.converters.EnumConverter;
@@ -49,5 +50,13 @@ public class SpringConfig {
         userRepository.setDatastore(datastore);
 
         return userRepository;
+    }
+
+    @Bean
+    public UserService userService(UserRepository userRepository) {
+        UserService userService = new UserService();
+        userService.setUserRepository(userRepository);
+
+        return userService;
     }
 }
