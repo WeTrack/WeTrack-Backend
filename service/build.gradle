@@ -1,9 +1,11 @@
 description = 'Service module, which contains all the REST service classes for WeTrack'
 
 apply plugin: 'war'
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 
 dependencies {
     compile "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion"
+    compile "org.glassfish.jersey.ext:jersey-spring3:$jerseyVersion"
     compile "org.springframework:spring-web:$springVersion"
     compile 'org.mongodb.morphia:morphia:1.2.1'
     compile group: 'org.mongodb.morphia', name: 'morphia-logging-slf4j', version: '1.2.1'

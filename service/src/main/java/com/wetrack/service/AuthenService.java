@@ -5,6 +5,7 @@ import com.wetrack.dao.UserTokenRepository;
 import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -19,8 +20,8 @@ import static com.wetrack.util.RsResponseUtils.ok;
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthenService {
 
-    private UserRepository userRepository;
-    private UserTokenRepository userTokenRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private UserTokenRepository userTokenRepository;
 
     @POST
     @Path("/users/{username}/login")

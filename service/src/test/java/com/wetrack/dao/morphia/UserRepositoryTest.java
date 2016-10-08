@@ -3,16 +3,19 @@ package com.wetrack.dao.morphia;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.wetrack.config.SpringConfig;
+import com.wetrack.config.SpringTestConfig;
 import com.wetrack.dao.Repository;
 import com.wetrack.dao.UserRepository;
-import com.wetrack.dao.WeTrackSpringTest;
 import com.wetrack.model.DbEntity;
 import com.wetrack.model.User;
 import org.bson.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.LocalDate;
 
@@ -21,12 +24,12 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-public class UserRepositoryTest extends WeTrackSpringTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = SpringTestConfig.class)
+public class UserRepositoryTest {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private MongoClient client;
+    @Autowired private UserRepository userRepository;
+    @Autowired private MongoClient client;
 
     private String username = "robert-peng";
     private String nickname = "Robert Peng";

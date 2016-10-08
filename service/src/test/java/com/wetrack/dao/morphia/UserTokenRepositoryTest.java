@@ -4,14 +4,17 @@ import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.wetrack.config.SpringConfig;
+import com.wetrack.config.SpringTestConfig;
 import com.wetrack.dao.UserTokenRepository;
-import com.wetrack.dao.WeTrackSpringTest;
 import com.wetrack.model.UserToken;
 import org.bson.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.temporal.ChronoUnit;
 
@@ -19,12 +22,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-public class UserTokenRepositoryTest extends WeTrackSpringTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = SpringTestConfig.class)
+public class UserTokenRepositoryTest {
 
-    @Autowired
-    UserTokenRepository userTokenRepository;
-    @Autowired
-    private MongoClient client;
+    @Autowired private UserTokenRepository userTokenRepository;
+    @Autowired private MongoClient client;
 
     private String username = "robert-peng";
 

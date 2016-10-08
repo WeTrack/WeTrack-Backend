@@ -2,5 +2,5 @@ description = 'Client module, can be used by Android client to access the REST s
         ' published by `service` module'
 
 dependencies {
-    compile "org.glassfish.jersey.core:jersey-client:$jerseyVersion"
+    compile group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.1.0'
 }

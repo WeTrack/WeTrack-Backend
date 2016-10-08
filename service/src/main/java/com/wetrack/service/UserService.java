@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -27,8 +28,8 @@ public class UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
-    private UserRepository userRepository;
-    private UserTokenRepository userTokenRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private UserTokenRepository userTokenRepository;
 
     @HEAD
     @Path("/{username}")
