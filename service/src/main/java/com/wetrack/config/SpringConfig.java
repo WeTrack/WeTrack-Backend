@@ -62,24 +62,4 @@ public class SpringConfig {
 
         return userTokenRepository;
     }
-
-    @Bean
-    public UserService userService(UserRepository userRepository,
-                                   UserTokenRepository userTokenRepository) {
-        UserService userService = new UserService();
-        userService.setUserRepository(userRepository);
-        userService.setUserTokenRepository(userTokenRepository);
-
-        return userService;
-    }
-
-    @Bean
-    public AuthenService authenService(UserRepository userRepository,
-                                       UserTokenRepository userTokenRepository) {
-        AuthenService authenService = new AuthenService();
-        authenService.setUserRepository(userRepository);
-        authenService.setUserTokenRepository(userTokenRepository);
-
-        return authenService;
-    }
 }

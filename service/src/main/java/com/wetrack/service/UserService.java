@@ -60,13 +60,13 @@ public class UserService {
 
     @PUT
     @Path("/{username}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUser(@PathParam("username") @DefaultValue("") String username,
-                               @FormParam("token") @DefaultValue("") String tokenId,
-                               @FormParam("user") @DefaultValue("") String userJson) {
+                               TokenUserRequest request) {
         if (username.isEmpty())
             return badRequest("Given username cannot be empty.");
-        if (tokenId.isEmpty())
+        String tokenId = request.getToken();
+        if (request.getToken().isEmpty())
             return badRequest("Given token cannot be empty.");
 
         User user = userRepository.findByUsername(username);
@@ -78,84 +78,69 @@ public class UserService {
         if (!token.getUsername().equals(username))
             return forbidden("You cannot update others' information.");
 
-        try {
-            JSONObject userInfo = new JSONObject(userJson);
-            setUser(user, userInfo);
-        } catch (JSONException ex) {
-            return badRequest("The given user information is not in valid JSON format.");
-        } catch (IllegalArgumentException ex) {
-            return badRequest(ex.getMessage());
-        }
+        User userInRequest = request.getUser();
+        updateUser(user, userInRequest);
 
         userRepository.update(user);
         return created("/users/" + username, "User updated.");
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response createUser(@FormParam("user") @DefaultValue("") String userJson) {
-        if (StringUtils.isBlank(userJson))
-            return badRequest("Given new user info cannot be empty.");
-        JSONObject userInfo;
-        try {
-            userInfo = new JSONObject(userJson);
-        } catch (JSONException ex) {
-            return badRequest("Given user info is not in valid JSON format.");
-        }
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createUser(User userInRequest) {
+        String username = userInRequest.getUsername();
 
-        String username = userInfo.optString("username");
         if (username.isEmpty())
             return badRequest("Given user info must contain username");
         if (userRepository.countByUsername(username) > 0)
             return forbidden("User with same username already exists.");
 
-        String password = userInfo.optString("password");
+        String password = userInRequest.getPassword();
         if (password.isEmpty())
             return badRequest("Given user info must contain password");
-        password = new Md5Hash(password).toHex();
+        userInRequest.setPassword(new Md5Hash(password).toHex());
 
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
-
-        try {
-            setUser(user, userInfo);
-        } catch (IllegalArgumentException ex) {
-            return badRequest(ex.getMessage());
-        }
-
-        userRepository.insert(user);
-        return created("/users/" + user.getUsername(), String.format("User `%s` created.", user.getUsername()));
+        userRepository.insert(userInRequest);
+        return created("/users/" + username, String.format("User `%s` created.", username));
     }
 
-    private void setUser(User user, JSONObject userJson) {
-        String nickname = userJson.optString("nickname");
-        if (nickname.isEmpty())
-            user.setNickname(user.getUsername());
-        else
-            user.setNickname(nickname);
+    private void updateUser(User oldUser, User newUser) {
+        if (!newUser.getUsername().trim().isEmpty())
+            oldUser.setNickname(newUser.getUsername());
 
-        user.setIconUrl(userJson.optString("iconUrl"));
-        user.setEmail(userJson.optString("email"));
+        if (!newUser.getIconUrl().trim().isEmpty())
+            oldUser.setIconUrl(newUser.getIconUrl());
 
-        String gender = userJson.optString("gender");
-        if (gender.isEmpty() || gender.equals("Male")) {
-            user.setGender(User.Gender.Male);
-        } else if (gender.equals("Female")) {
-            user.setGender(User.Gender.Female);
-        } else {
-            throw new IllegalArgumentException("Gender of given user info must be `Male` or `Female`.");
+        if (!newUser.getEmail().trim().isEmpty())
+            oldUser.setEmail(newUser.getEmail());
+
+        oldUser.setGender(newUser.getGender());
+
+        oldUser.setBirthDate(newUser.getBirthDate());
+    }
+
+    public static class TokenUserRequest {
+        private String token;
+        private User user;
+
+        public TokenUserRequest() {}
+
+        public TokenUserRequest(String token, User user) {
+            this.token = token;
+            this.user = user;
         }
 
-        String birthDateStr = userJson.optString("birthDate");
-        if (birthDateStr.isEmpty()) {
-            user.setBirthDate(LocalDate.now());
-        } else {
-            try {
-                user.setBirthDate(LocalDate.parse(birthDateStr, formatter));
-            } catch (IllegalArgumentException ex) {
-                throw new IllegalArgumentException("Birth date of given user info must be in the format of `MM/dd/yyyy`.");
-            }
+        public String getToken() {
+            return token;
+        }
+        public void setToken(String token) {
+            this.token = token;
+        }
+        public User getUser() {
+            return user;
+        }
+        public void setUser(User user) {
+            this.user = user;
         }
     }
 
