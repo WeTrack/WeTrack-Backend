@@ -12,17 +12,18 @@ import java.time.LocalDate;
 public class User implements DbEntity<String> {
 
     @Id
-    private String username;
-    private String password;
-    private String nickname;
-    private String iconUrl;
-    private String email;
-    private Gender gender;
+    private String username = "";
+    private String password = "";
+    private String nickname = "";
+    private String iconUrl = "";
+    private String email = "";
+    private Gender gender = Gender.Male;
     private LocalDate birthDate;
 
     public User() {}
 
     public User(String username, String password, String nickname) {
+        this();
         this.username = username;
         this.password = password;
         this.nickname = nickname;

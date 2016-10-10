@@ -17,9 +17,9 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 ## Future Task
 
 - [x] Implement service for user login and token management.
+- [x] Write unit test cases for service class.
 - [ ] Implement client for user login and management.
 - [ ] Write unit test cases for client class.
-- [ ] Write unit test cases for service class.
 - [ ] Write integration test cases for user login and management.
 - [ ] Implement icon upload.
 - [ ] Implement Friend adding.

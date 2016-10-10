@@ -7,8 +7,6 @@ import com.wetrack.dao.morphia.UserRepositoryImpl;
 import com.wetrack.dao.morphia.UserTokenRepositoryImpl;
 import com.wetrack.morphia.converter.EnumOrdinalConverter;
 import com.wetrack.morphia.converter.LocalDateConverter;
-import com.wetrack.service.AuthenService;
-import com.wetrack.service.UserService;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.converters.EnumConverter;

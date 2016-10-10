@@ -152,5 +152,4 @@ public class UserRepositoryTest {
         assertThat(user.getGender(), is(User.Gender.Female));
         assertThat(user.getBirthDate(), is(LocalDate.now().plusDays(1)));
     }
-
 }

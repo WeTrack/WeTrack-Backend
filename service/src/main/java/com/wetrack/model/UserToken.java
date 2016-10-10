@@ -20,6 +20,8 @@ public class UserToken implements DbEntity<String> {
     private String username;
     private LocalDateTime expireTime;
 
+    public UserToken() {}
+
     public UserToken(String username, LocalDateTime expireTime) {
         this.username = username;
         this.expireTime = expireTime;

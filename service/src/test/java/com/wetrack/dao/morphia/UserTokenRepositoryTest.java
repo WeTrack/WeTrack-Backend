@@ -62,11 +62,4 @@ public class UserTokenRepositoryTest {
         token = new UserToken(username, 3, ChronoUnit.MINUTES);
         userTokenRepository.insert(token); // Should trigger the expected exception
     }
-
-    public UserTokenRepository getUserTokenRepository() {
-        return userTokenRepository;
-    }
-    public void setUserTokenRepository(UserTokenRepository userTokenRepository) {
-        this.userTokenRepository = userTokenRepository;
-    }
 }
