@@ -22,5 +22,7 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile 'com.github.fakemongo:fongo:2.0.7'
 
+    testCompile project(':service')
+
     testRuntime "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:$jerseyVersion"
 }
