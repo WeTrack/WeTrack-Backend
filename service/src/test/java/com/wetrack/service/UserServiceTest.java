@@ -1,26 +1,24 @@
 package com.wetrack.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.wetrack.JerseyTest;
 import com.wetrack.model.User;
+import com.wetrack.model.UserToken;
 import com.wetrack.util.CryptoUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.LocalDateTime;
 
-import java.time.LocalDate;
-
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 public class UserServiceTest extends JerseyTest {
+    private Gson gson = new GsonBuilder().create();
 
     private String username = "robert-peng";
     private String nickname = "Robert Peng";
@@ -49,7 +47,7 @@ public class UserServiceTest extends JerseyTest {
     }
 
     @Test
-    public void testValidUserUpdateAndGet() throws JSONException {
+    public void testValidUserUpdateAndGet() {
         createUserWithAssertion();
         String token = loginUserWithAssertion();
         assertThat(token, notNullValue());
@@ -57,7 +55,7 @@ public class UserServiceTest extends JerseyTest {
         Invocation getRequest = request("/users/" + username).buildGet();
         Response response = getRequest.invoke();
         assertThat(response.getStatus(), is(200));
-        User userInResponse = parseStringAsUser(response.readEntity(String.class));
+        User userInResponse = gson.fromJson(response.readEntity(String.class), User.class);
 
         userInResponse.setEmail(email);
 
@@ -74,7 +72,7 @@ public class UserServiceTest extends JerseyTest {
         getRequest = request("/users/" + username).buildGet();
         response = getRequest.invoke();
         assertThat(response.getStatus(), is(200));
-        userInResponse = parseStringAsUser(response.readEntity(String.class));
+        userInResponse = gson.fromJson(response.readEntity(String.class), User.class);
 
         assertThat(userInResponse.getEmail(), is(email));
     }
@@ -199,32 +197,8 @@ public class UserServiceTest extends JerseyTest {
         Response response = loginRequest.invoke();
         assertThat(response.getStatus(), is(200));
 
-        String body = response.readEntity(String.class);
-        JSONObject entity = null;
-        try {
-            entity = new JSONObject(body);
-        } catch (JSONException ex) {
-            fail("The response entity `" + body + "` is not in valid JSON format." );
-        }
-        return entity.getString("token");
-    }
-
-    private User parseStringAsUser(String userStr) {
-        JSONObject userJson = null;
-        try {
-            userJson = new JSONObject(userStr);
-        } catch (JSONException ex) {
-            fail("The given string `" + userStr + "` is not in a valid JSON format.");
-        }
-
-        User user = new User();
-        user.setUsername(userJson.optString("username"));
-        user.setNickname(userJson.optString("nickname"));
-        user.setEmail(userJson.optString("email"));
-        user.setIconUrl(userJson.optString("iconUrl"));
-        user.setBirthDate(LocalDate.parse(userJson.optString("birthDate")));
-
-        return user;
+        UserToken token = gson.fromJson(response.readEntity(String.class), UserToken.class);
+        return token.getToken();
     }
 
     /**

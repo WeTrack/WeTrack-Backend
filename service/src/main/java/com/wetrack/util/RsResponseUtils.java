@@ -1,7 +1,6 @@
 package com.wetrack.util;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,26 +18,7 @@ public abstract class RsResponseUtils {
 
     private static final String NOT_FOUND = "Not Found";
 
-    /**
-     * Returns a {@link JSONObject} as follows:
-     *
-     * <pre>
-     * {
-     *     status_code: ${statusCode},
-     *     message: ${message},
-     *     documentation_url: ${DOC_URL}
-     * }
-     * </pre>
-     *
-     * @param statusCode variable {@code statusCode} for the resulting {@code JSONObject}.
-     * @param message variable {@code message} for the resulting {@code JSONObject}.
-     * @return the resulting {@code JSONObject}.
-     */
-    public static JSONObject message(int statusCode, String message) {
-        return new JSONObject().put("status_code", statusCode)
-                .put("message", message)
-                .put("documentation_url", DOC_URL);
-    }
+    private static final Gson gson = new Gson();
 
     /**
      * Returns a {@code 404 Response} with JSON object as follows:
@@ -73,7 +53,9 @@ public abstract class RsResponseUtils {
      * @return the resulting {@code Response}.
      */
     public static Response response(int statusCode, String message) {
-        return Response.status(statusCode).entity(message(statusCode, message).toString(4)).build();
+        return Response.status(statusCode)
+                .entity(gson.toJson(new ErrorMessage(statusCode, message, DOC_URL)))
+                .build();
     }
 
     /**
@@ -162,10 +144,14 @@ public abstract class RsResponseUtils {
             uri = new URI(location);
         } catch (URISyntaxException e) {
             LOG.error("Failed to parse string `" + location + "` as a URI, returning empty");
-            return Response.status(201).entity(message(201, message).toString(4)).build();
+            return Response.status(201)
+                    .entity(new CreatedResponse(message, ""))
+                    .build();
         }
 
-        return Response.created(uri).entity(message(201, message).put("entity_url", uri.toString()).toString(4)).build();
+        return Response.created(uri)
+                .entity(new CreatedResponse(message, location))
+                .build();
     }
 
     /**
@@ -182,26 +168,76 @@ public abstract class RsResponseUtils {
      * @return a {@code 200 Response} with the given message.
      */
     public static Response ok(String message) {
-        return ok(message(200, message));
+        return Response.ok(message).build();
     }
 
-    /**
-     * Returns a {@code 200 Response} with the given {@link JSONObject} as its body content.
-     *
-     * @param json the given {@code JSONObject}.
-     * @return a {@code 200 Response} with the given {@code JSONObject}.
-     */
-    public static Response ok(JSONObject json) {
-        return Response.ok().entity(json.toString(4)).build();
+    static class CreatedResponse {
+        private int statusCode;
+        private String message;
+        private String entityUrl;
+
+        public CreatedResponse() {}
+
+        public CreatedResponse(String message, String entityUrl) {
+            this(201, message, entityUrl);
+        }
+
+        public CreatedResponse(int statusCode, String message, String entityUrl) {
+            this.statusCode = statusCode;
+            this.message = message;
+            this.entityUrl = entityUrl;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+        public void setStatusCode(int statusCode) {
+            this.statusCode = statusCode;
+        }
+        public String getMessage() {
+            return message;
+        }
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        public String getEntityUrl() {
+            return entityUrl;
+        }
+        public void setEntityUrl(String entityUrl) {
+            this.entityUrl = entityUrl;
+        }
     }
 
-    /**
-     * Returns a {@code 200 Response} with the given {@link JSONArray} as its body content.
-     *
-     * @param json the given {@code JSONArray}.
-     * @return a {@code 200 Response} with the given {@code JSONArray}.
-     */
-    public static Response ok(JSONArray json) {
-        return Response.ok().entity(json.toString(4)).build();
+    static class ErrorMessage {
+        private int statusCode;
+        private String message;
+        private String documentationUrl;
+
+        public ErrorMessage() {}
+
+        public ErrorMessage(int statusCode, String message, String documentationUrl) {
+            this.statusCode = statusCode;
+            this.message = message;
+            this.documentationUrl = documentationUrl;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+        public void setStatusCode(int statusCode) {
+            this.statusCode = statusCode;
+        }
+        public String getMessage() {
+            return message;
+        }
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        public String getDocumentationUrl() {
+            return documentationUrl;
+        }
+        public void setDocumentationUrl(String documentationUrl) {
+            this.documentationUrl = documentationUrl;
+        }
     }
 }

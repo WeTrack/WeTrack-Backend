@@ -1,15 +1,20 @@
 package com.wetrack.service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.wetrack.dao.UserRepository;
 import com.wetrack.dao.UserTokenRepository;
 import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.temporal.ChronoUnit;
@@ -17,18 +22,28 @@ import java.time.temporal.ChronoUnit;
 import static com.wetrack.util.RsResponseUtils.*;
 
 @Path("/")
+@Component
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthenService {
     private static final Logger LOG = LoggerFactory.getLogger(AuthenService.class);
 
+    @Autowired private Gson gson;
     @Autowired private UserRepository userRepository;
     @Autowired private UserTokenRepository userTokenRepository;
 
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response userLogin(LoginRequest loginRequest) {
+    public Response userLogin(String requestBody) {
         LOG.debug("POST /login/");
+
+        LoginRequest loginRequest;
+        try {
+            loginRequest = gson.fromJson(requestBody, LoginRequest.class);
+        } catch (JsonSyntaxException ex) {
+            LOG.debug("The received body is not in valid format. Returning `400 Bad Request`...");
+            return badRequest("The given request body is not in valid JSON format.");
+        }
 
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
@@ -53,35 +68,31 @@ public class AuthenService {
             userTokenRepository.insert(token);
         }
 
-        JSONObject result = new JSONObject();
-        result.put("token", token.getToken())
-                .put("expireTime", token.getExpireTime());
-
         LOG.debug("User logged in successfully.");
-        return ok(result);
+        return ok(gson.toJson(token));
     }
 
-    public static class LoginRequest {
+    static class LoginRequest {
         private String username;
         private String password;
 
-        public LoginRequest() {}
+        LoginRequest() {}
 
-        public LoginRequest(String username, String password) {
+        LoginRequest(String username, String password) {
             this.username = username;
             this.password = password;
         }
 
-        public String getUsername() {
+        String getUsername() {
             return username;
         }
-        public void setUsername(String username) {
+        void setUsername(String username) {
             this.username = username;
         }
-        public String getPassword() {
+        String getPassword() {
             return password;
         }
-        public void setPassword(String password) {
+        void setPassword(String password) {
             this.password = password;
         }
     }

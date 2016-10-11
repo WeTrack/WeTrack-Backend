@@ -1,15 +1,17 @@
 package com.wetrack.service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.wetrack.dao.UserRepository;
 import com.wetrack.dao.UserTokenRepository;
 import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
 import com.wetrack.util.CryptoUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -20,10 +22,12 @@ import java.time.LocalDateTime;
 import static com.wetrack.util.RsResponseUtils.*;
 
 @Path("/users")
+@Component
 @Produces(MediaType.APPLICATION_JSON)
 public class UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
+    @Autowired private Gson gson;
     @Autowired private UserRepository userRepository;
     @Autowired private UserTokenRepository userTokenRepository;
 
@@ -61,12 +65,7 @@ public class UserService {
             return notFound("User with given username not found.");
         }
 
-        JSONObject result = new JSONObject();
-        result.put("username", user.getUsername()).put("nickname", user.getNickname())
-                .put("iconUrl", user.getIconUrl()).put("email", user.getEmail())
-                .put("gender", user.getGender().name())
-                .put("birthDate", user.getBirthDate().toString());
-        return ok(result);
+        return ok(gson.toJson(user));
     }
 
     @POST
@@ -99,7 +98,7 @@ public class UserService {
     @Path("/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUser(@PathParam("username") @DefaultValue("") String username,
-                               TokenUserRequest requestBody) {
+                               String requestBody) {
         LOG.debug("PUT  /users/{}/", username);
 
         if (username.isEmpty()) {
@@ -107,8 +106,16 @@ public class UserService {
             return badRequest("Given username cannot be empty.");
         }
 
-        String tokenId = requestBody.getToken();
-        if (requestBody.getToken().isEmpty()) {
+        TokenUserRequest tokenUserRequest;
+        try {
+            tokenUserRequest = gson.fromJson(requestBody, TokenUserRequest.class);
+        } catch (JsonSyntaxException ex) {
+            LOG.debug("Received body is not in valid format, returning `400 Bad Request`...");
+            return badRequest("The given request body is not in valid JSON format.");
+        }
+
+        String tokenId = tokenUserRequest.getToken();
+        if (tokenUserRequest.getToken().isEmpty()) {
             LOG.debug("Received empty token. Returning `400 Bad Request...`");
             return badRequest("Given token cannot be empty.");
         }
@@ -130,7 +137,7 @@ public class UserService {
             return forbidden("You cannot update others' information.");
         }
 
-        User userInRequest = requestBody.getUser();
+        User userInRequest = tokenUserRequest.getUser();
         updateUser(user, userInRequest);
 
         userRepository.update(user);
@@ -140,8 +147,16 @@ public class UserService {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createUser(User user) {
+    public Response createUser(String requestBody) {
         LOG.debug("POST /users/");
+
+        User user;
+        try {
+            user = gson.fromJson(requestBody, User.class);
+        } catch (JsonSyntaxException ex) {
+            LOG.debug("Received body in invalid format. Returning `400 Bad Request`...");
+            return badRequest("The given request body is not in valid JSON format.");
+        }
 
         String username = user.getUsername();
 
@@ -176,8 +191,16 @@ public class UserService {
     @Path("/{username}/password")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUserPassword(@PathParam("username") @DefaultValue("") String username,
-                                       PasswordUpdateRequest updateRequest) {
+                                       String requestBody) {
         LOG.debug("POST /users/{}/password", username);
+
+        PasswordUpdateRequest updateRequest;
+        try {
+            updateRequest = gson.fromJson(requestBody, PasswordUpdateRequest.class);
+        } catch (JsonSyntaxException ex) {
+            LOG.debug("The received body is not in valid format. Returning `400 Bad Request`...");
+            return badRequest("The given request body is not in valid JSON format.");
+        }
 
         if (username.isEmpty()) {
             LOG.debug("The given username is empty. Returning `400 Bad Request`...");
@@ -253,60 +276,60 @@ public class UserService {
             oldUser.setBirthDate(newUser.getBirthDate());
     }
 
-    public static class PasswordUpdateRequest {
+    static class PasswordUpdateRequest {
         private String token;
         private String oldPassword;
         private String newPassword;
 
-        public PasswordUpdateRequest() {}
+        PasswordUpdateRequest() {}
 
-        public PasswordUpdateRequest(String token, String oldPassword, String newPassword) {
+        PasswordUpdateRequest(String token, String oldPassword, String newPassword) {
             this.token = token;
             this.oldPassword = oldPassword;
             this.newPassword = newPassword;
         }
 
-        public String getToken() {
+        String getToken() {
             return token;
         }
-        public void setToken(String token) {
+        void setToken(String token) {
             this.token = token;
         }
-        public String getOldPassword() {
+        String getOldPassword() {
             return oldPassword;
         }
-        public void setOldPassword(String oldPassword) {
+        void setOldPassword(String oldPassword) {
             this.oldPassword = oldPassword;
         }
-        public String getNewPassword() {
+        String getNewPassword() {
             return newPassword;
         }
-        public void setNewPassword(String newPassword) {
+        void setNewPassword(String newPassword) {
             this.newPassword = newPassword;
         }
     }
 
-    public static class TokenUserRequest {
+    static class TokenUserRequest {
         private String token;
         private User user;
 
-        public TokenUserRequest() {}
+        TokenUserRequest() {}
 
-        public TokenUserRequest(String token, User user) {
+        TokenUserRequest(String token, User user) {
             this.token = token;
             this.user = user;
         }
 
-        public String getToken() {
+        String getToken() {
             return token;
         }
-        public void setToken(String token) {
+        void setToken(String token) {
             this.token = token;
         }
-        public User getUser() {
+        User getUser() {
             return user;
         }
-        public void setUser(User user) {
+        void setUser(User user) {
             this.user = user;
         }
     }
