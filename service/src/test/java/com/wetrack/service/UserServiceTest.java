@@ -56,6 +56,7 @@ public class UserServiceTest extends JerseyTest {
         Response response = getRequest.invoke();
         assertThat(response.getStatus(), is(200));
         User userInResponse = gson.fromJson(response.readEntity(String.class), User.class);
+        assertThat(userInResponse.getPassword().isEmpty(), is(true));
 
         userInResponse.setEmail(email);
 

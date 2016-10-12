@@ -65,6 +65,7 @@ public class UserService {
             return notFound("User with given username not found.");
         }
 
+        user.setPassword(null);  // Set the password field to `null` to avoid serialization
         return ok(gson.toJson(user));
     }
 
