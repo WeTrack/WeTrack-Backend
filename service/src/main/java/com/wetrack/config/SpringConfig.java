@@ -7,6 +7,8 @@ import com.wetrack.dao.UserRepository;
 import com.wetrack.dao.UserTokenRepository;
 import com.wetrack.dao.morphia.UserRepositoryImpl;
 import com.wetrack.dao.morphia.UserTokenRepositoryImpl;
+import com.wetrack.json.LocalDateTimeTypeAdapter;
+import com.wetrack.json.LocalDateTypeAdapter;
 import com.wetrack.morphia.converter.EnumOrdinalConverter;
 import com.wetrack.morphia.converter.LocalDateConverter;
 import com.wetrack.service.AuthenService;
@@ -17,6 +19,9 @@ import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.converters.EnumConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Configuration
 public class SpringConfig {
@@ -40,7 +45,10 @@ public class SpringConfig {
 
     @Bean
     public Gson gson() {
-        return new GsonBuilder().create();
+        return new GsonBuilder().setPrettyPrinting()
+                .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                .create();
     }
 
     @Bean
