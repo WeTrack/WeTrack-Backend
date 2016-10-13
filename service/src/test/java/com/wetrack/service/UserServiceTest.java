@@ -3,22 +3,29 @@ package com.wetrack.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.wetrack.JerseyTest;
+import com.wetrack.config.SpringConfig;
 import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
 import com.wetrack.util.CryptoUtils;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.time.LocalDateTime;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 public class UserServiceTest extends JerseyTest {
-    private Gson gson = new GsonBuilder().create();
+    private static final Logger LOG = LoggerFactory.getLogger(UserServiceTest.class);
+
+    private Gson gson = new SpringConfig().gson();
 
     private String username = "robert-peng";
     private String nickname = "Robert Peng";
@@ -35,15 +42,21 @@ public class UserServiceTest extends JerseyTest {
 
         Invocation.Builder builder = target("/login").request();
         Invocation postRequest = builder.buildPost(Entity.entity(requestEntity, MediaType.APPLICATION_JSON_TYPE));
-        assertThat(postRequest.invoke().getStatus(), is(400)); // Bad Request as password is empty
+        Response response = postRequest.invoke();
+        logResponse(response, "user login with empty password");
+        assertThat(response.getStatus(), is(400)); // Bad Request as password is empty
 
         requestEntity.setPassword(password);
         postRequest = builder.buildPost(Entity.entity(requestEntity, MediaType.APPLICATION_JSON_TYPE));
-        assertThat(postRequest.invoke().getStatus(), is(401)); // Unauthorized as the credential is incorrect
+        response = postRequest.invoke();
+        logResponse(response, "user login with plain password");
+        assertThat(response.getStatus(), is(401)); // Unauthorized as the credential is incorrect
 
         requestEntity.setPassword(CryptoUtils.md5Digest(password));
         postRequest = builder.buildPost(Entity.entity(requestEntity, MediaType.APPLICATION_JSON_TYPE));
-        assertThat(postRequest.invoke().getStatus(), is(200));
+        response = postRequest.invoke();
+        logResponse(response, "user login");
+        assertThat(response.getStatus(), is(200));
     }
 
     @Test
@@ -55,7 +68,10 @@ public class UserServiceTest extends JerseyTest {
         Invocation getRequest = request("/users/" + username).buildGet();
         Response response = getRequest.invoke();
         assertThat(response.getStatus(), is(200));
-        User userInResponse = gson.fromJson(response.readEntity(String.class), User.class);
+        String responseBody = response.readEntity(String.class);
+        LOG.debug("Received response body on user query:\n==========================\n{}\n==========================",
+                responseBody);
+        User userInResponse = gson.fromJson(responseBody, User.class);
         assertThat(userInResponse.getPassword().isEmpty(), is(true));
 
         userInResponse.setEmail(email);
@@ -68,12 +84,16 @@ public class UserServiceTest extends JerseyTest {
         Invocation updateRequest = request("/users/" + username, MediaType.APPLICATION_JSON_TYPE)
                 .buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
+        logResponse(response, "user update");
         assertThat(response.getStatus(), is(201));
 
         getRequest = request("/users/" + username).buildGet();
         response = getRequest.invoke();
         assertThat(response.getStatus(), is(200));
-        userInResponse = gson.fromJson(response.readEntity(String.class), User.class);
+        responseBody = response.readEntity(String.class);
+        LOG.debug("Received response body on user query:\n==========================\n{}\n==========================",
+                responseBody);
+        userInResponse = gson.fromJson(responseBody, User.class);
 
         assertThat(userInResponse.getEmail(), is(email));
     }
@@ -84,7 +104,9 @@ public class UserServiceTest extends JerseyTest {
     @Test
     public void testGettingNotExistUser() {
         Invocation getRequest = target("/users/BlahBlahNotExist").request().buildGet();
-        assertThat(getRequest.invoke().getStatus(), is(404));
+        Response response = getRequest.invoke();
+        logResponse(response, "query of not exist user");
+        assertThat(response.getStatus(), is(404));
     }
 
     /**
@@ -94,6 +116,8 @@ public class UserServiceTest extends JerseyTest {
     public void testHeadingExistUser() {
         createUserWithAssertion();
         Invocation headRequest = target("/users/" + username).request().build("HEAD");
+        Response response = headRequest.invoke();
+        logResponse(response, "user existence detect");
         assertThat(headRequest.invoke().getStatus(), is(200));
     }
 
@@ -105,35 +129,41 @@ public class UserServiceTest extends JerseyTest {
         Invocation validateRequest = target("/users/" + username + "/tokenValidate").request()
                 .buildPost(Entity.entity(token, MediaType.APPLICATION_JSON_TYPE));
         Response response = validateRequest.invoke();
+        logResponse(response, "user token validate");
         assertThat(response.getStatus(), is(200));
 
         Invocation.Builder builder = target("/users/" + username + "/password").request();
         UserService.PasswordUpdateRequest updateRequestEntity = new UserService.PasswordUpdateRequest(token, null, null);
         Invocation updateRequest = builder.buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
+        logResponse(response, "user password update with empty fields");
         assertThat(response.getStatus(), is(400)); // Bad Request as fields as empty
 
         updateRequestEntity.setOldPassword(password);
 
         updateRequest = builder.buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
+        logResponse(response, "user password update with empty new password");
         assertThat(response.getStatus(), is(400)); // Bad Request as fields as empty
 
         updateRequestEntity.setNewPassword(anotherPassword);
 
         updateRequest = builder.buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
+        logResponse(response, "user password update with incorrect old password");
         assertThat(response.getStatus(), is(401)); // Unauthorized as old password is incorrect
 
         updateRequestEntity.setOldPassword(CryptoUtils.md5Digest(password));
 
         updateRequest = builder.buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
-        assertThat(response.getStatus(), is(201)); // Unauthorized as old password is incorrect
+        logResponse(response, "user password update");
+        assertThat(response.getStatus(), is(201));
 
         validateRequest = target("/users/" + username + "/tokenValidate").request()
                 .buildPost(Entity.entity(token, MediaType.APPLICATION_JSON_TYPE));
         response = validateRequest.invoke();
+        logResponse(response, "expired user token validate");
         assertThat(response.getStatus(), is(401)); // Unauthorized as the token has been invalidated
 
         AuthenService.LoginRequest requestEntity =
@@ -141,6 +171,7 @@ public class UserServiceTest extends JerseyTest {
         Invocation loginRequest = target("/login").request(MediaType.APPLICATION_JSON_TYPE)
                 .buildPost(Entity.entity(requestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = loginRequest.invoke();
+        logResponse(response, "user login");
         assertThat(response.getStatus(), is(200));
     }
 
@@ -157,6 +188,7 @@ public class UserServiceTest extends JerseyTest {
 
         Invocation postRequest = target("/users").request(MediaType.APPLICATION_JSON).buildPost(requestEntity);
         Response response = postRequest.invoke();
+        logResponse(response, "duplicate user create");
 
         assertThat(response.getStatus(), is(403)); // Forbidden
     }
@@ -171,18 +203,21 @@ public class UserServiceTest extends JerseyTest {
         User newUser = new User();
         Invocation postRequest = builder.buildPost(Entity.entity(newUser, MediaType.APPLICATION_JSON_TYPE));
         Response response = postRequest.invoke();
+        logResponse(response, "user create with empty username");
 
         assertThat(response.getStatus(), is(400)); // Bad Request as username is empty
 
         newUser.setUsername(username);
         postRequest = builder.buildPost(Entity.entity(newUser, MediaType.APPLICATION_JSON_TYPE));
         response = postRequest.invoke();
+        logResponse(response, "user create with empty password");
 
         assertThat(response.getStatus(), is(400)); // Bad Request as password is empty
 
         newUser.setPassword(password);
         postRequest = builder.buildPost(Entity.entity(newUser, MediaType.APPLICATION_JSON_TYPE));
         response = postRequest.invoke();
+        logResponse(response, "user create");
 
         assertThat(response.getStatus(), is(201));
     }
@@ -198,7 +233,10 @@ public class UserServiceTest extends JerseyTest {
         Response response = loginRequest.invoke();
         assertThat(response.getStatus(), is(200));
 
-        UserToken token = gson.fromJson(response.readEntity(String.class), UserToken.class);
+        String responseBody = response.readEntity(String.class);
+        LOG.debug("Received response body on user login:\n==========================\n{}\n==========================",
+                responseBody);
+        UserToken token = gson.fromJson(responseBody, UserToken.class);
         return token.getToken();
     }
 
@@ -211,8 +249,23 @@ public class UserServiceTest extends JerseyTest {
 
         Invocation postRequest = target("/users").request(MediaType.APPLICATION_JSON).buildPost(requestEntity);
         Response response = postRequest.invoke();
+        logResponse(response, "user create");
 
         assertThat(response.getStatus(), is(201));
         assertThat(response.getHeaderString("Location"), endsWith("/users/" + username));
+    }
+
+    private void logResponse(Response response, String event) {
+        if (LOG.isDebugEnabled()) {
+            StringBuilder builder = new StringBuilder(String.valueOf(response.getStatus()));
+            for (Map.Entry<String, List<String>> entry : response.getStringHeaders().entrySet()) {
+                String key = entry.getKey();
+                for (String value : entry.getValue())
+                    builder.append('\n').append(key).append(": ").append(value);
+            }
+            builder.append("\n\n").append(response.readEntity(String.class));
+            LOG.debug("Received response on {}:\n==========================\n{}\n==========================",
+                    event, builder.toString());
+        }
     }
 }

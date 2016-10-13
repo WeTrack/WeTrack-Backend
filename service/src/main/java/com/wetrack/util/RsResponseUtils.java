@@ -18,8 +18,6 @@ public abstract class RsResponseUtils {
 
     private static final String NOT_FOUND = "Not Found";
 
-    private static final Gson gson = new Gson();
-
     /**
      * Returns a {@code 404 Response} with JSON object as follows:
      * <pre>
@@ -54,7 +52,7 @@ public abstract class RsResponseUtils {
      */
     public static Response response(int statusCode, String message) {
         return Response.status(statusCode)
-                .entity(gson.toJson(new ErrorMessage(statusCode, message, DOC_URL)))
+                .entity(new ErrorMessage(statusCode, message, DOC_URL))
                 .build();
     }
 
