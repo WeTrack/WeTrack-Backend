@@ -21,16 +21,4 @@ public class Config {
                 .create();
     }
 
-    public static Retrofit retrofit(String baseUrl, int timeout) {
-        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
-        httpClientBuilder.connectTimeout(timeout, TimeUnit.SECONDS);
-
-        return new Retrofit.Builder()
-                .client(httpClientBuilder.build())
-                .addConverterFactory(GsonConverterFactory.create(gson()))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .baseUrl(baseUrl)
-                .build();
-    }
-
 }

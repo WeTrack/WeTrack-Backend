@@ -1,11 +1,15 @@
 package com.wetrack.client;
 
 import com.wetrack.client.model.User;
+import com.wetrack.client.model.UserToken;
 import retrofit2.Response;
 import retrofit2.http.*;
 import rx.Observable;
 
 interface UserService {
+
+    @POST("/login")
+    Observable<Response<UserToken>> userLogin(@Body UserLoginRequest request);
 
     @HEAD("/users/{username}")
     Observable<Response> userExists(@Path("username") String username);
@@ -27,6 +31,31 @@ interface UserService {
     @POST("/users/{username}/password")
     Observable<Response> updateUserPassword(@Path("username") String username,
                                            @Body PasswordUpdateRequest request);
+
+    class UserLoginRequest {
+        private String username;
+        private String password;
+
+        UserLoginRequest() {}
+
+        UserLoginRequest(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        String getUsername() {
+            return username;
+        }
+        void setUsername(String username) {
+            this.username = username;
+        }
+        String getPassword() {
+            return password;
+        }
+        void setPassword(String password) {
+            this.password = password;
+        }
+    }
 
     class TokenUserRequest {
         private String token;
