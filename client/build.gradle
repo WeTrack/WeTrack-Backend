@@ -17,6 +17,8 @@ dependencies {
 
     compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
 
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+
     testCompile group: 'org.json', name: 'json', version: '20160810'
     testCompile group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '3.4.1'
 }

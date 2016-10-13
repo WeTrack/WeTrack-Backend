@@ -1,7 +1,6 @@
 package com.wetrack.client;
 
 import com.google.gson.JsonParseException;
-import com.wetrack.client.config.Config;
 import com.wetrack.client.model.User;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -11,14 +10,17 @@ import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import retrofit2.Retrofit;
-import rx.Subscriber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import retrofit2.Response;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -26,28 +28,28 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class TestUserService {
-
     private static MockWebServer server;
-    private static UserService userService;
+    private static WeTrackClient client;
 
     private String username = "windy-chan";
 
-    private Throwable receivedError;
+    private int receivedStatusCode;
     private User receivedUser;
+    private Throwable receivedError;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         server = new MockWebServer();
         server.start();
 
-        Retrofit retrofit = Config.retrofit(server.url("/").toString(), 0);
-        userService = retrofit.create(UserService.class);
+        client = new WeTrackClient(server.url("/").toString(), 3);
     }
 
     @Test
     public void testGetUserInfo() throws IOException, InterruptedException, URISyntaxException {
         server.enqueue(new MockResponse().setResponseCode(404));
-        userService.getUserInfo(username).subscribe(userSubscriber());
+
+        client.getUserInfo(username, userCallback());
 
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
 
@@ -56,13 +58,13 @@ public class TestUserService {
         assertThat(request.getMethod(), is("GET"));
         assertThat(request.getPath(), is("/users/" + username));
 
-        // Assert the error is received and the subscriber is triggered
-        assertThat(receivedError, notNullValue());
+        // Assert the error response is received and the subscriber is triggered
+        assertThat(receivedStatusCode, is(404));
         assertThat(receivedUser, nullValue());
 
         // Test on valid JSON response
-        String[] testResouces = {"200", "200_empty_field", "200_missing_field", "200_null_field" };
-        for (String testResource : testResouces) {
+        String[] testResources = { "200", "200_empty_field", "200_missing_field", "200_null_field" };
+        for (String testResource : testResources) {
             String fileName = "test_user_get/" + testResource + ".json";
             System.out.println("Test with " + fileName);
             URL resourceUrl = getClass().getClassLoader().getResource(fileName);
@@ -71,13 +73,11 @@ public class TestUserService {
             String testResponse = new String(Files.readAllBytes(Paths.get(resourceUrl.toURI())));
 
             server.enqueue(new MockResponse().setResponseCode(200).setBody(testResponse));
-            userService.getUserInfo(username).subscribe(userSubscriber());
+
+            client.getUserInfo(username, userCallback());
 
             // Assert the response is received and the subscriber is triggered
-            if (receivedError != null) {
-                receivedError.printStackTrace();
-                fail("`receivedError` is not null. Assertion failed.");
-            }
+            assertThat(receivedStatusCode, is(200));
             assertThat(receivedUser, notNullValue());
 
             JSONObject responseEntity = new JSONObject(testResponse);
@@ -122,27 +122,35 @@ public class TestUserService {
         String testResponse = new String(Files.readAllBytes(Paths.get(resourceUrl.toURI())));
 
         server.enqueue(new MockResponse().setResponseCode(200).setBody(testResponse));
-        userService.getUserInfo(username).subscribe(userSubscriber());
+        client.getUserInfo(username, userCallback());
         // Assert the error is received and the subscriber is triggered
         assertThat(receivedError, notNullValue());
-        assertThat(receivedUser, nullValue());
         assertThat(receivedError instanceof JsonParseException, is(true));
+        assertThat(receivedUser, nullValue());
+        assertThat(receivedStatusCode, is(-1));
     }
 
-    private Subscriber<User> userSubscriber() {
-        return new Subscriber<User>() {
-            @Override public void onCompleted() {}
-
-            @Override public void onError(Throwable e) {
-                System.out.println("Received error: " + e.getMessage());
-                receivedUser = null;
-                receivedError = e;
+    private AsyncCallback<User> userCallback() {
+        return new AsyncCallback<User>() {
+            @Override
+            public void onReceive(User user) {
+                receivedUser = user;
+                receivedStatusCode = 200;
+                receivedError = null;
             }
 
-            @Override public void onNext(User user) {
-                System.out.println("Received user: " + user);
-                receivedUser = user;
+            @Override
+            public void onErrorResponse(Response response) {
+                receivedUser = null;
+                receivedStatusCode = response.code();
                 receivedError = null;
+            }
+
+            @Override
+            public void onException(Throwable ex) {
+                receivedUser = null;
+                receivedStatusCode = -1;
+                receivedError = ex;
             }
         };
     }

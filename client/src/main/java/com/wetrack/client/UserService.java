@@ -1,30 +1,31 @@
 package com.wetrack.client;
 
 import com.wetrack.client.model.User;
+import retrofit2.Response;
 import retrofit2.http.*;
 import rx.Observable;
 
-public interface UserService {
+interface UserService {
 
     @HEAD("/users/{username}")
-    Observable<Boolean> userExists(@Path("username") String username);
+    Observable<Response> userExists(@Path("username") String username);
 
     @POST("/users/{username}/tokenValidate")
-    Observable<Boolean> tokenValidate(@Path("username") String username,
+    Observable<Response> tokenValidate(@Path("username") String username,
                                       @Body String token);
 
     @GET("/users/{username}")
-    Observable<User> getUserInfo(@Path("username") String username);
+    Observable<Response<User>> getUserInfo(@Path("username") String username);
 
     @POST("/users/{username}")
-    Observable<Boolean> updateUser(@Path("username") String username,
+    Observable<Response> updateUser(@Path("username") String username,
                                    @Body TokenUserRequest request);
 
     @POST("/users")
-    Observable<Boolean> createUser(@Body User newUser);
+    Observable<Response> createUser(@Body User newUser);
 
     @POST("/users/{username}/password")
-    Observable<Boolean> updateUserPassword(@Path("username") String username,
+    Observable<Response> updateUserPassword(@Path("username") String username,
                                            @Body PasswordUpdateRequest request);
 
     class TokenUserRequest {
