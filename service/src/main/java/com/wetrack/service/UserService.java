@@ -92,7 +92,7 @@ public class UserService {
             return unauthorized("The given token is invalid or has expired. Please log in again.");
         }
 
-        return ok();
+        return ok(gson.toJson(userToken));
     }
 
     @POST

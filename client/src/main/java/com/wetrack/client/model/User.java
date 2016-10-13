@@ -4,6 +4,7 @@ import org.joda.time.LocalDate;
 
 public class User {
     private String username;
+    private String password;
     private String nickname;
     private String iconUrl;
     private String email;
@@ -45,6 +46,12 @@ public class User {
     }
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public enum Gender {

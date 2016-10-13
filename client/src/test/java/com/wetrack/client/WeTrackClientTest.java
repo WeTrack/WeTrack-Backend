@@ -34,8 +34,8 @@ abstract class WeTrackClientTest<T> {
         server.shutdown();
     }
 
-    protected AsyncCallback<T> callback(final int successStatusCode) {
-        return new AsyncCallback<T>() {
+    protected Callback<T> callback(final int successStatusCode) {
+        return new Callback<T>() {
             @Override
             protected void onReceive(T entity) {
                 receivedEntity = entity;

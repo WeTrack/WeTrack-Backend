@@ -57,7 +57,7 @@ public class AuthenService {
         }
 
         User user = userRepository.findByUsername(username);
-        if (user == null || !user.getPassword().equals(password)) {
+        if (user == null || !user.getPassword().equalsIgnoreCase(password)) {
             LOG.debug("Login attempt with incorrect credential. Returning `401 Unauthorized`...");
             return unauthorized("The given username or password is incorrect.");
         }

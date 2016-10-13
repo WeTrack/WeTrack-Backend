@@ -2,7 +2,9 @@ rootProject.name = 'parent'
 
 include 'service'
 include 'client'
+include 'core'
 
 project(':service').projectDir = "$rootDir/service" as File
 project(':client').projectDir = "$rootDir/client" as File
+project(':core').projectDir = "$rootDir/core" as File
 

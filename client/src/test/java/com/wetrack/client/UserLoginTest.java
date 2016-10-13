@@ -2,6 +2,7 @@ package com.wetrack.client;
 
 import com.wetrack.client.config.Config;
 import com.wetrack.client.model.UserToken;
+import com.wetrack.util.CryptoUtils;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.json.JSONObject;
@@ -47,7 +48,7 @@ public class UserLoginTest extends WeTrackClientTest<UserToken> {
         assertThat(request.getMethod(), is("POST"));
         assertThat(request.getPath(), is("/login"));
         assertThat(request.getBody().readUtf8(),
-                is(Config.gson().toJson(new UserService.UserLoginRequest(username, password))));
+                is(Config.gson().toJson(new UserService.UserLoginRequest(username, CryptoUtils.md5Digest(password)))));
 
         // Assert the error response is received and triggers the observer
         assertThat(receivedException, nullValue());
