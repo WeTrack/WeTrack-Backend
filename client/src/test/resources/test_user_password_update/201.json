@@ -1,0 +1,5 @@
+{
+  "statusCode": 201,
+  "message": "User password successfully updated.",
+  "entityUrl": "/users/robert-peng"
+}

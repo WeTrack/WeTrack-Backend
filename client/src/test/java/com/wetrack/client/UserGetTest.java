@@ -2,37 +2,27 @@ package com.wetrack.client;
 
 import com.google.gson.JsonParseException;
 import com.wetrack.client.model.User;
+import com.wetrack.client.test.EntityResponseTest;
 import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.joda.time.LocalDate;
 import org.json.JSONObject;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import retrofit2.Response;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
-public class UserGetTest extends WeTrackClientTest<User> {
+public class UserGetTest extends EntityResponseTest<User> {
 
     private String username = "windy-chan";
 
     @Test
-    public void testGetUserInfo() throws Exception {
+    public void testUserGetRequestFormat() throws InterruptedException {
         server.enqueue(new MockResponse().setResponseCode(404));
 
         client.getUserInfo(username, callback(200));
@@ -43,13 +33,23 @@ public class UserGetTest extends WeTrackClientTest<User> {
         assertThat(request, notNullValue());
         assertThat(request.getMethod(), is("GET"));
         assertThat(request.getPath(), is("/users/" + username));
+    }
+
+    @Test
+    public void testUserGetOnErrorResponse() {
+        server.enqueue(new MockResponse().setResponseCode(404));
+
+        client.getUserInfo(username, callback(200));
 
         // Assert the error response is received and the subscriber is triggered
         assertThat(receivedStatusCode, is(404));
         assertThat(receivedEntity, nullValue());
+    }
 
-        // Test on valid JSON response
+    @Test
+    public void testUserGetOnValidResponse() throws Exception {
         String[] testResources = { "200", "200_empty_field", "200_missing_field", "200_null_field" };
+
         for (String testResource : testResources) {
             String fileName = "test_user_get/" + testResource + ".json";
             System.out.println("Test with " + fileName);
@@ -100,8 +100,10 @@ public class UserGetTest extends WeTrackClientTest<User> {
             else
                 assertThat(receivedEntity.getBirthDate(), is(LocalDate.parse(birthDateStr)));
         }
+    }
 
-        // Test on invalid JSON response
+    @Test
+    public void testUserGetOnInvalidResponse() throws Exception {
         URL resourceUrl = getClass().getClassLoader().getResource("test_user_get/200_invalid_field.json");
         String testResponse = new String(Files.readAllBytes(Paths.get(resourceUrl.toURI())));
 

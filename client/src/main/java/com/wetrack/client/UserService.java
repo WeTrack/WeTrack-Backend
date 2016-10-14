@@ -3,6 +3,7 @@ package com.wetrack.client;
 import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
 import com.wetrack.client.model.UserToken;
+import okhttp3.RequestBody;
 import retrofit2.Response;
 import retrofit2.http.*;
 import rx.Observable;
@@ -13,23 +14,26 @@ interface UserService {
     Observable<Response<UserToken>> userLogin(@Body UserLoginRequest request);
 
     @HEAD("/users/{username}")
-    Observable<Response> userExists(@Path("username") String username);
+    Observable<Response<Void>> userExists(@Path("username") String username);
 
+    @Headers({
+            "Content-Type: application/json"
+    })
     @POST("/users/{username}/tokenValidate")
     Observable<Response<UserToken>> tokenValidate(@Path("username") String username,
-                                                  @Body String token);
+                                                  @Body RequestBody token);
 
     @GET("/users/{username}")
     Observable<Response<User>> getUserInfo(@Path("username") String username);
 
-    @POST("/users/{username}")
+    @PUT("/users/{username}")
     Observable<Response<Message>> updateUser(@Path("username") String username,
                                              @Body TokenUserRequest request);
 
     @POST("/users")
     Observable<Response<Message>> createUser(@Body User newUser);
 
-    @POST("/users/{username}/password")
+    @PUT("/users/{username}/password")
     Observable<Response<Message>> updateUserPassword(@Path("username") String username,
                                                      @Body PasswordUpdateRequest request);
 

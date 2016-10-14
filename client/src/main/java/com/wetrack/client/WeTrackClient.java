@@ -5,7 +5,10 @@ import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
 import com.wetrack.client.model.UserToken;
 import com.wetrack.util.CryptoUtils;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -13,6 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observer;
 import rx.Scheduler;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static com.wetrack.client.config.Config.gson;
@@ -44,10 +48,10 @@ public class WeTrackClient {
     }
 
     public void tokenValidate(String username, String token, final Callback<UserToken> callback) {
-        userService.tokenValidate(username, token).subscribe(observer(callback));
+        userService.tokenValidate(username, RequestBody.create(MediaType.parse("text/plain"), token)).subscribe(observer(callback));
     }
 
-    public void creatUser(User newUser, final ResultMessageCallback callback) {
+    public void createUser(User newUser, final ResultMessageCallback callback) {
         userService.createUser(newUser).subscribe(observer(callback));
     }
 
@@ -64,7 +68,7 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
-    public void creatUser(User newUser, final Callback<Message> callback) {
+    public void createUser(User newUser, final Callback<Message> callback) {
         userService.createUser(newUser).subscribe(observer(callback));
     }
 
@@ -83,10 +87,11 @@ public class WeTrackClient {
 
     public void tokenValidate(String username, String token,
                               final Callback<UserToken> callback, Scheduler scheduler) {
-        userService.tokenValidate(username, token).subscribeOn(scheduler).subscribe(observer(callback));
+        userService.tokenValidate(username, RequestBody.create(MediaType.parse("text/plain"), token))
+                .subscribeOn(scheduler).subscribe(observer(callback));
     }
 
-    public void creatUser(User newUser, final ResultMessageCallback callback, Scheduler scheduler) {
+    public void createUser(User newUser, final ResultMessageCallback callback, Scheduler scheduler) {
         userService.createUser(newUser).subscribeOn(scheduler).subscribe(observer(callback));
     }
 
@@ -104,7 +109,7 @@ public class WeTrackClient {
                 .subscribeOn(scheduler).subscribe(observer(callback));
     }
 
-    public void creatUser(User newUser, final Callback<Message> callback, Scheduler scheduler) {
+    public void createUser(User newUser, final Callback<Message> callback, Scheduler scheduler) {
         userService.createUser(newUser).subscribeOn(scheduler).subscribe(observer(callback));
     }
 
@@ -223,10 +228,17 @@ public class WeTrackClient {
 
             @Override
             public void onNext(Response<Message> messageResponse) {
-                if (messageResponse.code() == callback.getSuccessStatusCode())
+                if (messageResponse.code() == callback.getSuccessStatusCode()) {
                     callback.onSuccess(messageResponse.body().getMessage());
-                else
-                    callback.onFail(messageResponse.body().getMessage());
+                } else {
+                    try (ResponseBody errorBody = messageResponse.errorBody()) {
+                        String errorResponse = errorBody.string();
+                        Message message = gson.fromJson(errorResponse, Message.class);
+                        callback.onFail(message.getMessage());
+                    } catch (IOException e) {
+                        callback.onFail(messageResponse.message());
+                    }
+                }
             }
         };
     }
@@ -264,7 +276,7 @@ public class WeTrackClient {
             @Override
             public void onNext(Response<T> response) {
                 callback.onResponse(response);
-                if (response.code() == 200)
+                if (response.code() >= 200 && response.code() < 300)
                     callback.onReceive(response.body());
                 else
                     callback.onErrorResponse(response);

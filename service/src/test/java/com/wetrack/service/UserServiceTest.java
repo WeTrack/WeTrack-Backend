@@ -1,7 +1,6 @@
 package com.wetrack.service;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.wetrack.JerseyTest;
 import com.wetrack.config.SpringConfig;
 import com.wetrack.model.User;
@@ -15,7 +14,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.util.List;
 import java.util.Map;
 
@@ -82,7 +80,7 @@ public class UserServiceTest extends JerseyTest {
 
         UserService.TokenUserRequest updateRequestEntity = new UserService.TokenUserRequest(token, userInResponse);
         Invocation updateRequest = request("/users/" + username, MediaType.APPLICATION_JSON_TYPE)
-                .buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
+                .buildPut(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
         logResponse(response, "user update");
         assertThat(response.getStatus(), is(201));
@@ -134,28 +132,28 @@ public class UserServiceTest extends JerseyTest {
 
         Invocation.Builder builder = target("/users/" + username + "/password").request();
         UserService.PasswordUpdateRequest updateRequestEntity = new UserService.PasswordUpdateRequest(token, null, null);
-        Invocation updateRequest = builder.buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
+        Invocation updateRequest = builder.buildPut(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
         logResponse(response, "user password update with empty fields");
         assertThat(response.getStatus(), is(400)); // Bad Request as fields as empty
 
         updateRequestEntity.setOldPassword(password);
 
-        updateRequest = builder.buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
+        updateRequest = builder.buildPut(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
         logResponse(response, "user password update with empty new password");
         assertThat(response.getStatus(), is(400)); // Bad Request as fields as empty
 
         updateRequestEntity.setNewPassword(anotherPassword);
 
-        updateRequest = builder.buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
+        updateRequest = builder.buildPut(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
         logResponse(response, "user password update with incorrect old password");
         assertThat(response.getStatus(), is(401)); // Unauthorized as old password is incorrect
 
         updateRequestEntity.setOldPassword(CryptoUtils.md5Digest(password));
 
-        updateRequest = builder.buildPost(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
+        updateRequest = builder.buildPut(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
         logResponse(response, "user password update");
         assertThat(response.getStatus(), is(201));

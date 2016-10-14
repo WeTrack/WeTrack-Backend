@@ -95,7 +95,7 @@ public class UserService {
         return ok(gson.toJson(userToken));
     }
 
-    @POST
+    @PUT
     @Path("/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUser(@PathParam("username") @DefaultValue("") String username,
@@ -188,7 +188,7 @@ public class UserService {
         return created("/users/" + username, String.format("User `%s` created.", username));
     }
 
-    @POST
+    @PUT
     @Path("/{username}/password")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUserPassword(@PathParam("username") @DefaultValue("") String username,

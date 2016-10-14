@@ -1,0 +1,5 @@
+{
+  "statusCode": 404,
+  "message": "User with given user name does not exist.",
+  "documentationUrl": ""
+}
