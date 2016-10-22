@@ -2,13 +2,16 @@ package com.wetrack.client;
 
 import com.google.gson.JsonParseException;
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.EntityResponseTest;
+import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.WeTrackClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.joda.time.LocalDate;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,15 +20,17 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
-public class UserGetTest extends EntityResponseTest<User> {
+public class UserGetTest extends WeTrackClientTest {
 
     private String username = "windy-chan";
+
+    private EntityResponseTestHelper<User> entityHelper = new EntityResponseTestHelper<>(gson);
 
     @Test
     public void testUserGetRequestFormat() throws InterruptedException {
         server.enqueue(new MockResponse().setResponseCode(404));
 
-        client.getUserInfo(username, callback(200));
+        client.getUserInfo(username, entityHelper.callback(200));
 
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
 
@@ -36,14 +41,13 @@ public class UserGetTest extends EntityResponseTest<User> {
     }
 
     @Test
-    public void testUserGetOnErrorResponse() {
-        server.enqueue(new MockResponse().setResponseCode(404));
+    public void testUserGetOnErrorResponse() throws Exception {
+        server.enqueue(new MockResponse().setResponseCode(404).setBody(readResource("test_user_get/404.json")));
 
-        client.getUserInfo(username, callback(200));
+        client.getUserInfo(username, entityHelper.callback(200));
 
         // Assert the error response is received and the subscriber is triggered
-        assertThat(receivedStatusCode, is(404));
-        assertThat(receivedEntity, nullValue());
+        entityHelper.assertReceivedErrorMessage(404);
     }
 
     @Test
@@ -58,47 +62,47 @@ public class UserGetTest extends EntityResponseTest<User> {
 
             server.enqueue(new MockResponse().setResponseCode(200).setBody(testResponse));
 
-            client.getUserInfo(username, callback(200));
+            client.getUserInfo(username, entityHelper.callback(200));
 
             // Assert the response is received and the subscriber is triggered
-            assertThat(receivedStatusCode, is(200));
-            assertThat(receivedEntity, notNullValue());
+            entityHelper.assertReceivedEntity(200);
 
             JSONObject responseEntity = new JSONObject(testResponse);
 
             // Assert the content of the received entity
-            assertThat(receivedEntity.getUsername(), is(username));
+            User receivedUser = entityHelper.getReceivedEntity();
+            assertThat(receivedUser.getUsername(), is(username));
             String email = responseEntity.optString("email");
             if (email == null || email.trim().isEmpty())
-                assertThat(receivedEntity.getEmail() == null || receivedEntity.getEmail().trim().isEmpty(), is(true));
+                assertThat(receivedUser.getEmail() == null || receivedUser.getEmail().trim().isEmpty(), is(true));
             else
-                assertThat(receivedEntity.getEmail(), is(email));
+                assertThat(receivedUser.getEmail(), is(email));
 
             String iconUrl = responseEntity.optString("iconUrl");
             if (iconUrl == null || iconUrl.trim().isEmpty())
-                assertThat(receivedEntity.getIconUrl() == null || receivedEntity.getIconUrl().trim().isEmpty(), is(true));
+                assertThat(receivedUser.getIconUrl() == null || receivedUser.getIconUrl().trim().isEmpty(), is(true));
             else
-                assertThat(receivedEntity.getIconUrl(), is(iconUrl));
+                assertThat(receivedUser.getIconUrl(), is(iconUrl));
 
             String nickname = responseEntity.optString("nickname");
             if (nickname == null || nickname.trim().isEmpty())
-                assertThat(receivedEntity.getNickname() == null || receivedEntity.getNickname().trim().isEmpty(), is(true));
+                assertThat(receivedUser.getNickname() == null || receivedUser.getNickname().trim().isEmpty(), is(true));
             else
-                assertThat(receivedEntity.getNickname(), is(nickname));
+                assertThat(receivedUser.getNickname(), is(nickname));
 
             User.Gender gender;
             try {
                 gender = User.Gender.valueOf(responseEntity.optString("gender"));
-                assertThat(receivedEntity.getGender(), is(gender));
+                assertThat(receivedUser.getGender(), is(gender));
             } catch (Throwable ex) {
-                assertThat(receivedEntity.getGender(), nullValue());
+                assertThat(receivedUser.getGender(), nullValue());
             }
 
             String birthDateStr = responseEntity.optString("birthDate");
             if (birthDateStr == null || birthDateStr.trim().isEmpty())
-                assertThat(receivedEntity.getBirthDate(), nullValue());
+                assertThat(receivedUser.getBirthDate(), nullValue());
             else
-                assertThat(receivedEntity.getBirthDate(), is(LocalDate.parse(birthDateStr)));
+                assertThat(receivedUser.getBirthDate(), is(LocalDate.parse(birthDateStr)));
         }
     }
 
@@ -108,11 +112,10 @@ public class UserGetTest extends EntityResponseTest<User> {
         String testResponse = new String(Files.readAllBytes(Paths.get(resourceUrl.toURI())));
 
         server.enqueue(new MockResponse().setResponseCode(200).setBody(testResponse));
-        client.getUserInfo(username, callback(200));
+        client.getUserInfo(username, entityHelper.callback(200));
         // Assert the error is received and the subscriber is triggered
-        assertThat(receivedException, notNullValue());
-        assertThat(receivedException instanceof JsonParseException, is(true));
-        assertThat(receivedEntity, nullValue());
-        assertThat(receivedStatusCode, is(-1));
+        assertThat(entityHelper.getReceivedException(), notNullValue());
+        assertThat(entityHelper.getReceivedException() instanceof JsonParseException, is(true));
+        assertThat(entityHelper.getReceivedEntity(), nullValue());
     }
 }

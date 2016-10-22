@@ -45,6 +45,6 @@ public class Callback<T> {
      *
      * @param response the received raw response.
      */
-    protected void onErrorResponse(Response response) {}
+    protected void onErrorResponse(Response<T> response) {}
 
 }
