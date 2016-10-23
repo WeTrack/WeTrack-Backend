@@ -4,6 +4,7 @@ import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
 import com.wetrack.client.test.EntityResponseTestHelper;
 import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.test.Utils;
 import com.wetrack.test.WeTrackIntegrateTest;
 import org.junit.Test;
 
@@ -14,7 +15,7 @@ public class UserCreateTest extends WeTrackIntegrateTest {
 
     @Test
     public void testUserCreateWithMessageCallback() throws Exception {
-        User exampleUser = gson.fromJson(readResource("test_user_create/example_user.json"), User.class);
+        User exampleUser = Utils.loadExampleUser(gson);
         client.createUser(exampleUser, messageHelper.callback(201));
 
         messageHelper.assertReceivedMessage(true); // Created
@@ -22,7 +23,7 @@ public class UserCreateTest extends WeTrackIntegrateTest {
 
     @Test
     public void testUserCreateWithEntityCallback() throws Exception {
-        User exampleUser = gson.fromJson(readResource("test_user_create/example_user.json"), User.class);
+        User exampleUser = Utils.loadExampleUser(gson);
         client.createUser(exampleUser, entityHelper.callback(201));
 
         entityHelper.assertReceivedEntity(201); // Created
@@ -30,7 +31,7 @@ public class UserCreateTest extends WeTrackIntegrateTest {
 
     @Test
     public void testCreateDuplicateUser() throws Exception {
-        User exampleUser = gson.fromJson(readResource("test_user_create/example_user.json"), User.class);
+        User exampleUser = Utils.loadExampleUser(gson);
         client.createUser(exampleUser, messageHelper.callback(201));
         messageHelper.assertReceivedMessage(true);
 
@@ -40,12 +41,12 @@ public class UserCreateTest extends WeTrackIntegrateTest {
 
     @Test
     public void testCreateInvalidUser() throws Exception {
-        User exampleUser = gson.fromJson(readResource("test_user_create/example_user.json"), User.class);
+        User exampleUser = Utils.loadExampleUser(gson);
         exampleUser.setUsername("");
         client.createUser(exampleUser, entityHelper.callback(201)); // Create user without username
         entityHelper.assertReceivedErrorMessage(400); // Bad Request
 
-        exampleUser = gson.fromJson(readResource("test_user_create/example_user.json"), User.class);
+        exampleUser = Utils.loadExampleUser(gson);
         exampleUser.setPassword("");
         client.createUser(exampleUser, entityHelper.callback(201)); // Create user without password
         entityHelper.assertReceivedErrorMessage(400); // Bad Request

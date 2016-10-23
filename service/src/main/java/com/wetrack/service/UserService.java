@@ -213,12 +213,6 @@ public class UserService {
             return badRequest("The given request body cannot be empty.");
         }
 
-        String token = updateRequest.getToken();
-        if (token == null || token.trim().isEmpty()) {
-            LOG.debug("The given token is empty. Returning `400 Bad Request`...");
-            return badRequest("A token must be provided to update the given user.");
-        }
-
         String oldPassword = updateRequest.getOldPassword();
         if (oldPassword == null || oldPassword.trim().isEmpty()) {
             LOG.debug("The given old password is empty. Returning `400 Bad Request`...");
@@ -229,17 +223,6 @@ public class UserService {
         if (newPassword == null || newPassword.trim().isEmpty()) {
             LOG.debug("The given new password is empty. Returning `400 Bad Request`...");
             return badRequest("The new password cannot be empty.");
-        }
-
-        UserToken userToken = userTokenRepository.findByTokenStr(token);
-        if (userToken == null) {
-            LOG.debug("The given token is invalid or has expired. Returning `401 Unauthorized`...");
-            return unauthorized("The given token is invalid or has expired. Please log in again.");
-        }
-
-        if (!userToken.getUsername().equals(username)) {
-            LOG.debug("User trying to change other's password. Returning `403 Forbidden`...");
-            return forbidden("You cannot change other's password.");
         }
 
         User userInDb = userRepository.findByUsername(username);
@@ -256,11 +239,14 @@ public class UserService {
         userInDb.setPassword(CryptoUtils.md5Digest(newPassword));
         userRepository.update(userInDb);
 
-        userTokenRepository.delete(userToken);
-        return created("/users/" + username, "User password successfully updated.");
+        userTokenRepository.deleteByUsername(username);
+        return ok("User password successfully updated.");
     }
 
     private void updateUser(User oldUser, User newUser) {
+        if (newUser == null)
+            return;
+
         if (newUser.getUsername() != null && !newUser.getUsername().trim().isEmpty())
             oldUser.setNickname(newUser.getUsername());
 
@@ -278,23 +264,14 @@ public class UserService {
     }
 
     static class PasswordUpdateRequest {
-        private String token;
         private String oldPassword;
         private String newPassword;
 
         PasswordUpdateRequest() {}
 
-        PasswordUpdateRequest(String token, String oldPassword, String newPassword) {
-            this.token = token;
+        PasswordUpdateRequest(String oldPassword, String newPassword) {
             this.oldPassword = oldPassword;
             this.newPassword = newPassword;
-        }
-
-        String getToken() {
-            return token;
-        }
-        void setToken(String token) {
-            this.token = token;
         }
         String getOldPassword() {
             return oldPassword;

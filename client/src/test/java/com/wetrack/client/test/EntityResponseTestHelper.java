@@ -20,9 +20,19 @@ public class EntityResponseTestHelper<T> {
     }
 
     public void assertReceivedEntity(int receivedStatusCode) {
-        if (this.receivedStatusCode != receivedStatusCode)
+        if (this.receivedStatusCode != receivedStatusCode) {
+            if (receivedErrorMessage != null)
+                throw new AssertionError("Expected received status code: " + receivedStatusCode +
+                        "\nActual received status code: " + this.receivedStatusCode +
+                        "\nWith error message: " + receivedErrorMessage.getMessage());
+            else if (receivedException != null)
+                throw new AssertionError("Expected received status code: " + receivedStatusCode +
+                        "\nActual received status code: " + this.receivedStatusCode +
+                        "\nWith exception: " + receivedException.getClass().getName() + ": " +
+                        receivedException.getMessage(), receivedException);
             throw new AssertionError("Expected received status code: " + receivedStatusCode +
                     "\nActual received status code: " + this.receivedStatusCode);
+        }
         assertReceivedEntity();
     }
 

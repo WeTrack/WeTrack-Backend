@@ -61,10 +61,10 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
-    public void updateUserPassword(String username, String token, String oldPassword, String newPassword,
+    public void updateUserPassword(String username, String oldPassword, String newPassword,
                                    final ResultMessageCallback callback) {
         oldPassword = CryptoUtils.md5Digest(oldPassword);
-        userService.updateUserPassword(username, new UserService.PasswordUpdateRequest(token, oldPassword, newPassword))
+        userService.updateUserPassword(username, new UserService.PasswordUpdateRequest(oldPassword, newPassword))
                 .subscribe(observer(callback));
     }
 
@@ -78,10 +78,10 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
-    public void updateUserPassword(String username, String token, String oldPassword, String newPassword,
+    public void updateUserPassword(String username, String oldPassword, String newPassword,
                                    final Callback<Message> callback) {
         oldPassword = CryptoUtils.md5Digest(oldPassword);
-        userService.updateUserPassword(username, new UserService.PasswordUpdateRequest(token, oldPassword, newPassword))
+        userService.updateUserPassword(username, new UserService.PasswordUpdateRequest(oldPassword, newPassword))
                 .subscribe(observer(callback));
     }
 
@@ -102,10 +102,10 @@ public class WeTrackClient {
                 .subscribeOn(scheduler).subscribe(observer(callback));
     }
 
-    public void updateUserPassword(String username, String token, String oldPassword, String newPassword,
+    public void updateUserPassword(String username, String oldPassword, String newPassword,
                                    final ResultMessageCallback callback, Scheduler scheduler) {
         oldPassword = CryptoUtils.md5Digest(oldPassword);
-        userService.updateUserPassword(username, new UserService.PasswordUpdateRequest(token, oldPassword, newPassword))
+        userService.updateUserPassword(username, new UserService.PasswordUpdateRequest(oldPassword, newPassword))
                 .subscribeOn(scheduler).subscribe(observer(callback));
     }
 
@@ -120,10 +120,10 @@ public class WeTrackClient {
                 .subscribeOn(scheduler).subscribe(observer(callback));
     }
 
-    public void updateUserPassword(String username, String token, String oldPassword, String newPassword,
+    public void updateUserPassword(String username, String oldPassword, String newPassword,
                                    final Callback<Message> callback, Scheduler scheduler) {
         oldPassword = CryptoUtils.md5Digest(oldPassword);
-        userService.updateUserPassword(username, new UserService.PasswordUpdateRequest(token, oldPassword, newPassword))
+        userService.updateUserPassword(username, new UserService.PasswordUpdateRequest(oldPassword, newPassword))
                 .subscribeOn(scheduler).subscribe(observer(callback));
     }
 

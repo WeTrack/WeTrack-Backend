@@ -92,28 +92,20 @@ interface UserService {
     }
 
     class PasswordUpdateRequest {
-        private String token;
         private String oldPassword;
         private String newPassword;
 
         public PasswordUpdateRequest() {}
 
-        public PasswordUpdateRequest(String token, String oldPassword, String newPassword) {
-            this.token = token;
+        public PasswordUpdateRequest(String oldPassword, String newPassword) {
             this.oldPassword = oldPassword;
             this.newPassword = newPassword;
         }
 
-        public static PasswordUpdateRequest of(String token, String oldPassword, String newPassword) {
-            return new PasswordUpdateRequest(token, oldPassword, newPassword);
+        public static PasswordUpdateRequest of(String oldPassword, String newPassword) {
+            return new PasswordUpdateRequest(oldPassword, newPassword);
         }
 
-        public String getToken() {
-            return token;
-        }
-        public void setToken(String token) {
-            this.token = token;
-        }
         public String getOldPassword() {
             return oldPassword;
         }

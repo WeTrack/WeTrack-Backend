@@ -21,7 +21,8 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 - [x] Refactor the service classes to use `Gson`.
 - [x] Implement client for user login and management.
 - [x] Write unit test cases for client class.
-- [ ] Write integration test cases for user login and management.
+- [x] Write integration test cases for user login and management.
+- [ ] Modularize the service classes in a more granular manner.
 - [ ] Refactor the service classes to add Spring Aspect for logging.
 - [ ] Implement icon upload.
 - [ ] Implement Friend adding.

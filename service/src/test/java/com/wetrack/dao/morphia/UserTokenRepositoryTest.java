@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -42,6 +43,23 @@ public class UserTokenRepositoryTest {
     public void cleanUp() {
         // Delete the inserted user
         tokens.deleteOne(new Document("username", username));
+    }
+
+    @Test
+    public void testUserTokenDeleteByUsername() {
+        UserToken token = new UserToken(username, 1, ChronoUnit.DAYS);
+        userTokenRepository.insert(token);
+
+        String anotherUsername = username + "Oi!";
+        UserToken anotherToken = new UserToken(anotherUsername, 3, ChronoUnit.DAYS);
+        userTokenRepository.insert(anotherToken);
+
+        userTokenRepository.deleteByUsername(username);
+
+        Document tokenInDB = tokens.find(new Document("_id", token.getId())).first();
+        assertNull(tokenInDB);
+        tokenInDB = tokens.find(new Document("_id", anotherToken.getId())).first();
+        assertNotNull(tokenInDB);
     }
 
     @Test

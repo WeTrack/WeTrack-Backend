@@ -8,4 +8,6 @@ public interface UserTokenRepository extends Repository<UserToken> {
 
     UserToken findByUsername(String username);
 
+    void deleteByUsername(String username);
+
 }

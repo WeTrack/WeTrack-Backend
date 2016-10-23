@@ -51,7 +51,7 @@ public abstract class RsResponseUtils {
      */
     public static Response response(int statusCode, String message) {
         return Response.status(statusCode)
-                .entity(new ErrorMessage(statusCode, message, DOC_URL))
+                .entity(new Message(statusCode, message, DOC_URL))
                 .build();
     }
 
@@ -159,13 +159,17 @@ public abstract class RsResponseUtils {
     }
 
     /**
-     * Returns a {@code 200 Response} with the given message as its body content.
+     * Returns a {@code 200 Response} with the given entity as its body content.
      *
-     * @param message the given message.
+     * @param entity the given entity.
      * @return a {@code 200 Response} with the given message.
      */
-    public static Response ok(String message) {
-        return Response.ok(message).build();
+    public static Response ok(String entity) {
+        return Response.ok(entity).build();
+    }
+
+    public static Response okMessage(String entity) {
+        return response(200, entity);
     }
 
     static class CreatedResponse {
@@ -205,14 +209,14 @@ public abstract class RsResponseUtils {
         }
     }
 
-    static class ErrorMessage {
+    static class Message {
         private int statusCode;
         private String message;
         private String documentationUrl;
 
-        public ErrorMessage() {}
+        public Message() {}
 
-        public ErrorMessage(int statusCode, String message, String documentationUrl) {
+        public Message(int statusCode, String message, String documentationUrl) {
             this.statusCode = statusCode;
             this.message = message;
             this.documentationUrl = documentationUrl;

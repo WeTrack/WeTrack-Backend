@@ -131,7 +131,7 @@ public class UserServiceTest extends JerseyTest {
         assertThat(response.getStatus(), is(200));
 
         Invocation.Builder builder = target("/users/" + username + "/password").request();
-        UserService.PasswordUpdateRequest updateRequestEntity = new UserService.PasswordUpdateRequest(token, null, null);
+        UserService.PasswordUpdateRequest updateRequestEntity = new UserService.PasswordUpdateRequest(null, null);
         Invocation updateRequest = builder.buildPut(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
         logResponse(response, "user password update with empty fields");
@@ -156,7 +156,7 @@ public class UserServiceTest extends JerseyTest {
         updateRequest = builder.buildPut(Entity.entity(updateRequestEntity, MediaType.APPLICATION_JSON_TYPE));
         response = updateRequest.invoke();
         logResponse(response, "user password update");
-        assertThat(response.getStatus(), is(201));
+        assertThat(response.getStatus(), is(200));
 
         validateRequest = target("/users/" + username + "/tokenValidate").request()
                 .buildPost(Entity.entity(token, MediaType.APPLICATION_JSON_TYPE));

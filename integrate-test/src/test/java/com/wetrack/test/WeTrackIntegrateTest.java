@@ -21,11 +21,4 @@ public class WeTrackIntegrateTest extends JerseyTest {
         super.setUp();
         client = new WeTrackClient(getBaseUri().toString(), 3);
     }
-
-    protected String readResource(String filePath) throws Exception {
-        URL resourceUrl = getClass().getClassLoader().getResource(filePath);
-        if (resourceUrl == null)
-            fail("Failed to find `" + filePath + "` in resources folder. Check if it is deleted.");
-        return new String(Files.readAllBytes(Paths.get(resourceUrl.toURI())));
-    }
 }
