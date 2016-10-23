@@ -8,10 +8,8 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.joda.time.LocalDate;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;

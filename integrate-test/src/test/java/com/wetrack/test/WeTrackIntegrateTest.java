@@ -1,18 +1,11 @@
 package com.wetrack.test;
 
 import com.google.gson.Gson;
-import com.wetrack.JerseyTest;
 import com.wetrack.client.WeTrackClient;
 import com.wetrack.client.config.Config;
 import org.junit.Before;
 
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static org.junit.Assert.fail;
-
-public class WeTrackIntegrateTest extends JerseyTest {
+public class WeTrackIntegrateTest extends WeTrackServerTest {
     protected WeTrackClient client;
     protected Gson gson = Config.gson();
 

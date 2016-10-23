@@ -8,13 +8,12 @@ import com.wetrack.client.test.WeTrackClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class UserCreateTest extends WeTrackClientTest {

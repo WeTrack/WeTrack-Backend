@@ -57,7 +57,7 @@ public class UserUpdateTest extends WeTrackIntegrateTest {
 
     @Test
     public void testValidUserUpdateWithMessageCallback() {
-        client.updateUser(username, token, newUser, messageHelper.callback(201));
+        client.updateUser(username, token, newUser, messageHelper.callback(200));
         messageHelper.assertReceivedMessage(true);
 
         client.getUserInfo(username, userHelper.callback(200));

@@ -19,9 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.time.temporal.ChronoUnit;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SpringTestConfig.class)
@@ -31,6 +29,7 @@ public class UserTokenRepositoryTest {
     @Autowired private MongoClient client;
 
     private String username = "robert-peng";
+    private String anotherUsername = username + "Oi!";
 
     private MongoCollection<Document> tokens;
 
@@ -43,6 +42,23 @@ public class UserTokenRepositoryTest {
     public void cleanUp() {
         // Delete the inserted user
         tokens.deleteOne(new Document("username", username));
+        tokens.deleteOne(new Document("username", anotherUsername));
+    }
+
+    @Test
+    public void testUserTokenDeleteByTokenStr() {
+        UserToken token = new UserToken(username, 1, ChronoUnit.DAYS);
+        userTokenRepository.insert(token);
+
+        UserToken anotherToken = new UserToken(anotherUsername, 3, ChronoUnit.DAYS);
+        userTokenRepository.insert(anotherToken);
+
+        userTokenRepository.deleteByTokenStr(token.getToken());
+
+        Document tokenInDB = tokens.find(new Document("_id", token.getId())).first();
+        assertNull(tokenInDB);
+        tokenInDB = tokens.find(new Document("_id", anotherToken.getId())).first();
+        assertNotNull(tokenInDB);
     }
 
     @Test
@@ -50,7 +66,6 @@ public class UserTokenRepositoryTest {
         UserToken token = new UserToken(username, 1, ChronoUnit.DAYS);
         userTokenRepository.insert(token);
 
-        String anotherUsername = username + "Oi!";
         UserToken anotherToken = new UserToken(anotherUsername, 3, ChronoUnit.DAYS);
         userTokenRepository.insert(anotherToken);
 

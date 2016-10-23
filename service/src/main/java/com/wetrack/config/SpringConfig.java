@@ -11,9 +11,6 @@ import com.wetrack.json.LocalDateTimeTypeAdapter;
 import com.wetrack.json.LocalDateTypeAdapter;
 import com.wetrack.morphia.converter.EnumOrdinalConverter;
 import com.wetrack.morphia.converter.LocalDateConverter;
-import com.wetrack.service.AuthenService;
-import com.wetrack.service.UserService;
-import com.wetrack.util.GsonJerseyProvider;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.converters.EnumConverter;
@@ -77,23 +74,5 @@ public class SpringConfig {
         userTokenRepository.setDatastore(datastore);
 
         return userTokenRepository;
-    }
-
-    @Bean
-    public UserService userService() {
-        UserService userService = new UserService();
-        return userService;
-    }
-
-    @Bean
-    public AuthenService authenService() {
-        AuthenService authenService = new AuthenService();
-        return authenService;
-    }
-
-    @Bean
-    public GsonJerseyProvider gsonJerseyProvider() {
-        GsonJerseyProvider gsonJerseyProvider = new GsonJerseyProvider();
-        return gsonJerseyProvider;
     }
 }

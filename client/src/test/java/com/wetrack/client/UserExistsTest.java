@@ -4,10 +4,8 @@ import com.wetrack.client.test.ResultResponseTestHelper;
 import com.wetrack.client.test.WeTrackClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.is;

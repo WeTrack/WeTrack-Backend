@@ -231,12 +231,16 @@ public class WeTrackClient {
                 if (messageResponse.code() == callback.getSuccessStatusCode()) {
                     callback.onSuccess(messageResponse.body().getMessage());
                 } else {
-                    try (ResponseBody errorBody = messageResponse.errorBody()) {
-                        String errorResponse = errorBody.string();
-                        Message message = gson.fromJson(errorResponse, Message.class);
-                        callback.onFail(message.getMessage());
-                    } catch (IOException e) {
-                        callback.onFail(messageResponse.message());
+                    if (messageResponse.body() != null) {
+                        callback.onFail(messageResponse.body().getMessage());
+                    } else {
+                        try (ResponseBody errorBody = messageResponse.errorBody()) {
+                            String errorResponse = errorBody.string();
+                            Message message = gson.fromJson(errorResponse, Message.class);
+                            callback.onFail(message.getMessage());
+                        } catch (IOException e) {
+                            callback.onFail(messageResponse.message());
+                        }
                     }
                 }
             }

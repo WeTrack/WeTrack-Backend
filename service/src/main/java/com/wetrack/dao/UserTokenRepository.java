@@ -10,4 +10,6 @@ public interface UserTokenRepository extends Repository<UserToken> {
 
     void deleteByUsername(String username);
 
+    void deleteByTokenStr(String tokenStr);
+
 }

@@ -1,5 +1,7 @@
 package com.wetrack.util;
 
+import com.wetrack.model.CreatedMessage;
+import com.wetrack.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +14,6 @@ import java.net.URISyntaxException;
  */
 public abstract class RsResponseUtils {
     private static final Logger LOG = LoggerFactory.getLogger(RsResponseUtils.class);
-
-    private static final String DOC_URL = ""; // TODO to be set
 
     private static final String NOT_FOUND = "Not Found";
 
@@ -32,7 +32,7 @@ public abstract class RsResponseUtils {
      * @see #notFound(String)
      */
     public static Response notFound() {
-        return notFound(NOT_FOUND);
+        return Response.status(404).build();
     }
 
     /**
@@ -51,7 +51,7 @@ public abstract class RsResponseUtils {
      */
     public static Response response(int statusCode, String message) {
         return Response.status(statusCode)
-                .entity(new Message(statusCode, message, DOC_URL))
+                .entity(new Message(statusCode, message))
                 .build();
     }
 
@@ -142,12 +142,12 @@ public abstract class RsResponseUtils {
         } catch (URISyntaxException e) {
             LOG.error("Failed to parse string `" + location + "` as a URI, returning empty");
             return Response.status(201)
-                    .entity(new CreatedResponse(message, ""))
+                    .entity(new CreatedMessage(message, ""))
                     .build();
         }
 
         return Response.created(uri)
-                .entity(new CreatedResponse(message, location))
+                .entity(new CreatedMessage(message, location))
                 .build();
     }
 
@@ -170,75 +170,5 @@ public abstract class RsResponseUtils {
 
     public static Response okMessage(String entity) {
         return response(200, entity);
-    }
-
-    static class CreatedResponse {
-        private int statusCode;
-        private String message;
-        private String entityUrl;
-
-        public CreatedResponse() {}
-
-        public CreatedResponse(String message, String entityUrl) {
-            this(201, message, entityUrl);
-        }
-
-        public CreatedResponse(int statusCode, String message, String entityUrl) {
-            this.statusCode = statusCode;
-            this.message = message;
-            this.entityUrl = entityUrl;
-        }
-
-        public int getStatusCode() {
-            return statusCode;
-        }
-        public void setStatusCode(int statusCode) {
-            this.statusCode = statusCode;
-        }
-        public String getMessage() {
-            return message;
-        }
-        public void setMessage(String message) {
-            this.message = message;
-        }
-        public String getEntityUrl() {
-            return entityUrl;
-        }
-        public void setEntityUrl(String entityUrl) {
-            this.entityUrl = entityUrl;
-        }
-    }
-
-    static class Message {
-        private int statusCode;
-        private String message;
-        private String documentationUrl;
-
-        public Message() {}
-
-        public Message(int statusCode, String message, String documentationUrl) {
-            this.statusCode = statusCode;
-            this.message = message;
-            this.documentationUrl = documentationUrl;
-        }
-
-        public int getStatusCode() {
-            return statusCode;
-        }
-        public void setStatusCode(int statusCode) {
-            this.statusCode = statusCode;
-        }
-        public String getMessage() {
-            return message;
-        }
-        public void setMessage(String message) {
-            this.message = message;
-        }
-        public String getDocumentationUrl() {
-            return documentationUrl;
-        }
-        public void setDocumentationUrl(String documentationUrl) {
-            this.documentationUrl = documentationUrl;
-        }
     }
 }

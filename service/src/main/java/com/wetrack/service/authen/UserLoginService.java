@@ -1,4 +1,4 @@
-package com.wetrack.service;
+package com.wetrack.service.authen;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -9,7 +9,6 @@ import com.wetrack.model.UserToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -21,19 +20,17 @@ import java.time.temporal.ChronoUnit;
 
 import static com.wetrack.util.RsResponseUtils.*;
 
-@Path("/")
-@Component
+@Path("/login")
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class AuthenService {
-    private static final Logger LOG = LoggerFactory.getLogger(AuthenService.class);
+public class UserLoginService {
+    private static final Logger LOG = LoggerFactory.getLogger(UserLoginService.class);
 
     @Autowired private Gson gson;
     @Autowired private UserRepository userRepository;
     @Autowired private UserTokenRepository userTokenRepository;
 
     @POST
-    @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response userLogin(String requestBody) {
         LOG.debug("POST /login/");
 
@@ -72,13 +69,13 @@ public class AuthenService {
         return ok(gson.toJson(token));
     }
 
-    static class LoginRequest {
+    public static class LoginRequest {
         private String username;
         private String password;
 
-        LoginRequest() {}
+        public LoginRequest() {}
 
-        LoginRequest(String username, String password) {
+        public LoginRequest(String username, String password) {
             this.username = username;
             this.password = password;
         }
@@ -96,4 +93,5 @@ public class AuthenService {
             this.password = password;
         }
     }
+
 }

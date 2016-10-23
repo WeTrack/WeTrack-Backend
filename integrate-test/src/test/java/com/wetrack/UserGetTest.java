@@ -5,7 +5,6 @@ import com.wetrack.client.test.EntityResponseTestHelper;
 import com.wetrack.client.test.MessageResponseTestHelper;
 import com.wetrack.test.Utils;
 import com.wetrack.test.WeTrackIntegrateTest;
-import com.wetrack.util.CryptoUtils;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -17,9 +17,9 @@ interface UserService {
     Observable<Response<Void>> userExists(@Path("username") String username);
 
     @Headers({
-            "Content-Type: application/json"
+            "Content-Type: text/plain"
     })
-    @POST("/users/{username}/tokenValidate")
+    @POST("/users/{username}/tokenVerify")
     Observable<Response<UserToken>> tokenValidate(@Path("username") String username,
                                                   @Body RequestBody token);
 

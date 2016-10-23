@@ -25,4 +25,9 @@ public class UserTokenRepositoryImpl extends MorphiaRepository<UserToken> implem
         getDatastore().delete(createQuery().field("username").equal(username));
     }
 
+    @Override
+    public void deleteByTokenStr(String tokenStr) {
+        getDatastore().delete(createQuery().field("_id").equal(tokenStr));
+    }
+
 }

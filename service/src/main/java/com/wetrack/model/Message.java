@@ -1,7 +1,9 @@
-package com.wetrack.client.model;
+package com.wetrack.model;
+
+import com.google.gson.annotations.SerializedName;
 
 public class Message {
-    private int statusCode;
+    @SerializedName("status_code") private int statusCode;
     private String message;
 
     public Message() {}

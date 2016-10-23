@@ -22,9 +22,10 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 - [x] Implement client for user login and management.
 - [x] Write unit test cases for client class.
 - [x] Write integration test cases for user login and management.
-- [ ] Modularize the service classes in a more granular manner.
-- [ ] Refactor the service classes to add Spring Aspect for logging.
-- [ ] Implement icon upload.
+- [x] Modularize the service classes in a more granular manner.
+- [ ] Implement Notification framework.
 - [ ] Implement Friend adding.
 - [ ] Implement Chat creating.
 - [ ] Implement message sending.
+- [ ] Refactor the service classes to add Spring Aspect for logging.
+- [ ] Implement icon upload.

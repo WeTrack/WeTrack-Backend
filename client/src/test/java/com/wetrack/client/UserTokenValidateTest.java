@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class UserTokenValidateTest extends WeTrackClientTest {
@@ -30,13 +29,13 @@ public class UserTokenValidateTest extends WeTrackClientTest {
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
         assertThat(request, notNullValue());
         assertThat(request.getMethod(), is("POST"));
-        assertThat(request.getPath(), is("/users/" + username + "/tokenValidate"));
+        assertThat(request.getPath(), is("/users/" + username + "/tokenVerify"));
         assertThat(request.getBody().readUtf8(), is(token));
     }
 
     @Test
     public void testTokenValidateOnErrorResponse() throws Exception {
-        server.enqueue(new MockResponse().setResponseCode(401).setBody(readResource("test_token_validate/401.json")));
+        server.enqueue(new MockResponse().setResponseCode(401).setBody(readResource("test_token_verify/401.json")));
         client.tokenValidate(username, token, entityHelper.callback(200));
 
         entityHelper.assertReceivedErrorMessage(401);
@@ -44,7 +43,7 @@ public class UserTokenValidateTest extends WeTrackClientTest {
 
     @Test
     public void testTokenValidateOnOkResponse() throws Exception {
-        String testResponse = readResource("test_token_validate/200.json");
+        String testResponse = readResource("test_token_verify/200.json");
         server.enqueue(new MockResponse().setResponseCode(200).setBody(testResponse));
 
         client.userLogin(username, token, entityHelper.callback(200));
