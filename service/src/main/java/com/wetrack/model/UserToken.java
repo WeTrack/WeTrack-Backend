@@ -1,11 +1,10 @@
 package com.wetrack.model;
 
-import org.apache.shiro.crypto.hash.Md5Hash;
+import com.wetrack.util.HashedIDGenerator;
 import org.mongodb.morphia.annotations.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalUnit;
-import java.util.Random;
 
 @Entity(value = "tokens", noClassnameStored = true)
 @Indexes({
@@ -13,7 +12,6 @@ import java.util.Random;
         @Index(fields = @Field("username"), options = @IndexOptions(unique = true))
 })
 public class UserToken implements DbEntity<String> {
-    private static final Random random = new Random(System.currentTimeMillis());
 
     @Id
     private String token;
@@ -25,8 +23,7 @@ public class UserToken implements DbEntity<String> {
     public UserToken(String username, LocalDateTime expireTime) {
         this.username = username;
         this.expireTime = expireTime;
-        this.token = new Md5Hash(String.format("%d-%s:%d-%s:%d",
-                random.nextInt(), username, random.nextInt(), expireTime, random.nextInt())).toHex();
+        this.token = HashedIDGenerator.get(username, expireTime.toString());
     }
 
     public UserToken(String username, long durationAmount, TemporalUnit durationUnit) {
