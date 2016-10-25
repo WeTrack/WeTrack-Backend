@@ -20,7 +20,9 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.lang.reflect.Type;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +40,8 @@ public abstract class WeTrackServerTest extends JerseyTest {
     protected String password = "I\'m a password";
     protected String anotherPassword = "I\'m another password";
     protected String email = "robert.peng@example.com";
+    protected LocalDate birthDate = LocalDate.of(1993, 8, 10);
+    protected User.Gender gender = User.Gender.Male;
 
     @Override
     protected Application configure() {
@@ -91,7 +95,6 @@ public abstract class WeTrackServerTest extends JerseyTest {
         User newUser = new User(username, password, nickname);
         Response response = post("/users", newUser);
 
-        logResponse(response, "user create");
         assertThat(response.getStatus(), is(201));
         assertThat(response.getHeaderString("Location"), endsWith("/users/" + username));
     }
@@ -118,8 +121,6 @@ public abstract class WeTrackServerTest extends JerseyTest {
         assertThat(response.getStatus(), is(200));
 
         String responseBody = response.readEntity(String.class);
-        LOG.debug("Received response body on user login:\n==========================\n{}\n==========================",
-                responseBody);
         UserToken token = gson.fromJson(responseBody, UserToken.class);
         return token.getToken();
     }
@@ -155,7 +156,7 @@ public abstract class WeTrackServerTest extends JerseyTest {
                 + "`entity_url` field: " + createdResponse.getEntityUrl());
     }
 
-    protected <T> T assertReceivedEntity(Response response, int expectedStatusCode, Class<T> expectedEntityType) {
+    protected <T> T assertReceivedEntity(Response response, int expectedStatusCode, Type expectedEntityType) {
         if (response.getStatus() != expectedStatusCode)
             throw new AssertionError("Expected status code: " + expectedStatusCode +
                     "\nActual status code: " + response.getStatus());
@@ -169,7 +170,7 @@ public abstract class WeTrackServerTest extends JerseyTest {
         assertReceivedNonemptyMessage(response);
     }
 
-    protected <T> T assertReceivedEntity(Response response, Class<T> expectedEntityType) {
+    protected <T> T assertReceivedEntity(Response response, Type expectedEntityType) {
         String responseEntity = response.readEntity(String.class);
         T receivedEntity = gson.fromJson(responseEntity, expectedEntityType);
         if (receivedEntity == null)

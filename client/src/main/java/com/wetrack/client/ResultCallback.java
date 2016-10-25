@@ -9,7 +9,7 @@ public class ResultCallback {
 
     protected void onSuccess() {}
 
-    protected void onFail() {}
+    protected void onFail(int failedStatusCode) {}
 
     protected void onError(Throwable ex) {}
 

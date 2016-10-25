@@ -2,7 +2,7 @@ package com.wetrack.dao;
 
 import com.wetrack.model.UserToken;
 
-public interface UserTokenRepository extends Repository<UserToken> {
+public interface UserTokenRepository extends Repository<String, UserToken> {
 
     UserToken findByTokenStr(String tokenStr);
 

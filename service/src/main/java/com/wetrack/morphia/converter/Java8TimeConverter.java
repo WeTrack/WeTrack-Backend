@@ -14,10 +14,10 @@ import java.util.Date;
 /**
  * Converter used to save {@link LocalDate} into MongoDB as String
  */
-public class LocalDateConverter extends TypeConverter implements SimpleValueConverter {
-    private static final Logger LOG = LoggerFactory.getLogger(LocalDateConverter.class);
+public class Java8TimeConverter extends TypeConverter implements SimpleValueConverter {
+    private static final Logger LOG = LoggerFactory.getLogger(Java8TimeConverter.class);
 
-    public LocalDateConverter() {
+    public Java8TimeConverter() {
         super(LocalDate.class, LocalDateTime.class);
     }
 

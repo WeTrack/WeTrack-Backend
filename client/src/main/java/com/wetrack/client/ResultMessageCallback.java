@@ -9,7 +9,7 @@ public class ResultMessageCallback {
 
     protected void onSuccess(String message) {}
 
-    protected void onFail(String message) {}
+    protected void onFail(String message, int failedStatusCode) {}
 
     protected void onError(Throwable ex) {}
 

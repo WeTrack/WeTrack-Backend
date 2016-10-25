@@ -25,10 +25,19 @@ public class Location implements DbEntity<String> {
     public Location() {}
 
     public Location(String username, double latitude, double longitude, LocalDateTime time) {
+        this(username, GeoJson.point(latitude, longitude), time);
+    }
+
+    public Location(String username, Point point, LocalDateTime time) {
         this.username = username;
         this.time = time;
-        this.point = GeoJson.point(latitude, longitude);
-        this.id = HashedIDGenerator.get(username, String.valueOf(latitude), String.valueOf(longitude), time.toString());
+        this.point = point;
+        generateId();
+    }
+
+    public void generateId() {
+        this.id = HashedIDGenerator.get(username, String.valueOf(point.getLatitude()),
+                String.valueOf(point.getLongitude()), time.toString());
     }
 
     @Override
@@ -56,5 +65,11 @@ public class Location implements DbEntity<String> {
     }
     public void setTime(LocalDateTime time) {
         this.time = time;
+    }
+    public double getLatitude() {
+        return point.getLatitude();
+    }
+    public double getLongitude() {
+        return point.getLongitude();
     }
 }

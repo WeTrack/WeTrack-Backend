@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;

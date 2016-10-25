@@ -8,11 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static org.junit.Assert.fail;
 
 public abstract class WeTrackClientTest {
     protected MockWebServer server;
@@ -30,12 +25,5 @@ public abstract class WeTrackClientTest {
     @After
     public void tearDown() throws IOException {
         server.shutdown();
-    }
-
-    protected String readResource(String filePath) throws Exception {
-        URL resourceUrl = getClass().getClassLoader().getResource(filePath);
-        if (resourceUrl == null)
-            fail("Failed to find `" + filePath + "` in resources folder. Check if it is deleted.");
-        return new String(Files.readAllBytes(Paths.get(resourceUrl.toURI())));
     }
 }

@@ -15,12 +15,12 @@ import static org.junit.Assert.assertThat;
 public class UserExistsTest extends WeTrackClientTest {
 
     private String username = "robert-peng";
-    private ResultResponseTestHelper resultHelper = new ResultResponseTestHelper();
+    private ResultResponseTestHelper resultHelper = new ResultResponseTestHelper(200);
 
     @Test
     public void testUserExistsRequestFormat() throws InterruptedException {
         server.enqueue(new MockResponse().setResponseCode(200));
-        client.userExists(username, resultHelper.callback(200));
+        client.userExists(username, resultHelper.callback());
 
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
 
@@ -32,15 +32,15 @@ public class UserExistsTest extends WeTrackClientTest {
     @Test
     public void testUserExistsOnErrorResponse() {
         server.enqueue(new MockResponse().setResponseCode(404));
-        client.userExists(username, resultHelper.callback(200));
+        client.userExists(username, resultHelper.callback());
 
-        resultHelper.assertFailed();
+        resultHelper.assertFailed(404);
     }
 
     @Test
     public void testUserExistsOnOkResponse() {
         server.enqueue(new MockResponse().setResponseCode(200));
-        client.userExists(username, resultHelper.callback(200));
+        client.userExists(username, resultHelper.callback());
 
         resultHelper.assertSucceeded();
     }

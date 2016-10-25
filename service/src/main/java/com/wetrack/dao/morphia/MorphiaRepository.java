@@ -5,7 +5,7 @@ import com.wetrack.model.DbEntity;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
-public abstract class MorphiaRepository<T extends DbEntity> implements Repository<T> {
+public abstract class MorphiaRepository<S, T extends DbEntity<S>> implements Repository<S, T> {
 
     private Datastore datastore;
 
@@ -24,7 +24,7 @@ public abstract class MorphiaRepository<T extends DbEntity> implements Repositor
     }
 
     @Override
-    public T findById(Object id) {
+    public T findById(S id) {
         return createQuery().field("_id").equal(id).get();
     }
 

@@ -3,14 +3,18 @@ package com.wetrack.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.MongoClient;
+import com.wetrack.dao.LocationRepository;
 import com.wetrack.dao.UserRepository;
 import com.wetrack.dao.UserTokenRepository;
+import com.wetrack.dao.morphia.LocationRepositoryImpl;
 import com.wetrack.dao.morphia.UserRepositoryImpl;
 import com.wetrack.dao.morphia.UserTokenRepositoryImpl;
 import com.wetrack.json.LocalDateTimeTypeAdapter;
 import com.wetrack.json.LocalDateTypeAdapter;
+import com.wetrack.json.LocationTypeAdapter;
+import com.wetrack.model.Location;
 import com.wetrack.morphia.converter.EnumOrdinalConverter;
-import com.wetrack.morphia.converter.LocalDateConverter;
+import com.wetrack.morphia.converter.Java8TimeConverter;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.converters.EnumConverter;
@@ -35,7 +39,7 @@ public class SpringConfig {
 
         morphia.getMapper().getConverters().removeConverter(new EnumConverter());
         morphia.getMapper().getConverters().addConverter(new EnumOrdinalConverter());
-        morphia.getMapper().getConverters().addConverter(new LocalDateConverter());
+        morphia.getMapper().getConverters().addConverter(new Java8TimeConverter());
 
         return morphia;
     }
@@ -45,6 +49,7 @@ public class SpringConfig {
         return new GsonBuilder().setPrettyPrinting()
                 .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                .registerTypeAdapter(Location.class, new LocationTypeAdapter())
                 .create();
     }
 
@@ -64,7 +69,6 @@ public class SpringConfig {
     public UserRepository userRepository(Datastore datastore) {
         UserRepositoryImpl userRepository = new UserRepositoryImpl();
         userRepository.setDatastore(datastore);
-
         return userRepository;
     }
 
@@ -72,7 +76,13 @@ public class SpringConfig {
     public UserTokenRepository userTokenRepository(Datastore datastore) {
         UserTokenRepositoryImpl userTokenRepository = new UserTokenRepositoryImpl();
         userTokenRepository.setDatastore(datastore);
-
         return userTokenRepository;
+    }
+
+    @Bean
+    public LocationRepository locationRepository(Datastore datastore) {
+        LocationRepositoryImpl locationRepository = new LocationRepositoryImpl();
+        locationRepository.setDatastore(datastore);
+        return locationRepository;
     }
 }

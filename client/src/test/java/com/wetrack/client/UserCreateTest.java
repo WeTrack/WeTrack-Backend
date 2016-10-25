@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -19,7 +20,7 @@ import static org.junit.Assert.assertThat;
 public class UserCreateTest extends WeTrackClientTest {
 
     private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper();
+    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(201);
 
     @Test
     public void testUserCreateRequestFormat() throws Exception {
@@ -31,7 +32,7 @@ public class UserCreateTest extends WeTrackClientTest {
         String testUserStr = readResource("test_user_update/example_user.json");
         User testUser = gson.fromJson(testUserStr, User.class);
 
-        client.createUser(testUser, messageHelper.callback(201));
+        client.createUser(testUser, messageHelper.callback());
 
         // Assert the request is sent as-is
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
@@ -58,11 +59,11 @@ public class UserCreateTest extends WeTrackClientTest {
 
         String testUserStr = readResource("test_user_create/example_user.json");
         User testUser = gson.fromJson(testUserStr, User.class);
-        client.createUser(testUser, messageHelper.callback(201));
+        client.createUser(testUser, messageHelper.callback());
         client.createUser(testUser, entityHelper.callback(201));
 
         entityHelper.assertReceivedEntity(201);
-        messageHelper.assertReceivedMessage(true);
+        messageHelper.assertReceivedSuccessfulMessage();
 
         JSONObject testResponseJson = new JSONObject(testResponseBody);
         assertThat(messageHelper.getReceivedMessage(), is(testResponseJson.optString("message")));
@@ -78,11 +79,11 @@ public class UserCreateTest extends WeTrackClientTest {
 
         String testUserStr = readResource("test_user_create/example_user.json");
         User testUser = gson.fromJson(testUserStr, User.class);
-        client.createUser(testUser, messageHelper.callback(201));
+        client.createUser(testUser, messageHelper.callback());
         client.createUser(testUser, entityHelper.callback(201));
 
         entityHelper.assertReceivedErrorMessage(403);
-        messageHelper.assertReceivedMessage(false);
+        messageHelper.assertReceivedFailedMessage(403);
 
         JSONObject testResponseJson = new JSONObject(testResponseBody);
         assertThat(messageHelper.getReceivedMessage(), is(testResponseJson.optString("message")));

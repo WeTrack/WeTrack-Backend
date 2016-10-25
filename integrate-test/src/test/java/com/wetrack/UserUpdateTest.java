@@ -2,48 +2,30 @@ package com.wetrack;
 
 import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
-import com.wetrack.client.model.UserToken;
 import com.wetrack.client.test.EntityResponseTestHelper;
 import com.wetrack.client.test.MessageResponseTestHelper;
 import com.wetrack.test.Utils;
-import com.wetrack.test.WeTrackIntegrateTest;
+import com.wetrack.test.WeTrackIntegrateTestWithUserLoggedIn;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class UserUpdateTest extends WeTrackIntegrateTest {
+public class UserUpdateTest extends WeTrackIntegrateTestWithUserLoggedIn {
 
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper();
+    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
     private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
     private EntityResponseTestHelper<User> userHelper = new EntityResponseTestHelper<>(gson);
 
-    private User oldUser;
     private User newUser;
-
-    private String username;
-    private String token;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
 
-        oldUser = Utils.loadExampleUser(gson);
-        MessageResponseTestHelper messageHelper = new MessageResponseTestHelper();
-        client.createUser(oldUser, messageHelper.callback(201));
-        messageHelper.assertReceivedMessage(true);
-
-        username = oldUser.getUsername();
-
         newUser = Utils.loadExampleUser(gson, "updated_user.json");
         assertThat(newUser.getUsername(), is(username));
-
-        // Login
-        EntityResponseTestHelper<UserToken> entityHelper = new EntityResponseTestHelper<>(gson);
-        client.userLogin(username, oldUser.getPassword(), entityHelper.callback(200));
-        entityHelper.assertReceivedEntity(200);
-        token = entityHelper.getReceivedEntity().getToken();
     }
 
     @Test
@@ -57,8 +39,8 @@ public class UserUpdateTest extends WeTrackIntegrateTest {
 
     @Test
     public void testValidUserUpdateWithMessageCallback() {
-        client.updateUser(username, token, newUser, messageHelper.callback(200));
-        messageHelper.assertReceivedMessage(true);
+        client.updateUser(username, token, newUser, messageHelper.callback());
+        messageHelper.assertReceivedSuccessfulMessage();
 
         client.getUserInfo(username, userHelper.callback(200));
         userHelper.assertReceivedEntity(200);

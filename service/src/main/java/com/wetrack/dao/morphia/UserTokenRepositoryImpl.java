@@ -3,7 +3,7 @@ package com.wetrack.dao.morphia;
 import com.wetrack.dao.UserTokenRepository;
 import com.wetrack.model.UserToken;
 
-public class UserTokenRepositoryImpl extends MorphiaRepository<UserToken> implements UserTokenRepository {
+public class UserTokenRepositoryImpl extends MorphiaRepository<String, UserToken> implements UserTokenRepository {
 
     @Override
     protected Class<UserToken> getEntityClass() {

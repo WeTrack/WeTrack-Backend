@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -23,17 +24,17 @@ public class UserPasswordUpdateTest extends WeTrackClientTest {
     private String oldPassword = "Not matter";
     private String newPassword = "Not matter";
 
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper();
+    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
     private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
 
     @Test
     public void testUserPasswordUpdateRequestFormat() throws Exception {
         String testResponseBody = readResource("test_user_password_update/200.json");
-        MockResponse testResponse = new MockResponse().setResponseCode(201).setBody(testResponseBody);
+        MockResponse testResponse = new MockResponse().setResponseCode(200).setBody(testResponseBody);
         server.enqueue(testResponse);
         server.enqueue(testResponse);
 
-        client.updateUserPassword(username, oldPassword, newPassword, messageHelper.callback(201));
+        client.updateUserPassword(username, oldPassword, newPassword, messageHelper.callback());
 
         // Assert the request is sent as-is
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
@@ -61,11 +62,11 @@ public class UserPasswordUpdateTest extends WeTrackClientTest {
         server.enqueue(testResponse);
         server.enqueue(testResponse);
 
-        client.updateUserPassword(username, oldPassword, newPassword, messageHelper.callback(200));
+        client.updateUserPassword(username, oldPassword, newPassword, messageHelper.callback());
         client.updateUserPassword(username, oldPassword, newPassword, entityHelper.callback(200));
 
         entityHelper.assertReceivedEntity(200);
-        messageHelper.assertReceivedMessage(true);
+        messageHelper.assertReceivedSuccessfulMessage();
 
         JSONObject testResponseJson = new JSONObject(testResponseBody);
         assertThat(messageHelper.getReceivedMessage(), is(testResponseJson.optString("message")));
@@ -80,10 +81,10 @@ public class UserPasswordUpdateTest extends WeTrackClientTest {
         server.enqueue(testResponse);
 
         client.updateUserPassword(username, oldPassword, newPassword, entityHelper.callback(200));
-        client.updateUserPassword(username, oldPassword, newPassword, messageHelper.callback(200));
+        client.updateUserPassword(username, oldPassword, newPassword, messageHelper.callback());
 
         entityHelper.assertReceivedErrorMessage(401);
-        messageHelper.assertReceivedMessage(false);
+        messageHelper.assertReceivedFailedMessage(401);
 
 
         JSONObject testResponseJson = new JSONObject(testResponseBody);

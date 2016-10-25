@@ -1,6 +1,7 @@
 package com.wetrack.client;
 
 import com.google.gson.Gson;
+import com.wetrack.client.model.Location;
 import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
 import com.wetrack.client.model.UserToken;
@@ -9,6 +10,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import org.joda.time.LocalDateTime;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -17,6 +19,7 @@ import rx.Observer;
 import rx.Scheduler;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.wetrack.client.config.Config.gson;
@@ -26,6 +29,7 @@ public class WeTrackClient {
     private Gson gson;
     private Retrofit retrofit;
     private UserService userService;
+    private LocationService locationService;
 
     public WeTrackClient(String baseUrl, int timeoutSeconds) {
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
@@ -85,6 +89,20 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
+    public void getUserLocationsSince(String username, LocalDateTime sinceTime, final Callback<List<Location>> callback) {
+        locationService.getLocationSince(username, sinceTime.toString())
+                .subscribe(observer(callback));
+    }
+
+    public void uploadLocations(String username, String token, List<Location> locations, final ResultMessageCallback callback) {
+        locationService.uploadLocations(username, new LocationService.LocationsUploadRequest(token, locations))
+                .subscribe(observer(callback));
+    }
+
+    public void getUserLatestLocation(String username, final Callback<Location> callback) {
+        locationService.getLatestLocation(username).subscribe(observer(callback));
+    }
+
     public void tokenValidate(String username, String token,
                               final Callback<UserToken> callback, Scheduler scheduler) {
         userService.tokenValidate(username, RequestBody.create(MediaType.parse("text/plain"), token))
@@ -127,10 +145,26 @@ public class WeTrackClient {
                 .subscribeOn(scheduler).subscribe(observer(callback));
     }
 
+    public void getUserLocationsSince(String username, LocalDateTime sinceTime,
+                                      final Callback<List<Location>> callback, Scheduler scheduler) {
+        locationService.getLocationSince(username, sinceTime.toString())
+                .subscribeOn(scheduler).subscribe(observer(callback));
+    }
+
+    public void uploadLocations(String username, String token, List<Location> locations,
+                                final ResultMessageCallback callback, Scheduler scheduler) {
+        locationService.uploadLocations(username, new LocationService.LocationsUploadRequest(token, locations))
+                .subscribeOn(scheduler).subscribe(observer(callback));
+    }
+
+    public void getUserLatestLocation(String username, final Callback<Location> callback, Scheduler scheduler) {
+        locationService.getLatestLocation(username).subscribeOn(scheduler).subscribe(observer(callback));
+    }
+
     /**
      * Checks if a user with the given username exists synchronously.
      * The {@link ResultCallback#onSuccess()} method will be invoked if there is such user,
-     * otherwise the {@link ResultCallback#onFail()} will be invoked.
+     * otherwise the {@link ResultCallback#onFail(int)} will be invoked.
      *
      * @param username the given username
      * @param callback callback object which defines how to handle different result
@@ -170,7 +204,7 @@ public class WeTrackClient {
      * Checks if a user with the given username exists asynchronously.
      * The method will use the given {@link Scheduler} to execute the network request.
      * The {@link ResultCallback#onSuccess()} method will be invoked on the current thread
-     * if there is such user, otherwise the {@link ResultCallback#onFail()} will be invoked.
+     * if there is such user, otherwise the {@link ResultCallback#onFail(int)} will be invoked.
      *
      * @param username the given username
      * @param callback callback object which defines how to handle different result
@@ -214,6 +248,7 @@ public class WeTrackClient {
 
     private void setUpServices() {
         userService = retrofit.create(UserService.class);
+        locationService = retrofit.create(LocationService.class);
     }
 
     private Observer<Response<Message>> observer(final ResultMessageCallback callback) {
@@ -232,14 +267,14 @@ public class WeTrackClient {
                     callback.onSuccess(messageResponse.body().getMessage());
                 } else {
                     if (messageResponse.body() != null) {
-                        callback.onFail(messageResponse.body().getMessage());
+                        callback.onFail(messageResponse.body().getMessage(), messageResponse.code());
                     } else {
                         try (ResponseBody errorBody = messageResponse.errorBody()) {
                             String errorResponse = errorBody.string();
                             Message message = gson.fromJson(errorResponse, Message.class);
-                            callback.onFail(message.getMessage());
+                            callback.onFail(message.getMessage(), messageResponse.code());
                         } catch (IOException e) {
-                            callback.onFail(messageResponse.message());
+                            callback.onFail(messageResponse.message(), messageResponse.code());
                         }
                     }
                 }
@@ -262,7 +297,7 @@ public class WeTrackClient {
                 if (response.code() == callback.getSuccessStatusCode())
                     callback.onSuccess();
                 else
-                    callback.onFail();
+                    callback.onFail(response.code());
             }
         };
     }

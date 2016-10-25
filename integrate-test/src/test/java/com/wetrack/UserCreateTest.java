@@ -11,14 +11,14 @@ import org.junit.Test;
 public class UserCreateTest extends WeTrackIntegrateTest {
 
     private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper();
+    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(201);
 
     @Test
     public void testUserCreateWithMessageCallback() throws Exception {
         User exampleUser = Utils.loadExampleUser(gson);
-        client.createUser(exampleUser, messageHelper.callback(201));
+        client.createUser(exampleUser, messageHelper.callback());
 
-        messageHelper.assertReceivedMessage(true); // Created
+        messageHelper.assertReceivedSuccessfulMessage(); // Created
     }
 
     @Test
@@ -32,8 +32,8 @@ public class UserCreateTest extends WeTrackIntegrateTest {
     @Test
     public void testCreateDuplicateUser() throws Exception {
         User exampleUser = Utils.loadExampleUser(gson);
-        client.createUser(exampleUser, messageHelper.callback(201));
-        messageHelper.assertReceivedMessage(true);
+        client.createUser(exampleUser, messageHelper.callback());
+        messageHelper.assertReceivedSuccessfulMessage();
 
         client.createUser(exampleUser, entityHelper.callback(201)); // Create user with existed username
         entityHelper.assertReceivedErrorMessage(403); // Forbidden

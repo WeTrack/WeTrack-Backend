@@ -35,6 +35,10 @@ public abstract class RsResponseUtils {
         return Response.status(404).build();
     }
 
+    public static Response notFoundMessage() {
+        return response(404, NOT_FOUND);
+    }
+
     /**
      * Returns a {@code Response} with the given status code and a JSON object as follows:
      * <pre>

@@ -4,7 +4,7 @@ import com.wetrack.model.User;
 
 import java.util.Iterator;
 
-public interface UserRepository extends Repository<User> {
+public interface UserRepository extends Repository<String, User> {
 
     User findByUsername(String username);
     long countByUsername(String username);

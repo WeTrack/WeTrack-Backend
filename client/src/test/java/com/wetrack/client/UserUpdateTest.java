@@ -8,12 +8,11 @@ import com.wetrack.client.test.WeTrackClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -22,27 +21,19 @@ public class UserUpdateTest extends WeTrackClientTest {
 
     private String token = "Not matter";
 
-    private MessageResponseTestHelper messageHelper;
-    private EntityResponseTestHelper<Message> entityHelper;
-
-    @Before
-    public void setUp() throws IOException {
-        super.setUp();
-
-        entityHelper = new EntityResponseTestHelper<>(gson);
-        messageHelper = new MessageResponseTestHelper();
-    }
+    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
+    private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
 
     @Test
     public void testUserUpdateRequestFormat() throws Exception {
-        String testResponseBody = readResource("test_user_update/201.json");
-        MockResponse testResponse = new MockResponse().setResponseCode(201).setBody(testResponseBody);
+        String testResponseBody = readResource("test_user_update/200.json");
+        MockResponse testResponse = new MockResponse().setResponseCode(200).setBody(testResponseBody);
         server.enqueue(testResponse);
         server.enqueue(testResponse);
 
         String testUserStr = readResource("test_user_update/example_user.json");
         User testUser = gson.fromJson(testUserStr, User.class);
-        client.updateUser(testUser.getUsername(), token, testUser, messageHelper.callback(201));
+        client.updateUser(testUser.getUsername(), token, testUser, messageHelper.callback());
 
         // Assert the request is sent as-is
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
@@ -54,7 +45,7 @@ public class UserUpdateTest extends WeTrackClientTest {
                 new UserService.TokenUserRequest(token, testUser);
         assertThat(request.getBody().readUtf8(), is(gson.toJson(expectedRequestBody)));
 
-        client.updateUser(testUser.getUsername(), token, testUser, entityHelper.callback(201));
+        client.updateUser(testUser.getUsername(), token, testUser, entityHelper.callback(200));
 
         request = server.takeRequest(3, TimeUnit.SECONDS);
         assertThat(request, notNullValue());
@@ -65,19 +56,19 @@ public class UserUpdateTest extends WeTrackClientTest {
 
     @Test
     public void testUserUpdateOnOkResponse() throws Exception {
-        String testResponseBody = readResource("test_user_update/201.json");
-        MockResponse testResponse = new MockResponse().setResponseCode(201).setBody(testResponseBody);
+        String testResponseBody = readResource("test_user_update/200.json");
+        MockResponse testResponse = new MockResponse().setResponseCode(200).setBody(testResponseBody);
         server.enqueue(testResponse);
         server.enqueue(testResponse);
 
         String testUserStr = readResource("test_user_update/example_user.json");
         User testUser = gson.fromJson(testUserStr, User.class);
 
-        client.updateUser(testUser.getUsername(), token, testUser, messageHelper.callback(201));
-        client.updateUser(testUser.getUsername(), token, testUser, entityHelper.callback(201));
+        client.updateUser(testUser.getUsername(), token, testUser, messageHelper.callback());
+        client.updateUser(testUser.getUsername(), token, testUser, entityHelper.callback(200));
 
-        entityHelper.assertReceivedEntity(201);
-        messageHelper.assertReceivedMessage(true);
+        entityHelper.assertReceivedEntity(200);
+        messageHelper.assertReceivedSuccessfulMessage();
 
         JSONObject testResponseJson = new JSONObject(testResponseBody);
         assertThat(messageHelper.getReceivedMessage(), is(testResponseJson.optString("message")));
@@ -94,11 +85,11 @@ public class UserUpdateTest extends WeTrackClientTest {
         String testUserStr = readResource("test_user_update/example_user.json");
         User testUser = gson.fromJson(testUserStr, User.class);
 
-        client.updateUser(testUser.getUsername(), token, testUser, messageHelper.callback(201));
-        client.updateUser(testUser.getUsername(), token, testUser, entityHelper.callback(201));
+        client.updateUser(testUser.getUsername(), token, testUser, messageHelper.callback());
+        client.updateUser(testUser.getUsername(), token, testUser, entityHelper.callback(200));
 
         entityHelper.assertReceivedErrorMessage(404);
-        messageHelper.assertReceivedMessage(false);
+        messageHelper.assertReceivedFailedMessage(404);
 
         JSONObject testResponseJson = new JSONObject(testResponseBody);
         assertThat(messageHelper.getReceivedMessage(), is(testResponseJson.optString("message")));

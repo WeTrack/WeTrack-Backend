@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
+import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
