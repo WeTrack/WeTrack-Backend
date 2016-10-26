@@ -3,12 +3,8 @@ package com.wetrack.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.MongoClient;
-import com.wetrack.dao.LocationRepository;
-import com.wetrack.dao.UserRepository;
-import com.wetrack.dao.UserTokenRepository;
-import com.wetrack.dao.morphia.LocationRepositoryImpl;
-import com.wetrack.dao.morphia.UserRepositoryImpl;
-import com.wetrack.dao.morphia.UserTokenRepositoryImpl;
+import com.wetrack.dao.*;
+import com.wetrack.dao.morphia.*;
 import com.wetrack.json.LocalDateTimeTypeAdapter;
 import com.wetrack.json.LocalDateTypeAdapter;
 import com.wetrack.json.LocationTypeAdapter;
@@ -84,5 +80,19 @@ public class SpringConfig {
         LocationRepositoryImpl locationRepository = new LocationRepositoryImpl();
         locationRepository.setDatastore(datastore);
         return locationRepository;
+    }
+
+    @Bean
+    public FriendRepository friendRepository(Datastore datastore) {
+        FriendRepositoryImpl friendRepository = new FriendRepositoryImpl();
+        friendRepository.setDatastore(datastore);
+        return friendRepository;
+    }
+
+    @Bean
+    public ChatRepository chatRepository(Datastore datastore) {
+        ChatRepositoryImpl chatRepository = new ChatRepositoryImpl();
+        chatRepository.setDatastore(datastore);
+        return chatRepository;
     }
 }

@@ -1,13 +1,16 @@
 package com.wetrack.model;
 
+import com.google.gson.annotations.Expose;
 import com.wetrack.util.HashedIDGenerator;
 import org.mongodb.morphia.annotations.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity("chats")
 @Indexes({
+    @Index(fields = @Field("ownerUsername")),
     @Index(fields = @Field("members"))
 })
 public class Chat implements DbEntity<String> {
@@ -16,13 +19,15 @@ public class Chat implements DbEntity<String> {
     private String chatName;
 
     @Reference(idOnly = true, lazy = true)
-    private List<User> members;
+    @Expose(serialize = false, deserialize = false)
+    private Set<User> members;
 
     public Chat() {}
 
     public Chat(String chatName) {
         this.chatName = chatName;
         this.id = HashedIDGenerator.get(chatName, LocalDateTime.now().toString());
+        this.members = new HashSet<>();
     }
 
     @Override
@@ -39,10 +44,10 @@ public class Chat implements DbEntity<String> {
     public void setChatName(String chatName) {
         this.chatName = chatName;
     }
-    public List<User> getMembers() {
+    public Set<User> getMembers() {
         return members;
     }
-    public void setMembers(List<User> members) {
+    public void setMembers(Set<User> members) {
         this.members = members;
     }
 }

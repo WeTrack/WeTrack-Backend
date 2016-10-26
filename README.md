@@ -26,6 +26,7 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 - [x] Implement Location uploading and query.
 - [ ] Implement Friend adding.
 - [ ] Implement Chat creating.
+- [ ] Implement WebSocket notification pushing.
 - [ ] Implement Message sending.
 - [ ] Implement personal icon uploading.
 - [ ] Refactor the service classes to add Spring Aspect for logging.

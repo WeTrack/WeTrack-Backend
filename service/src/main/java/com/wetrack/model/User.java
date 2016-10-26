@@ -29,6 +29,18 @@ public class User implements DbEntity<String> {
         this.nickname = nickname;
     }
 
+    @Override
+    public int hashCode() {
+        return username.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other != null && other instanceof User)
+            return username.equals(((User) other).getUsername());
+        return false;
+    }
+
     // Getters and Setters
     public String getPassword() {
         return password;
