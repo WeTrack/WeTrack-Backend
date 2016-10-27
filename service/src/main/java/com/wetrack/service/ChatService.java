@@ -2,6 +2,7 @@ package com.wetrack.service;
 
 import com.google.gson.*;
 import com.wetrack.dao.ChatRepository;
+import com.wetrack.dao.FriendRepository;
 import com.wetrack.dao.UserRepository;
 import com.wetrack.dao.UserTokenRepository;
 import com.wetrack.model.Chat;
@@ -25,6 +26,7 @@ public class ChatService {
 
     @Autowired private Gson gson;
     @Autowired private UserRepository userRepository;
+    @Autowired private FriendRepository friendRepository;
     @Autowired private UserTokenRepository userTokenRepository;
     @Autowired private ChatRepository chatRepository;
 
@@ -48,6 +50,8 @@ public class ChatService {
                 String memberName = memberNameJson.getAsString();
                 if (userRepository.countByUsername(memberName) == 0)
                     return notFound("User with given username `" + memberName + "` does not exist.");
+                if (!friendRepository.isFriend(loggedInUser.getUsername(), memberName))
+                    return unauthorized("User with given username `" + memberName + "` is not your friend.");
                 chat.getMembers().add(userRepository.findByUsername(memberName));
             }
             chat.getMembers().add(loggedInUser);

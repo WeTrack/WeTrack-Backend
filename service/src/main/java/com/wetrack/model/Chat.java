@@ -10,13 +10,12 @@ import java.util.Set;
 
 @Entity("chats")
 @Indexes({
-    @Index(fields = @Field("ownerUsername")),
     @Index(fields = @Field("members"))
 })
 public class Chat implements DbEntity<String> {
     @Id
     private String id;
-    private String chatName;
+    private String name;
 
     @Reference(idOnly = true, lazy = true)
     @Expose(serialize = false, deserialize = false)
@@ -24,9 +23,9 @@ public class Chat implements DbEntity<String> {
 
     public Chat() {}
 
-    public Chat(String chatName) {
-        this.chatName = chatName;
-        this.id = HashedIDGenerator.get(chatName, LocalDateTime.now().toString());
+    public Chat(String name) {
+        this.name = name;
+        this.id = HashedIDGenerator.get(name, LocalDateTime.now().toString());
         this.members = new HashSet<>();
     }
 
@@ -38,11 +37,11 @@ public class Chat implements DbEntity<String> {
     public void setId(String id) {
         this.id = id;
     }
-    public String getChatName() {
-        return chatName;
+    public String getName() {
+        return name;
     }
-    public void setChatName(String chatName) {
-        this.chatName = chatName;
+    public void setName(String name) {
+        this.name = name;
     }
     public Set<User> getMembers() {
         return members;

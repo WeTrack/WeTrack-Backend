@@ -7,11 +7,14 @@ import org.junit.Test;
 import javax.ws.rs.core.Response;
 
 public class UserCreateTest extends WeTrackServerTest {
+    private String username = "robert-peng";
+    private String password = "I\'m a password";
+    private String nickname = "Robert Peng";
+    private String email = "robert.peng@example.com";
 
     @Test
     public void testCreatingUser() {
         User newUser = new User(username, password, nickname);
-
         Response response = post("/users", newUser);
 
         logResponse(response, "user create");
@@ -20,15 +23,16 @@ public class UserCreateTest extends WeTrackServerTest {
 
     @Test
     public void testCreatingDuplicateUser() {
-        createUserWithAssertion();
-
-        User newUser = new User(username, nickname, password);
-        newUser.setEmail(email);
-
+        // Create a user
+        User newUser = new User(username, password, nickname);
         Response response = post("/users", newUser);
 
+        // Create it again with email field updated
+        newUser.setEmail(email);
+        response = post("/users", newUser);
+
         logResponse(response, "duplicate user create");
-        assertReceivedNonemptyMessage(response, 403);
+        assertReceivedNonemptyMessage(response, 403); // Forbidden for duplicate username
     }
 
     @Test

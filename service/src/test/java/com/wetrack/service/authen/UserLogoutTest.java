@@ -1,5 +1,6 @@
 package com.wetrack.service.authen;
 
+import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
 import com.wetrack.test.WeTrackServerTestWithUserLoggedIn;
 import org.junit.Test;
@@ -17,14 +18,24 @@ public class UserLogoutTest extends WeTrackServerTestWithUserLoggedIn {
 
     @Test
     public void testLogoutWithValidToken() {
-        Response response = post("/users/" + username + "/tokenVerify", token, MediaType.TEXT_PLAIN_TYPE);
-        assertReceivedEntity(response, 200, UserToken.class);
+        // Assert the token is still valid
+        tokenVerificationWithAssertion(robertPeng, true);
 
-        response = post("/logout", token);
+        // Log out
+        Response response = post("/logout", tokens.get(robertPeng));
         assertReceivedEmptyResponse(response, 200);
 
-        response = post("/users/" + username + "/tokenVerify", token, MediaType.TEXT_PLAIN_TYPE);
-        assertReceivedNonemptyMessage(response, 401);
+        // Assert the token has been invalidated
+        tokenVerificationWithAssertion(robertPeng, false);
+    }
+
+    private void tokenVerificationWithAssertion(User verifiedLoggedInUser, boolean expectedResult) {
+        Response response = post("/users/" + verifiedLoggedInUser.getUsername() + "/tokenVerify",
+                tokens.get(verifiedLoggedInUser), MediaType.TEXT_PLAIN_TYPE);
+        if (expectedResult)
+            assertReceivedEntity(response, UserToken.class);
+        else
+            assertReceivedNonemptyMessage(response, 401);
     }
 
 }

@@ -15,8 +15,10 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -35,14 +37,6 @@ public abstract class WeTrackServerTest extends JerseyTest {
 
     protected Gson gson = new SpringConfig().gson();
 
-    protected String username = "robert-peng";
-    protected String nickname = "Robert Peng";
-    protected String password = "I\'m a password";
-    protected String anotherPassword = "I\'m another password";
-    protected String email = "robert.peng@example.com";
-    protected LocalDate birthDate = LocalDate.of(1993, 8, 10);
-    protected User.Gender gender = User.Gender.Male;
-
     @Override
     protected Application configure() {
         return new WeTrackApplication();
@@ -53,50 +47,67 @@ public abstract class WeTrackServerTest extends JerseyTest {
         config.register(GsonJerseyProvider.class);
     }
 
-    protected Response get(String url) {
-        Invocation getRequest = target(url).request(MediaType.APPLICATION_JSON).buildGet();
+    protected Response get(String url, QueryParam... queryParams) {
+        WebTarget requestTarget = target(url);
+        for (QueryParam queryParam : queryParams)
+            requestTarget = requestTarget.queryParam(queryParam.getName(), queryParam.getValue());
+        Invocation getRequest = requestTarget.request(MediaType.APPLICATION_JSON_TYPE).buildGet();
         Response response = getRequest.invoke();
         response.bufferEntity();
         return response;
     }
 
-    protected Response head(String url) {
-        Invocation getRequest = target(url).request(MediaType.APPLICATION_JSON).build("HEAD");
-        Response response = getRequest.invoke();
+    protected Response head(String url, QueryParam... queryParams) {
+        WebTarget requestTarget = target(url);
+        for (QueryParam queryParam : queryParams)
+            requestTarget = requestTarget.queryParam(queryParam.getName(), queryParam.getValue());
+        Invocation headRequest = requestTarget.request(MediaType.APPLICATION_JSON_TYPE).build("HEAD");
+        Response response = headRequest.invoke();
         response.bufferEntity();
         return response;
     }
 
-    protected Response post(String url, String entity, MediaType mediaType) {
+    protected Response delete(String url, QueryParam... queryParams) {
+        WebTarget requestTarget = target(url);
+        for (QueryParam queryParam : queryParams)
+            requestTarget = requestTarget.queryParam(queryParam.getName(), queryParam.getValue());
+        Invocation headRequest = requestTarget.request(MediaType.APPLICATION_JSON_TYPE).build("DELETE");
+        Response response = headRequest.invoke();
+        response.bufferEntity();
+        return response;
+    }
+
+    protected Response post(String url, String entity, MediaType mediaType, QueryParam... queryParams) {
         Entity requestEntity = Entity.entity(entity, mediaType);
-        Invocation postRequest = target(url).request(MediaType.APPLICATION_JSON).buildPost(requestEntity);
+        WebTarget requestTarget = target(url);
+        for (QueryParam queryParam : queryParams)
+            requestTarget = requestTarget.queryParam(queryParam.getName(), queryParam.getValue());
+        Invocation postRequest = requestTarget.request(MediaType.APPLICATION_JSON_TYPE).buildPost(requestEntity);
         Response response = postRequest.invoke();
         response.bufferEntity();
         return response;
     }
 
-    protected <T> Response post(String url, T entity) {
+    protected <T> Response post(String url, T entity, QueryParam... queryParams) {
         Entity requestEntity = Entity.entity(entity, MediaType.APPLICATION_JSON_TYPE);
-        Invocation postRequest = target(url).request(MediaType.APPLICATION_JSON).buildPost(requestEntity);
+        WebTarget requestTarget = target(url);
+        for (QueryParam queryParam : queryParams)
+            requestTarget = requestTarget.queryParam(queryParam.getName(), queryParam.getValue());
+        Invocation postRequest = requestTarget.request(MediaType.APPLICATION_JSON_TYPE).buildPost(requestEntity);
         Response response = postRequest.invoke();
         response.bufferEntity();
         return response;
     }
 
-    protected <T> Response put(String url, T entity) {
+    protected <T> Response put(String url, T entity, QueryParam... queryParams) {
         Entity requestEntity = Entity.entity(entity, MediaType.APPLICATION_JSON_TYPE);
-        Invocation putRequest = target(url).request(MediaType.APPLICATION_JSON).buildPut(requestEntity);
+        WebTarget requestTarget = target(url);
+        for (QueryParam queryParam : queryParams)
+            requestTarget = requestTarget.queryParam(queryParam.getName(), queryParam.getValue());
+        Invocation putRequest = requestTarget.request(MediaType.APPLICATION_JSON_TYPE).buildPut(requestEntity);
         Response response = putRequest.invoke();
         response.bufferEntity();
         return response;
-    }
-
-    protected void createUserWithAssertion() {
-        User newUser = new User(username, password, nickname);
-        Response response = post("/users", newUser);
-
-        assertThat(response.getStatus(), is(201));
-        assertThat(response.getHeaderString("Location"), endsWith("/users/" + username));
     }
 
     protected void logResponse(Response response, String event) {
@@ -111,18 +122,6 @@ public abstract class WeTrackServerTest extends JerseyTest {
             LOG.debug("Received response on {}:\n==========================\n{}\n==========================",
                     event, builder.toString());
         }
-    }
-
-    protected String loginUserWithAssertion() {
-        UserLoginService.LoginRequest requestEntity =
-                new UserLoginService.LoginRequest(username, CryptoUtils.md5Digest(password));
-
-        Response response = post("/login", requestEntity);
-        assertThat(response.getStatus(), is(200));
-
-        String responseBody = response.readEntity(String.class);
-        UserToken token = gson.fromJson(responseBody, UserToken.class);
-        return token.getToken();
     }
 
     protected void assertReceivedEmptyResponse(Response response, int expectedStatusCode) {

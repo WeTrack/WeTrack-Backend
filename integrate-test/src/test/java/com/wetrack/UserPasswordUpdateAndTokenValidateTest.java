@@ -13,7 +13,8 @@ public class UserPasswordUpdateAndTokenValidateTest extends WeTrackIntegrateTest
     private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
     private EntityResponseTestHelper<UserToken> tokenHelper = new EntityResponseTestHelper<>(gson);
 
-
+    private String username = robertPeng.getUsername();
+    private String password = robertPeng.getPassword();
     private String newPasword = "Surprise, motherf*cker.";
 
     @Test

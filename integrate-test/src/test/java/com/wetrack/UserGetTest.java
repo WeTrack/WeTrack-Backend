@@ -16,15 +16,15 @@ public class UserGetTest extends WeTrackIntegrateTestWithUserCreated {
 
     @Test
     public void testGetExistedUser() {
-        client.getUserInfo(username, entityHelper.callback(200));
+        client.getUserInfo(robertPeng.getUsername(), entityHelper.callback(200));
         entityHelper.assertReceivedEntity(200);
 
         User userFromServer = entityHelper.getReceivedEntity();
-        assertThat(userFromServer.getUsername(), is(username));
+        assertThat(userFromServer.getUsername(), is(robertPeng.getUsername()));
         assertThat(userFromServer.getPassword(), nullValue());
-        assertThat(userFromServer.getNickname(), is(nickname));
-        assertThat(userFromServer.getEmail(), is(email));
-        assertThat(userFromServer.getBirthDate(), is(LocalDate.parse(birthDate.toString())));
+        assertThat(userFromServer.getNickname(), is(robertPeng.getNickname()));
+        assertThat(userFromServer.getEmail(), is(robertPeng.getEmail()));
+        assertThat(userFromServer.getBirthDate(), is(robertPeng.getBirthDate()));
     }
 
     @Test

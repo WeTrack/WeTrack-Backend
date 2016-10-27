@@ -11,6 +11,14 @@ public class User {
     private Gender gender;
     private LocalDate birthDate;
 
+    public User() {}
+
+    public User(String username, String password, String nickname) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+    }
+
     public String getUsername() {
         return username;
     }

@@ -22,7 +22,6 @@ public class Friend implements DbEntity<String> {
         this.friends = new HashSet<>();
     }
 
-
     public String getOwnerUsername() {
         return ownerUsername;
     }

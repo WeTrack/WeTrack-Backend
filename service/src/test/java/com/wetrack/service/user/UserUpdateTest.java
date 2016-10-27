@@ -13,14 +13,15 @@ import static org.junit.Assert.assertThat;
 public class UserUpdateTest extends WeTrackServerTestWithUserLoggedIn {
 
     private User updatedUser;
+    private String newEmail = "robert.peng@hotmail.com";
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
 
-        Response response = get("/users/" + username);
+        Response response = get("/users/" + robertPeng.getUsername());
         User userInResponse = assertReceivedEntity(response, 200, User.class);
-        userInResponse.setEmail(email);
+        userInResponse.setEmail(newEmail);
         userInResponse.setBirthDate(null);
         // FIXME The Jackson serializer Jersey Test uses cannot correctly handle java.time classes,
         // FIXME it keeps on serializing them as Bean
@@ -31,16 +32,16 @@ public class UserUpdateTest extends WeTrackServerTestWithUserLoggedIn {
     public void testInvalidUserUpdate() {
         UserUpdateService.TokenUserRequest updateRequestEntity =
                 new UserUpdateService.TokenUserRequest("", updatedUser);
-        Response response = put("/users/" + username, updateRequestEntity);
+        Response response = put("/users/" + robertPeng.getUsername(), updateRequestEntity);
         logResponse(response, "user update");
         assertReceivedNonemptyMessage(response, 400); // Bad Request for empty token
 
         updateRequestEntity.setToken("I am token");
-        response = put("/users/" + username, updateRequestEntity);
+        response = put("/users/" + robertPeng.getUsername(), updateRequestEntity);
         logResponse(response, "user update");
         assertReceivedNonemptyMessage(response, 401); // Unauthorized for incorrect token
 
-        updateRequestEntity.setToken(token);
+        updateRequestEntity.setToken(tokens.get(robertPeng));
         response = put("/users/" + "Whatever", updateRequestEntity);
         logResponse(response, "user update");
         assertReceivedNonemptyMessage(response, 404); // Not Found for not existed user
@@ -49,16 +50,16 @@ public class UserUpdateTest extends WeTrackServerTestWithUserLoggedIn {
     @Test
     public void testValidUserUpdate() {
         UserUpdateService.TokenUserRequest updateRequestEntity =
-                new UserUpdateService.TokenUserRequest(token, updatedUser);
-        Response response = put("/users/" + username, updateRequestEntity);
+                new UserUpdateService.TokenUserRequest(tokens.get(robertPeng), updatedUser);
+        Response response = put("/users/" + robertPeng.getUsername(), updateRequestEntity);
 
         logResponse(response, "user update");
         assertReceivedNonemptyMessage(response, 200);
 
-        response = get("/users/" + username);
+        response = get("/users/" + robertPeng.getUsername());
         User userInResponse = assertReceivedEntity(response, 200, User.class);
 
-        assertThat(userInResponse.getEmail(), is(email));
+        assertThat(userInResponse.getEmail(), is(newEmail));
     }
 
 }

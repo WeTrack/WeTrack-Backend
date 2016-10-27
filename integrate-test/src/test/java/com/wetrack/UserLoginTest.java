@@ -11,16 +11,15 @@ public class UserLoginTest extends WeTrackIntegrateTestWithUserCreated {
 
     @Test
     public void testLoginWithCorrectCredential() {
-        client.userLogin(username, password, entityHelper.callback(200));
-
+        client.userLogin(robertPeng.getUsername(), robertPeng.getPassword(), entityHelper.callback(200));
         entityHelper.assertReceivedEntity(200);
     }
 
     @Test
     public void testLoginWithIncorrectCredential() {
-        client.userLogin(username, password + "Whatever", entityHelper.callback(200));
+        client.userLogin(robertPeng.getUsername(), robertPeng.getPassword() + "Whatever", entityHelper.callback(200));
         entityHelper.assertReceivedErrorMessage(401);
-        client.userLogin(username + "Whatever", password, entityHelper.callback(200));
+        client.userLogin(robertPeng.getUsername() + "Whatever", robertPeng.getPassword(), entityHelper.callback(200));
         entityHelper.assertReceivedErrorMessage(401);
     }
 

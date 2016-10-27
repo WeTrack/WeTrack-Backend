@@ -37,6 +37,7 @@ public class FriendService {
 
         if (token.isEmpty())
             return badRequest("Token must be provided in the query param");
+
         UserToken tokenInDB = userTokenRepository.findByTokenStr(token);
         if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now()))
             return unauthorized("The given token is invalid or has expired. Please log in again.");
