@@ -42,8 +42,8 @@ public class UserLoginService {
             return badRequest("The given request body is not in valid JSON format.");
         }
 
-        String username = loginRequest.getUsername();
-        String password = loginRequest.getPassword();
+        String username = loginRequest.username;
+        String password = loginRequest.password;
         if (username == null || username.isEmpty()) {
             LOG.debug("The given username is empty. Returning `400 Bad Request`...");
             return badRequest("The given username cannot be empty.");
@@ -69,29 +69,9 @@ public class UserLoginService {
         return ok(gson.toJson(token));
     }
 
-    public static class LoginRequest {
+    private static class LoginRequest {
         private String username;
         private String password;
-
-        public LoginRequest() {}
-
-        public LoginRequest(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        String getUsername() {
-            return username;
-        }
-        void setUsername(String username) {
-            this.username = username;
-        }
-        String getPassword() {
-            return password;
-        }
-        void setPassword(String password) {
-            this.password = password;
-        }
     }
 
 }

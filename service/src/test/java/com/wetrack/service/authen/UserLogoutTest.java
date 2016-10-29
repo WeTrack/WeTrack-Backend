@@ -22,7 +22,7 @@ public class UserLogoutTest extends WeTrackServerTestWithUserLoggedIn {
         tokenVerificationWithAssertion(robertPeng, true);
 
         // Log out
-        Response response = post("/logout", tokens.get(robertPeng));
+        Response response = post("/logout", tokenOf(robertPeng));
         assertReceivedEmptyResponse(response, 200);
 
         // Assert the token has been invalidated
@@ -31,7 +31,7 @@ public class UserLogoutTest extends WeTrackServerTestWithUserLoggedIn {
 
     private void tokenVerificationWithAssertion(User verifiedLoggedInUser, boolean expectedResult) {
         Response response = post("/users/" + verifiedLoggedInUser.getUsername() + "/tokenVerify",
-                tokens.get(verifiedLoggedInUser), MediaType.TEXT_PLAIN_TYPE);
+                tokenOf(verifiedLoggedInUser), MediaType.TEXT_PLAIN_TYPE);
         if (expectedResult)
             assertReceivedEntity(response, UserToken.class);
         else

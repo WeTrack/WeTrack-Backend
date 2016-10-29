@@ -1,11 +1,11 @@
 package com.wetrack.test;
 
+import com.google.gson.JsonObject;
 import com.wetrack.model.User;
+import com.wetrack.util.CryptoUtils;
 import org.junit.Before;
 
 import javax.ws.rs.core.Response;
-
-import java.time.LocalDate;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.is;
@@ -13,12 +13,12 @@ import static org.junit.Assert.assertThat;
 
 public abstract class WeTrackServerTestWithUserCreated extends WeTrackServerTest {
 
-    protected User robertPeng = new User("robert-peng", "Robert Peng", "robert-peng");
-    protected User windyChan = new User("windy-chan", "Windy Chan", "windy-chan");
-    protected User mrDai = new User("mr-dai", "Mr. Dai", "mr-dai");
-    protected User littleHearth = new User("little-hearth", "Little Hearth", "little-hearth");
+    protected User robertPeng = new User("robert-peng", "robert-peng", "Robert Peng");
+    protected User windyChan = new User("windy-chan", "windy-chan", "Windy Chan");
+    protected User mrDai = new User("mr-dai", "mr-dai", "Mr. Dai");
+    protected User littleHearth = new User("little-hearth", "little-hearth", "Little Hearth");
 
-    protected String notExistUsername = "BlahBlahNotExist";
+    protected String notExistEntityId = "BlahBlahNotExist";
 
     @Before
     public void setUp() throws Exception {
@@ -47,6 +47,13 @@ public abstract class WeTrackServerTestWithUserCreated extends WeTrackServerTest
 
         assertThat(response.getStatus(), is(201));
         assertThat(response.getHeaderString("Location"), endsWith("/users/" + user.getUsername()));
+    }
+
+    protected Response userLogin(String username, String password) {
+        JsonObject requestEntity = new JsonObject();
+        requestEntity.addProperty("username", username);
+        requestEntity.addProperty("password", CryptoUtils.md5Digest(password));
+        return post("/login", requestEntity);
     }
 
 }

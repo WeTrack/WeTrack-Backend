@@ -50,14 +50,12 @@ public class UserPasswordUpdateService {
             return badRequest("The given request body cannot be empty.");
         }
 
-        String oldPassword = updateRequest.getOldPassword();
-        if (oldPassword == null || oldPassword.trim().isEmpty()) {
+        if (updateRequest.oldPassword == null || updateRequest.oldPassword.trim().isEmpty()) {
             LOG.debug("The given old password is empty. Returning `400 Bad Request`...");
             return badRequest("The original password must be provided to change the password.");
         }
 
-        String newPassword = updateRequest.getNewPassword();
-        if (newPassword == null || newPassword.trim().isEmpty()) {
+        if (updateRequest.newPassword == null || updateRequest.newPassword.trim().isEmpty()) {
             LOG.debug("The given new password is empty. Returning `400 Bad Request`...");
             return badRequest("The new password cannot be empty.");
         }
@@ -68,39 +66,20 @@ public class UserPasswordUpdateService {
             return notFound("User with given username does not exist.");
         }
 
-        if (!userInDb.getPassword().equals(oldPassword)) {
+        if (!userInDb.getPassword().equals(updateRequest.oldPassword)) {
             LOG.debug("The given old password is incorrect. Returning `401 Unauthorized`...");
             return unauthorized("The given old password is incorrect.");
         }
 
-        userInDb.setPassword(CryptoUtils.md5Digest(newPassword));
+        userInDb.setPassword(CryptoUtils.md5Digest(updateRequest.newPassword));
         userRepository.update(userInDb);
 
         userTokenRepository.deleteByUsername(username);
         return okMessage("User password successfully updated.");
     }
 
-    static class PasswordUpdateRequest {
+    private static class PasswordUpdateRequest {
         private String oldPassword;
         private String newPassword;
-
-        PasswordUpdateRequest() {}
-
-        PasswordUpdateRequest(String oldPassword, String newPassword) {
-            this.oldPassword = oldPassword;
-            this.newPassword = newPassword;
-        }
-        String getOldPassword() {
-            return oldPassword;
-        }
-        void setOldPassword(String oldPassword) {
-            this.oldPassword = oldPassword;
-        }
-        String getNewPassword() {
-            return newPassword;
-        }
-        void setNewPassword(String newPassword) {
-            this.newPassword = newPassword;
-        }
     }
 }

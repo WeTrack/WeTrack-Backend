@@ -28,7 +28,8 @@ interface UserService {
 
     @PUT("/users/{username}")
     Observable<Response<Message>> updateUser(@Path("username") String username,
-                                             @Body TokenUserRequest request);
+                                             @Query("token") String token,
+                                             @Body User updatedUser);
 
     @POST("/users")
     Observable<Response<Message>> createUser(@Body User newUser);
@@ -59,35 +60,6 @@ interface UserService {
         }
         void setPassword(String password) {
             this.password = password;
-        }
-    }
-
-    class TokenUserRequest {
-        private String token;
-        private User user;
-
-        public TokenUserRequest() {}
-
-        public TokenUserRequest(String token, User user) {
-            this.token = token;
-            this.user = user;
-        }
-
-        public static TokenUserRequest of(String token, User user) {
-            return new TokenUserRequest(token, user);
-        }
-
-        public String getToken() {
-            return token;
-        }
-        public void setToken(String token) {
-            this.token = token;
-        }
-        public User getUser() {
-            return user;
-        }
-        public void setUser(User user) {
-            this.user = user;
         }
     }
 

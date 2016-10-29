@@ -1,6 +1,7 @@
 package com.wetrack.test;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.wetrack.config.SpringConfig;
 import com.wetrack.config.WeTrackApplication;
 import com.wetrack.model.CreatedMessage;
@@ -36,6 +37,8 @@ public abstract class WeTrackServerTest extends JerseyTest {
     private static final Logger LOG = LoggerFactory.getLogger(WeTrackServerTest.class);
 
     protected Gson gson = new SpringConfig().gson();
+
+    protected Type userListType = new TypeToken<List<User>>() {}.getType();
 
     @Override
     protected Application configure() {
@@ -133,7 +136,7 @@ public abstract class WeTrackServerTest extends JerseyTest {
             throw new AssertionError("Expected to receive empty body, but received:\n" + responseBody);
     }
 
-    protected void assertReceivedCreatedMessage(Response response, String newEntityUrl) {
+    protected void assertReceivedCreatedMessage(Response response) {
         if (response.getStatus() != 201)
             throw new AssertionError("Expected to received status code `201 Created`, but received: "
                     + response.getStatus());
@@ -141,9 +144,6 @@ public abstract class WeTrackServerTest extends JerseyTest {
         String locationHeader = locationUri.getPath();
         if (locationHeader == null || locationHeader.trim().isEmpty())
             throw new AssertionError("`Location` header of the received response is empty.");
-        if (!locationHeader.equals(newEntityUrl))
-            throw new AssertionError("Expected new entity URL: " + newEntityUrl
-                + "\nActual received `Location` header: " + locationHeader);
 
         String responseEntity = response.readEntity(String.class);
         CreatedMessage createdResponse = gson.fromJson(responseEntity, CreatedMessage.class);
@@ -151,8 +151,18 @@ public abstract class WeTrackServerTest extends JerseyTest {
             throw new AssertionError("`entity_url` field of the received created message is empty.");
         if (!locationHeader.equals(createdResponse.getEntityUrl()))
             throw new AssertionError("`Location` header field and `entity_url` message field mismatch.\n"
-                + "`Location` header: " + locationHeader + "\n"
-                + "`entity_url` field: " + createdResponse.getEntityUrl());
+                    + "`Location` header: " + locationHeader + "\n"
+                    + "`entity_url` field: " + createdResponse.getEntityUrl());
+    }
+
+    protected void assertReceivedCreatedMessage(Response response, String newEntityUrl) {
+        assertReceivedCreatedMessage(response);
+
+        URI locationUri = response.getLocation();
+        String locationHeader = locationUri.getPath();
+        if (!locationHeader.equals(newEntityUrl))
+            throw new AssertionError("Expected new entity URL: " + newEntityUrl
+                + "\nActual received `Location` header: " + locationHeader);
     }
 
     protected <T> T assertReceivedEntity(Response response, int expectedStatusCode, Type expectedEntityType) {

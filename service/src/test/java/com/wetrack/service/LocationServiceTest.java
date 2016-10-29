@@ -38,7 +38,7 @@ public class LocationServiceTest extends WeTrackServerTestWithUserLoggedIn {
         String testInput = readResource("location_service/standard.json");
 
         JsonObject requestEntity = new JsonObject();
-        requestEntity.addProperty("token", tokens.get(robertPeng));
+        requestEntity.addProperty("token", tokenOf(robertPeng));
         requestEntity.addProperty("locations", testInput);
         Response response = post("/users/" + robertPeng.getUsername() + "/locations", requestEntity.toString());
 
@@ -53,7 +53,7 @@ public class LocationServiceTest extends WeTrackServerTestWithUserLoggedIn {
         String testInput = readResource("location_service/nonstandard.json");
 
         JsonObject requestEntity = new JsonObject();
-        requestEntity.addProperty("token", tokens.get(robertPeng));
+        requestEntity.addProperty("token", tokenOf(robertPeng));
         requestEntity.addProperty("locations", testInput);
         Response response = post("/users/" + robertPeng.getUsername() + "/locations", requestEntity.toString());
 

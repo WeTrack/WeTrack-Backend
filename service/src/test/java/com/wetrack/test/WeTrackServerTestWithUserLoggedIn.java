@@ -1,5 +1,6 @@
 package com.wetrack.test;
 
+import com.google.gson.JsonObject;
 import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
 import com.wetrack.service.authen.UserLoginService;
@@ -16,8 +17,7 @@ import static org.junit.Assert.assertThat;
 
 public abstract class WeTrackServerTestWithUserLoggedIn extends WeTrackServerTestWithUserCreated {
 
-    protected Map<User, String> tokens;
-    protected String invalidToken = "1234567890abcdef1234567890abcdef";
+    private Map<User, String> tokens;
 
     @Before
     public void setUp() throws Exception {
@@ -34,9 +34,18 @@ public abstract class WeTrackServerTestWithUserLoggedIn extends WeTrackServerTes
         tokens.put(littleHearth, token);
     }
 
-    protected String loginUserWithAssertion(User user) {
-        UserLoginService.LoginRequest requestEntity =
-                new UserLoginService.LoginRequest(user.getUsername(), CryptoUtils.md5Digest(user.getPassword()));
+    protected String tokenOf(User user) {
+        return tokens.get(user);
+    }
+
+    protected String tokenOf(String username) {
+        return tokenOf(new User(username, null, null));
+    }
+
+    private String loginUserWithAssertion(User user) {
+        JsonObject requestEntity = new JsonObject();
+        requestEntity.addProperty("username", user.getUsername());
+        requestEntity.addProperty("password", CryptoUtils.md5Digest(user.getPassword()));
 
         Response response = post("/login", requestEntity);
         assertThat(response.getStatus(), is(200));

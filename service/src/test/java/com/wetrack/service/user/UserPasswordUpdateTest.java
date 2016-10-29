@@ -1,5 +1,6 @@
 package com.wetrack.service.user;
 
+import com.google.gson.JsonObject;
 import com.wetrack.test.WeTrackServerTestWithUserLoggedIn;
 import com.wetrack.util.CryptoUtils;
 import org.junit.Test;
@@ -12,35 +13,33 @@ public class UserPasswordUpdateTest extends WeTrackServerTestWithUserLoggedIn {
 
     @Test
     public void testInvalidPasswordUpdate() {
-        UserPasswordUpdateService.PasswordUpdateRequest updateRequestEntity =
-                new UserPasswordUpdateService.PasswordUpdateRequest(null, null);
-        Response response = put("/users/" + robertPeng.getUsername() + "/password", updateRequestEntity);
+        Response response = passwordUpdate(robertPeng.getUsername(), "", newPassword);
         logResponse(response, "password update with empty old password and new password");
-        assertReceivedNonemptyMessage(response, 400); // Bad Request for empty fields
+        assertReceivedNonemptyMessage(response, 401); // Unauthorized for empty fields
 
-        updateRequestEntity.setOldPassword(robertPeng.getPassword()); // Not md5ed
-        updateRequestEntity.setNewPassword(newPassword);
-        response = put("/users/" + robertPeng.getUsername() + "/password", updateRequestEntity);
+        response = passwordUpdate(robertPeng.getUsername(), windyChan.getPassword(), newPassword);
         logResponse(response, "password update with incorrect old password");
         assertReceivedNonemptyMessage(response, 401); // Unauthorized for incorrect old password
     }
 
     @Test
     public void testValidPasswordUpdate() {
-        UserPasswordUpdateService.PasswordUpdateRequest updateRequestEntity =
-                new UserPasswordUpdateService.PasswordUpdateRequest(
-                        CryptoUtils.md5Digest(robertPeng.getPassword()),
-                        newPassword
-                );
-        Response response = put("/users/" + robertPeng.getUsername() + "/password", updateRequestEntity);
+        Response response = passwordUpdate(robertPeng.getUsername(), robertPeng.getPassword(), newPassword);
         logResponse(response, "password update");
         assertReceivedNonemptyMessage(response, 200);
 
         // Assert the token has been invalidated
         response = post("/users/" + robertPeng.getUsername() + "/tokenVerify",
-                tokens.get(robertPeng), MediaType.TEXT_PLAIN_TYPE);
+                tokenOf(robertPeng), MediaType.TEXT_PLAIN_TYPE);
         logResponse(response, "invalidated token verification");
         assertReceivedNonemptyMessage(response, 401);
+    }
+
+    private Response passwordUpdate(String username, String oldPassword, String newPassword) {
+        JsonObject requestEntity = new JsonObject();
+        requestEntity.addProperty("oldPassword", CryptoUtils.md5Digest(oldPassword));
+        requestEntity.addProperty("newPassword", newPassword);
+        return put("/users/" + username + "/password", requestEntity);
     }
 
 }

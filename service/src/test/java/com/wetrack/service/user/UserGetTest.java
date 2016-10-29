@@ -1,7 +1,6 @@
 package com.wetrack.service.user;
 
 import com.wetrack.model.User;
-import com.wetrack.test.WeTrackServerTest;
 import com.wetrack.test.WeTrackServerTestWithUserCreated;
 import org.junit.Test;
 
@@ -14,7 +13,7 @@ public class UserGetTest extends WeTrackServerTestWithUserCreated {
 
     @Test
     public void testGettingNotExistUser() {
-        Response response = get("/users/" + notExistUsername);
+        Response response = get("/users/" + notExistEntityId);
         logResponse(response, "query of not exist user");
         assertReceivedNonemptyMessage(response, 404);
     }
@@ -36,7 +35,7 @@ public class UserGetTest extends WeTrackServerTestWithUserCreated {
 
     @Test
     public void testHeadingNotExistUser() {
-        Response response = head("/users/" + notExistUsername);
+        Response response = head("/users/" + notExistEntityId);
         logResponse(response, "user existence detect of not exist user");
         assertReceivedEmptyResponse(response, 404);
     }

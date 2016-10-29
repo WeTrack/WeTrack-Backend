@@ -61,8 +61,7 @@ public class WeTrackClient {
 
     public void updateUser(String username, String token, User updatedUser, final ResultMessageCallback callback) {
         updatedUser.setPassword(null);
-        userService.updateUser(username, new UserService.TokenUserRequest(token, updatedUser))
-                .subscribe(observer(callback));
+        userService.updateUser(username, token, updatedUser).subscribe(observer(callback));
     }
 
     public void updateUserPassword(String username, String oldPassword, String newPassword,
@@ -78,8 +77,7 @@ public class WeTrackClient {
 
     public void updateUser(String username, String token, User updatedUser, final Callback<Message> callback) {
         updatedUser.setPassword(null);
-        userService.updateUser(username, new UserService.TokenUserRequest(token, updatedUser))
-                .subscribe(observer(callback));
+        userService.updateUser(username, token, updatedUser).subscribe(observer(callback));
     }
 
     public void updateUserPassword(String username, String oldPassword, String newPassword,
@@ -116,8 +114,7 @@ public class WeTrackClient {
     public void updateUser(String username, String token, User updatedUser,
                            final ResultMessageCallback callback, Scheduler scheduler) {
         updatedUser.setPassword(null);
-        userService.updateUser(username, new UserService.TokenUserRequest(token, updatedUser))
-                .subscribeOn(scheduler).subscribe(observer(callback));
+        userService.updateUser(username, token, updatedUser).subscribeOn(scheduler).subscribe(observer(callback));
     }
 
     public void updateUserPassword(String username, String oldPassword, String newPassword,
@@ -134,8 +131,7 @@ public class WeTrackClient {
     public void updateUser(String username, String token, User updatedUser,
                            final Callback<Message> callback, Scheduler scheduler) {
         updatedUser.setPassword(null);
-        userService.updateUser(username, new UserService.TokenUserRequest(token, updatedUser))
-                .subscribeOn(scheduler).subscribe(observer(callback));
+        userService.updateUser(username, token, updatedUser).subscribeOn(scheduler).subscribe(observer(callback));
     }
 
     public void updateUserPassword(String username, String oldPassword, String newPassword,

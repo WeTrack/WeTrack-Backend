@@ -30,6 +30,7 @@ public class UserUpdateService {
     @Path("/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUser(@PathParam("username") @DefaultValue("") String username,
+                               @QueryParam("token") @DefaultValue("") String token,
                                String requestBody) {
         LOG.debug("PUT  /users/{}/", username);
 
@@ -38,39 +39,36 @@ public class UserUpdateService {
             return badRequest("Given username cannot be empty.");
         }
 
-        TokenUserRequest tokenUserRequest;
-        try {
-            tokenUserRequest = gson.fromJson(requestBody, TokenUserRequest.class);
-        } catch (JsonSyntaxException ex) {
-            LOG.debug("Received body is not in valid format, returning `400 Bad Request`...");
-            return badRequest("The given request body is not in valid JSON format.");
-        }
-
-        String tokenId = tokenUserRequest.getToken();
-        if (tokenUserRequest.getToken().isEmpty()) {
-            LOG.debug("Received empty token. Returning `400 Bad Request...`");
-            return badRequest("Given token cannot be empty.");
-        }
-
         User user = userRepository.findByUsername(username);
         if (user == null) {
             LOG.debug("Failed to find the user with username `{}`. Returning `404 Not Found`...", username);
             return notFound("User with given user name does not exist.");
         }
 
-        UserToken token = userTokenRepository.findByTokenStr(tokenId);
-        if (token == null || token.getExpireTime().isBefore(LocalDateTime.now())) {
+        if (token.trim().isEmpty()) {
+            return badRequest("Token must be provided as query parameter.");
+        }
+
+        UserToken tokenInDB = userTokenRepository.findByTokenStr(token);
+        if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now())) {
             LOG.debug("The given token is invalid or has expired. Returning `401 Unauthorized`...");
             return unauthorized("The given token is invalid or has expired, please log in again.");
         }
 
-        if (!token.getUsername().equals(username)) {
+        if (!tokenInDB.getUsername().equals(username)) {
             LOG.debug("The given token does not belong the user trying to update. Returning `403 Forbidden`...");
             return unauthorized("You cannot update other's information.");
         }
 
-        User userInRequest = tokenUserRequest.getUser();
-        updateUser(user, userInRequest);
+        User updatedUser;
+        try {
+            updatedUser = gson.fromJson(requestBody, User.class);
+        } catch (JsonSyntaxException ex) {
+            LOG.debug("Received body is not in valid format, returning `400 Bad Request`...");
+            return badRequest("The given request body is not in valid JSON format.");
+        }
+
+        updateUser(user, updatedUser);
 
         userRepository.update(user);
         LOG.debug("User updated successfully. Returning `200 OK`...");
@@ -95,30 +93,5 @@ public class UserUpdateService {
 
         if (newUser.getBirthDate() != null)
             oldUser.setBirthDate(newUser.getBirthDate());
-    }
-
-    static class TokenUserRequest {
-        private String token;
-        private User user;
-
-        TokenUserRequest() {}
-
-        TokenUserRequest(String token, User user) {
-            this.token = token;
-            this.user = user;
-        }
-
-        String getToken() {
-            return token;
-        }
-        void setToken(String token) {
-            this.token = token;
-        }
-        User getUser() {
-            return user;
-        }
-        void setUser(User user) {
-            this.user = user;
-        }
     }
 }

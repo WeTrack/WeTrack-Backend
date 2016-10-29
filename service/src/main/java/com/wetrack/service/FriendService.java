@@ -64,6 +64,8 @@ public class FriendService {
             return notFound("User with given username `" + username + "` does not exist.");
         if (userRepository.countByUsername(friendName) == 0)
             return notFound("User with given username `" + friendName + "` does not exist.");
+        if (token.trim().isEmpty())
+            return badRequest("Token must be provided as query parameter.");
 
         UserToken tokenInDB = userTokenRepository.findByTokenStr(token);
         if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now()))
@@ -93,6 +95,9 @@ public class FriendService {
                                  @QueryParam("token") @DefaultValue("") String token) {
         LOG.debug("DELETE /users/{}/friends/{}", username, friendName);
 
+        if (token.trim().isEmpty())
+            return badRequest("Token must be provided as query parameter.");
+
         if (userRepository.countByUsername(username) == 0)
             return notFound("User with given username `" + username + "` does not exist.");
         if (userRepository.countByUsername(friendName) == 0)
@@ -105,10 +110,20 @@ public class FriendService {
             return unauthorized("You cannot modify others' friend list.");
 
         Friend friend = friendRepository.findById(username);
+        if (friend == null) {
+            friend = new Friend(username);
+            friendRepository.insert(friend);
+        }
+        if (friend.getFriends().stream().filter((u) -> u.getUsername().equals(friendName)).count() == 0)
+            return notFound("User with username `" + friendName + "` is not your friend.");
         friend.getFriends().removeIf((u) -> u.getUsername().equals(friendName));
         friendRepository.update(friend);
 
         friend = friendRepository.findById(friendName);
+        if (friend == null) {
+            friend = new Friend(friendName);
+            friendRepository.insert(friend);
+        }
         friend.getFriends().removeIf((u) -> u.getUsername().equals(username));
         friendRepository.update(friend);
 

@@ -19,7 +19,7 @@ import static org.junit.Assert.assertThat;
 
 public class UserUpdateTest extends WeTrackClientTest {
 
-    private String token = "Not matter";
+    private String token = "Notmatter";
 
     private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
     private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
@@ -39,19 +39,16 @@ public class UserUpdateTest extends WeTrackClientTest {
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
         assertThat(request, notNullValue());
         assertThat(request.getMethod(), is("PUT"));
-        assertThat(request.getPath(), is("/users/" + testUser.getUsername()));
-
-        UserService.TokenUserRequest expectedRequestBody =
-                new UserService.TokenUserRequest(token, testUser);
-        assertThat(request.getBody().readUtf8(), is(gson.toJson(expectedRequestBody)));
+        assertThat(request.getPath(), is("/users/" + testUser.getUsername() + "?token=" + token));
+        assertThat(request.getBody().readUtf8(), is(gson.toJson(testUser)));
 
         client.updateUser(testUser.getUsername(), token, testUser, entityHelper.callback(200));
 
         request = server.takeRequest(3, TimeUnit.SECONDS);
         assertThat(request, notNullValue());
         assertThat(request.getMethod(), is("PUT"));
-        assertThat(request.getPath(), is("/users/" + testUser.getUsername()));
-        assertThat(request.getBody().readUtf8(), is(gson.toJson(expectedRequestBody)));
+        assertThat(request.getPath(), is("/users/" + testUser.getUsername() + "?token=" + token));
+        assertThat(request.getBody().readUtf8(), is(gson.toJson(testUser)));
     }
 
     @Test

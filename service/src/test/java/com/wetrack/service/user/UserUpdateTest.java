@@ -1,6 +1,7 @@
 package com.wetrack.service.user;
 
 import com.wetrack.model.User;
+import com.wetrack.test.QueryParam;
 import com.wetrack.test.WeTrackServerTestWithUserLoggedIn;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,28 +31,22 @@ public class UserUpdateTest extends WeTrackServerTestWithUserLoggedIn {
 
     @Test
     public void testInvalidUserUpdate() {
-        UserUpdateService.TokenUserRequest updateRequestEntity =
-                new UserUpdateService.TokenUserRequest("", updatedUser);
-        Response response = put("/users/" + robertPeng.getUsername(), updateRequestEntity);
-        logResponse(response, "user update");
+        Response response = updateUser(robertPeng.getUsername(), "");
+        logResponse(response, "user update with empty token");
         assertReceivedNonemptyMessage(response, 400); // Bad Request for empty token
 
-        updateRequestEntity.setToken("I am token");
-        response = put("/users/" + robertPeng.getUsername(), updateRequestEntity);
-        logResponse(response, "user update");
+        response = updateUser(robertPeng.getUsername(), "I\'m a token.");
+        logResponse(response, "user update with invalid token");
         assertReceivedNonemptyMessage(response, 401); // Unauthorized for incorrect token
 
-        updateRequestEntity.setToken(tokens.get(robertPeng));
-        response = put("/users/" + "Whatever", updateRequestEntity);
-        logResponse(response, "user update");
+        response = put("/users/" + "Whatever", tokenOf(robertPeng));
+        logResponse(response, "user update for not-exist user");
         assertReceivedNonemptyMessage(response, 404); // Not Found for not existed user
     }
 
     @Test
     public void testValidUserUpdate() {
-        UserUpdateService.TokenUserRequest updateRequestEntity =
-                new UserUpdateService.TokenUserRequest(tokens.get(robertPeng), updatedUser);
-        Response response = put("/users/" + robertPeng.getUsername(), updateRequestEntity);
+        Response response = updateUser(robertPeng.getUsername(), tokenOf(robertPeng));
 
         logResponse(response, "user update");
         assertReceivedNonemptyMessage(response, 200);
@@ -60,6 +55,10 @@ public class UserUpdateTest extends WeTrackServerTestWithUserLoggedIn {
         User userInResponse = assertReceivedEntity(response, 200, User.class);
 
         assertThat(userInResponse.getEmail(), is(newEmail));
+    }
+
+    private Response updateUser(String username, String token) {
+        return put("/users/" + robertPeng.getUsername(), updatedUser, QueryParam.of("token", token));
     }
 
 }

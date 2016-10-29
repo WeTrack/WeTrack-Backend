@@ -1,10 +1,12 @@
 package com.wetrack.service;
 
 import com.google.gson.*;
+import com.google.gson.annotations.SerializedName;
 import com.wetrack.dao.ChatRepository;
 import com.wetrack.dao.FriendRepository;
 import com.wetrack.dao.UserRepository;
 import com.wetrack.dao.UserTokenRepository;
+import com.wetrack.json.GsonTypes;
 import com.wetrack.model.Chat;
 import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
@@ -16,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.wetrack.util.RsResponseUtils.*;
 
@@ -35,6 +38,8 @@ public class ChatService {
     public Response createChat(@QueryParam("token") @DefaultValue("") String token,
                                @DefaultValue("") String requestBody) {
         LOG.debug("POST /chats");
+        if (token.trim().isEmpty())
+            return badRequest("Token must be provided as query parameter.");
 
         UserToken tokenInDB = userTokenRepository.findByTokenStr(token);
         if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now()))
@@ -43,21 +48,24 @@ public class ChatService {
         User loggedInUser = userRepository.findByUsername(tokenInDB.getUsername());
 
         try {
-            JsonObject json = gson.fromJson(requestBody, JsonObject.class);
-            Chat chat = new Chat(json.getAsString());
-            JsonArray memberNames = json.getAsJsonArray("members");
-            for (JsonElement memberNameJson : memberNames) {
-                String memberName = memberNameJson.getAsString();
+            ChatCreateRequest request = gson.fromJson(requestBody, ChatCreateRequest.class);
+            if (request.name == null || request.name.trim().isEmpty())
+                return badRequest("Name of the chat must be provided in the request body.");
+            if (request.memberNames == null || request.memberNames.isEmpty())
+                return badRequest("A chat must contain at least two people.");
+
+            Chat chat = new Chat(request.name);
+            for (String memberName : request.memberNames) {
                 if (userRepository.countByUsername(memberName) == 0)
                     return notFound("User with given username `" + memberName + "` does not exist.");
                 if (!friendRepository.isFriend(loggedInUser.getUsername(), memberName))
-                    return unauthorized("User with given username `" + memberName + "` is not your friend.");
+                    return forbidden("User with given username `" + memberName + "` is not your friend.");
                 chat.getMembers().add(userRepository.findByUsername(memberName));
             }
             chat.getMembers().add(loggedInUser);
             chatRepository.insert(chat);
             return created("/chats/" + chat.getId(), "Chat created.");
-        } catch (JsonSyntaxException | IllegalStateException | ClassCastException ex) {
+        } catch (JsonSyntaxException | NullPointerException | IllegalStateException | ClassCastException ex) {
             return badRequest("The given request body is not in valid JSON format.");
         }
     }
@@ -65,10 +73,13 @@ public class ChatService {
     @POST
     @Path("/{chatId}/members")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addMember(@PathParam("chatId") String chatId,
-                              @QueryParam("token") @DefaultValue("") String token,
-                              @DefaultValue("") String requestBody) {
+    public Response addMembers(@PathParam("chatId") String chatId,
+                               @QueryParam("token") @DefaultValue("") String token,
+                               @DefaultValue("") String requestBody) {
         LOG.debug("POST /chats/{}/members", chatId);
+
+        if (token.trim().isEmpty())
+            return badRequest("Token must be provided as query parameter.");
 
         UserToken tokenInDB = userTokenRepository.findByTokenStr(token);
         if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now()))
@@ -81,12 +92,15 @@ public class ChatService {
             return unauthorized("You are not a member of the specified chat.");
 
         try {
-            JsonObject json = gson.fromJson(requestBody, JsonObject.class);
-            String newMemberName = json.get("member").getAsString();
-            if (userRepository.countByUsername(newMemberName) == 0)
-                return notFound("User with given username `" + newMemberName + "` does not exist.");
-            chat.getMembers().add(userRepository.findByUsername(newMemberName));
-            chatRepository.update(chat);
+            List<String> newMemberNames = gson.fromJson(requestBody, GsonTypes.stringListType);
+            for (String newMemberName : newMemberNames) {
+                if (userRepository.countByUsername(newMemberName) == 0)
+                    return notFound("User with given username `" + newMemberName + "` does not exist.");
+                if (!friendRepository.isFriend(tokenInDB.getUsername(), newMemberName))
+                    return forbidden("User with username `" + newMemberName + "` is not your friend.");
+                chat.getMembers().add(userRepository.findByUsername(newMemberName));
+                chatRepository.update(chat);
+            }
             return ok();
         } catch (JsonSyntaxException | IllegalStateException | ClassCastException ex) {
             return badRequest("The given request body is not in valid JSON format.");
@@ -108,9 +122,12 @@ public class ChatService {
     @DELETE
     @Path("/{chatId}/members/{memberName}")
     public Response removeMember(@PathParam("chatId") String chatId,
-                                 @PathParam("memberName") String memberName,
+                                 @PathParam("memberName") @DefaultValue("") String memberName,
                                  @QueryParam("token") @DefaultValue("") String token) {
         LOG.debug("DELETE /chats/{}/members/{}", chatId, memberName);
+
+        if (token.trim().isEmpty())
+            return badRequest("Token must be provided as query parameter.");
 
         UserToken tokenInDB = userTokenRepository.findByTokenStr(token);
         if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now()))
@@ -127,4 +144,8 @@ public class ChatService {
         return ok();
     }
 
+    private static class ChatCreateRequest {
+        private String name;
+        @SerializedName("members") private List<String> memberNames;
+    }
 }

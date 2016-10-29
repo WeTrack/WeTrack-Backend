@@ -12,18 +12,18 @@ public class UserTokenVerificationTest extends WeTrackServerTestWithUserLoggedIn
     @Test
     public void testInvalidTokenVerification() {
         Response response = post("/users/" + robertPeng.getUsername() + "Whatever" + "/tokenVerify",
-                tokens.get(robertPeng), MediaType.TEXT_PLAIN_TYPE);
+                tokenOf(robertPeng), MediaType.TEXT_PLAIN_TYPE);
         assertReceivedNonemptyMessage(response, 401);
 
         response = post("/users/" + robertPeng.getUsername() + "/tokenVerify",
-                tokens.get(robertPeng) + "Whatever", MediaType.TEXT_PLAIN_TYPE);
+                tokenOf(robertPeng) + "Whatever", MediaType.TEXT_PLAIN_TYPE);
         assertReceivedNonemptyMessage(response, 401);
     }
 
     @Test
     public void testValidTokenVerification() {
         Response response = post("/users/" + robertPeng.getUsername() + "/tokenVerify",
-                tokens.get(robertPeng), MediaType.TEXT_PLAIN_TYPE);
+                tokenOf(robertPeng), MediaType.TEXT_PLAIN_TYPE);
         assertReceivedEntity(response, 200, UserToken.class);
     }
 
