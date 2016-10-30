@@ -13,7 +13,7 @@ public class FriendDeletingTest extends FriendServiceTestWithFriendAdded {
         Response response = delete("/users/" + robertPeng.getUsername() + "/friends/" + windyChan.getUsername(),
                 QueryParam.of("token", tokenOf(robertPeng)));
         logResponse(response, "deleting friend");
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
         assertFriendsNum(robertPeng, 1);
         assertFriendsNum(windyChan, 1);
         assertFriendsNum(mrDai, 2);

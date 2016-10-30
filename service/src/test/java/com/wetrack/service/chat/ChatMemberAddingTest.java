@@ -19,7 +19,7 @@ public class ChatMemberAddingTest extends ChatServiceTestWithChatCreated {
     public void testChatMemberAdding() {
         Response response = addMembers(chatIdOf(robertFamily), tokenOf(robertPeng), windyChan);
         logResponse(response, "adding chat member");
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
         response = get("/chats/" + chatIdOf(robertFamily) + "/members", QueryParam.of("token", tokenOf(robertPeng)));
         List<User> members = assertReceivedEntity(response, userListType);
         assertThat(members.size(), is(3));
@@ -31,7 +31,7 @@ public class ChatMemberAddingTest extends ChatServiceTestWithChatCreated {
         addFriendWithAssertion(robertPeng, tokenOf(robertPeng), littleHearth);
         Response response = addMembers(chatIdOf(robertFamily), tokenOf(robertPeng), windyChan, littleHearth);
         logResponse(response, "adding multiple chat member");
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
 
         List<User> members = getChatMemberWithAssertion(chatIdOf(robertFamily), tokenOf(robertPeng));
         List<String> memberNames = members.stream().map(User::getUsername).collect(Collectors.toList());

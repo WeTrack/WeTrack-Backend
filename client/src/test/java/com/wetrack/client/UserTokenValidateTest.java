@@ -25,7 +25,7 @@ public class UserTokenValidateTest extends WeTrackClientTest {
     @Test
     public void testTokenValidateRequestFormat() throws InterruptedException {
         server.enqueue(new MockResponse().setResponseCode(200));
-        client.tokenValidate(username, token, entityHelper.callback(200));
+        client.tokenVerify(username, token, entityHelper.callback(200));
 
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
         assertThat(request, notNullValue());
@@ -37,7 +37,7 @@ public class UserTokenValidateTest extends WeTrackClientTest {
     @Test
     public void testTokenValidateOnErrorResponse() throws Exception {
         server.enqueue(new MockResponse().setResponseCode(401).setBody(readResource("test_token_verify/401.json")));
-        client.tokenValidate(username, token, entityHelper.callback(200));
+        client.tokenVerify(username, token, entityHelper.callback(200));
 
         entityHelper.assertReceivedErrorMessage(401);
     }

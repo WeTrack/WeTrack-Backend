@@ -37,27 +37,27 @@ public class UserPasswordUpdateAndTokenValidateTest extends WeTrackIntegrateTest
 
     @Test
     public void testCorrectPasswordUpdateWithMessageCallback() {
-        client.tokenValidate(username, token, tokenHelper.callback(200));
+        client.tokenVerify(username, token, tokenHelper.callback(200));
         tokenHelper.assertReceivedEntity(200);
 
         client.updateUserPassword(username, password, newPasword, messageHelper.callback());
         messageHelper.assertReceivedSuccessfulMessage();
 
         // Assert the old token is invalidated
-        client.tokenValidate(username, token, tokenHelper.callback(200));
+        client.tokenVerify(username, token, tokenHelper.callback(200));
         tokenHelper.assertReceivedErrorMessage(401);
     }
 
     @Test
     public void testCorrectPasswordUpdateWithEntityCallback() {
-        client.tokenValidate(username, token, tokenHelper.callback(200));
+        client.tokenVerify(username, token, tokenHelper.callback(200));
         tokenHelper.assertReceivedEntity(200);
 
         client.updateUserPassword(username, password, newPasword, entityHelper.callback(200));
         entityHelper.assertReceivedEntity(200);
 
         // Assert the old token is invalidated
-        client.tokenValidate(username, token, tokenHelper.callback(200));
+        client.tokenVerify(username, token, tokenHelper.callback(200));
         tokenHelper.assertReceivedErrorMessage(401);
     }
 

@@ -21,7 +21,7 @@ public class ChatExitingTest extends ChatServiceTestWithChatCreated {
         assertChatNum(robertPeng, 2);
         Response response = exitChat(robertPeng, tokenOf(robertPeng), chatIdOf(robertFamily));
         logResponse(response, "exiting chat");
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
         assertChatNum(robertPeng, 1);
     }
 

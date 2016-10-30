@@ -41,7 +41,7 @@ abstract class ChatServiceTest extends WeTrackServerTestWithUserLoggedIn {
     void addFriendWithAssertion(User userA, User userB, String tokenOfUserA) {
         Response response = post("/users/" + userA.getUsername() + "/friends/" + userB.getUsername(),
                 "", QueryParam.of("token", tokenOfUserA));
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
     }
 
     void assertFriendsNum(User user, int expectedFriendsNum) {
@@ -74,13 +74,13 @@ abstract class ChatServiceTest extends WeTrackServerTestWithUserLoggedIn {
 
     void addMembersWithAssertion(String chatId, String token, User... newMembers) {
         Response response = addMembers(chatId, token, newMembers);
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
     }
 
     void addFriendWithAssertion(User sourceUser, String token, User newFriendUser) {
         Response response = post("/users/" + sourceUser.getUsername() + "/friends/" + newFriendUser.getUsername(),
                 "", QueryParam.of("token", token));
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
     }
 
     List<User> getChatMemberWithAssertion(String chatId, String token) {

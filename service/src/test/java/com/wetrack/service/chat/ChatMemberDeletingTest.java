@@ -26,7 +26,7 @@ public class ChatMemberDeletingTest extends ChatServiceTestWithChatCreated {
     public void testRemovingMember() {
         Response response = removeMembers(chatIdOf(robertFamily), tokenOf(robertPeng), windyChan);
         logResponse(response, "removing single member");
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
 
         List<User> members = getChatMemberWithAssertion(chatIdOf(robertFamily), tokenOf(robertPeng));
         List<String> memberNames = members.stream().map(User::getUsername).collect(Collectors.toList());
@@ -44,8 +44,9 @@ public class ChatMemberDeletingTest extends ChatServiceTestWithChatCreated {
     @Test
     public void testRemovingMemberWithInvalidToken() {
         Response response = removeMembers(chatIdOf(robertFamily), tokenOf(robertPeng), littleHearth);
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
         response = removeMembers(chatIdOf(robertFamily), tokenOf(littleHearth), windyChan);
+        logResponse(response, "removing member with invalid token");
         assertReceivedNonemptyMessage(response, 401);
     }
 

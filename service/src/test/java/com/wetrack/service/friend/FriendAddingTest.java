@@ -12,7 +12,7 @@ public class FriendAddingTest extends FriendServiceTest {
     public void testAddFriend() {
         Response response = addFriend(robertPeng, windyChan, tokenOf(robertPeng));
         logResponse(response, "adding friend");
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
         assertFriendsNum(robertPeng, 1);
     }
 
@@ -58,7 +58,7 @@ public class FriendAddingTest extends FriendServiceTest {
 
         Response response = addFriend(robertPeng, windyChan, tokenOf(robertPeng));
         logResponse(response, "adding friend");
-        assertReceivedEmptyResponse(response, 200);
+        assertReceivedNonemptyMessage(response, 200);
         assertFriendsNum(robertPeng, 1);
     }
 }

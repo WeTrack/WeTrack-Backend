@@ -68,6 +68,6 @@ public class UserChatService {
 
         chat.getMembers().removeIf((u) -> u.getUsername().equals(username));
         chatRepository.update(chat);
-        return ok();
+        return okMessage("You have exited chat `" + chat.getName() + "`.");
     }
 }

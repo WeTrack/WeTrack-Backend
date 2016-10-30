@@ -10,6 +10,7 @@ import com.wetrack.json.GsonTypes;
 import com.wetrack.model.Chat;
 import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class ChatService {
             }
             chat.getMembers().add(loggedInUser);
             chatRepository.insert(chat);
-            return created("/chats/" + chat.getId(), "Chat created.");
+            return created("/chats/" + chat.getId(), "Chat `" + chat.getName() + "` created.");
         } catch (JsonSyntaxException | NullPointerException | IllegalStateException | ClassCastException ex) {
             return badRequest("The given request body is not in valid JSON format.");
         }
@@ -101,7 +102,7 @@ public class ChatService {
                 chat.getMembers().add(userRepository.findByUsername(newMemberName));
                 chatRepository.update(chat);
             }
-            return ok();
+            return okMessage("Users " + StringUtils.join(newMemberNames, ", ") + " are added to chat " + chat.getName());
         } catch (JsonSyntaxException | IllegalStateException | ClassCastException ex) {
             return badRequest("The given request body is not in valid JSON format.");
         }
@@ -141,7 +142,7 @@ public class ChatService {
 
         chat.getMembers().removeIf((u) -> u.getUsername().equals(memberName));
         chatRepository.update(chat);
-        return ok();
+        return okMessage("User " + memberName + " is removed from chat " + chat.getName() + ".");
     }
 
     private static class ChatCreateRequest {

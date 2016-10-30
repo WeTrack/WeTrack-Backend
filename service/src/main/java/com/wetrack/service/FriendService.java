@@ -85,7 +85,7 @@ public class FriendService {
         friend.getFriends().add(userRepository.findByUsername(username));
         friendRepository.insert(friend);
 
-        return ok();
+        return okMessage("You have added `" + friendName + "` as your friend.");
     }
 
     @DELETE
@@ -127,7 +127,7 @@ public class FriendService {
         friend.getFriends().removeIf((u) -> u.getUsername().equals(username));
         friendRepository.update(friend);
 
-        return ok();
+        return okMessage("You have deleted `" + friendName + "` from your friend list.");
     }
 
     @HEAD
