@@ -3,12 +3,10 @@ package com.wetrack.test;
 import com.google.gson.JsonObject;
 import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
-import com.wetrack.service.authen.UserLoginService;
 import com.wetrack.util.CryptoUtils;
 import org.junit.Before;
 
 import javax.ws.rs.core.Response;
-
 import java.util.HashMap;
 import java.util.Map;
 

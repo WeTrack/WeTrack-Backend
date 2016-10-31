@@ -1,17 +1,14 @@
 package com.wetrack;
 
-import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.EntityResponseTestHelper;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.CreatedResponseTestHelper;
 import com.wetrack.test.Utils;
 import com.wetrack.test.WeTrackIntegrateTest;
 import org.junit.Test;
 
 public class UserCreateTest extends WeTrackIntegrateTest {
 
-    private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(201);
+    private CreatedResponseTestHelper messageHelper = new CreatedResponseTestHelper();
 
     @Test
     public void testUserCreateWithMessageCallback() throws Exception {
@@ -22,34 +19,26 @@ public class UserCreateTest extends WeTrackIntegrateTest {
     }
 
     @Test
-    public void testUserCreateWithEntityCallback() throws Exception {
-        User exampleUser = Utils.loadExampleUser(gson);
-        client.createUser(exampleUser, entityHelper.callback(201));
-
-        entityHelper.assertReceivedEntity(201); // Created
-    }
-
-    @Test
     public void testCreateDuplicateUser() throws Exception {
         User exampleUser = Utils.loadExampleUser(gson);
         client.createUser(exampleUser, messageHelper.callback());
         messageHelper.assertReceivedSuccessfulMessage();
 
-        client.createUser(exampleUser, entityHelper.callback(201)); // Create user with existed username
-        entityHelper.assertReceivedErrorMessage(403); // Forbidden
+        client.createUser(exampleUser, messageHelper.callback()); // Create user with existed username
+        messageHelper.assertReceivedFailedMessage(403); // Forbidden
     }
 
     @Test
     public void testCreateInvalidUser() throws Exception {
         User exampleUser = Utils.loadExampleUser(gson);
         exampleUser.setUsername("");
-        client.createUser(exampleUser, entityHelper.callback(201)); // Create user without username
-        entityHelper.assertReceivedErrorMessage(400); // Bad Request
+        client.createUser(exampleUser, messageHelper.callback()); // Create user without username
+        messageHelper.assertReceivedFailedMessage(400); // Bad Request
 
         exampleUser = Utils.loadExampleUser(gson);
         exampleUser.setPassword("");
-        client.createUser(exampleUser, entityHelper.callback(201)); // Create user without password
-        entityHelper.assertReceivedErrorMessage(400); // Bad Request
+        client.createUser(exampleUser, messageHelper.callback()); // Create user without password
+        messageHelper.assertReceivedFailedMessage(400); // Bad Request
     }
 
 }

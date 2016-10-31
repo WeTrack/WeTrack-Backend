@@ -7,16 +7,12 @@ import com.wetrack.config.WeTrackApplication;
 import com.wetrack.model.CreatedMessage;
 import com.wetrack.model.Message;
 import com.wetrack.model.User;
-import com.wetrack.model.UserToken;
-import com.wetrack.service.authen.UserLoginService;
-import com.wetrack.util.CryptoUtils;
 import com.wetrack.util.GsonJerseyProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -25,16 +21,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 public abstract class WeTrackServerTest extends JerseyTest {
     private static final Logger LOG = LoggerFactory.getLogger(WeTrackServerTest.class);
+
+    protected String notExistEntityId = "1234567890abcdef1234567890abcdef";
 
     protected Gson gson = new SpringConfig().gson();
 

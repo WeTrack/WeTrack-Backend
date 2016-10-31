@@ -7,7 +7,6 @@ import com.wetrack.config.SpringTestConfig;
 import com.wetrack.dao.ChatRepository;
 import com.wetrack.dao.UserRepository;
 import com.wetrack.model.Chat;
-import com.wetrack.model.Friend;
 import com.wetrack.model.User;
 import org.bson.Document;
 import org.junit.After;

@@ -1,5 +1,6 @@
 package com.wetrack.client;
 
+import com.wetrack.client.model.CreatedMessage;
 import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
 import com.wetrack.client.model.UserToken;
@@ -32,7 +33,7 @@ interface UserService {
                                              @Body User updatedUser);
 
     @POST("/users")
-    Observable<Response<Message>> createUser(@Body User newUser);
+    Observable<Response<CreatedMessage>> createUser(@Body User newUser);
 
     @PUT("/users/{username}/password")
     Observable<Response<Message>> updateUserPassword(@Path("username") String username,

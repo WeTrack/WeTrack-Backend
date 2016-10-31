@@ -1,6 +1,7 @@
 package com.wetrack.service.chat;
 
 import com.google.gson.reflect.TypeToken;
+import com.wetrack.json.GsonTypes;
 import com.wetrack.model.Chat;
 import com.wetrack.model.User;
 import com.wetrack.test.QueryParam;
@@ -16,20 +17,19 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class ChatListGettingTest extends ChatServiceTestWithChatCreated {
-    private Type chatListType = new TypeToken<List<Chat>>(){}.getType();
 
     @Test
     public void testChatListGetting() {
         Response response = getChatList(robertPeng, tokenOf(robertPeng));
         logResponse(response, "getting chat list");
-        List<Chat> chats = assertReceivedEntity(response, 200, chatListType);
+        List<Chat> chats = assertReceivedEntity(response, 200, GsonTypes.chatListType);
         List<String> chatNames = chats.stream().map(Chat::getName).collect(Collectors.toList());
         assertThat(chatNames.size(), is(2));
         assertThat(chatNames, hasItems(robertFamily, robertAndWindy));
 
         response = getChatList(mrDai, tokenOf(mrDai));
         logResponse(response, "getting chat list");
-        chats = assertReceivedEntity(response, 200, chatListType);
+        chats = assertReceivedEntity(response, 200, GsonTypes.chatListType);
         chatNames = chats.stream().map(Chat::getName).collect(Collectors.toList());
         assertThat(chatNames.size(), is(2));
         assertThat(chatNames, hasItems(robertFamily, mrDaiAndLittleHearth));

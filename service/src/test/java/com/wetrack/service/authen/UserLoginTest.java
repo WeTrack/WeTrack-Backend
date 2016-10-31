@@ -1,10 +1,7 @@
 package com.wetrack.service.authen;
 
 import com.wetrack.model.UserToken;
-import com.wetrack.test.WeTrackServerTest;
 import com.wetrack.test.WeTrackServerTestWithUserCreated;
-import com.wetrack.util.CryptoUtils;
-import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;

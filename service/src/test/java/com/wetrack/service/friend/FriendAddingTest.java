@@ -1,7 +1,6 @@
 package com.wetrack.service.friend;
 
 import com.wetrack.model.User;
-import com.wetrack.test.QueryParam;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;

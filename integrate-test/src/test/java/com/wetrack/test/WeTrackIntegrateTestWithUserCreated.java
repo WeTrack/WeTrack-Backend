@@ -1,7 +1,7 @@
 package com.wetrack.test;
 
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.CreatedResponseTestHelper;
 import org.joda.time.LocalDate;
 import org.junit.Before;
 
@@ -34,15 +34,15 @@ public class WeTrackIntegrateTestWithUserCreated extends WeTrackIntegrateTest {
         littleHearth.setBirthDate(LocalDate.parse("1994-10-02"));
         littleHearth.setGender(User.Gender.Female);
 
-        MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(201);
+        CreatedResponseTestHelper messageHelper = new CreatedResponseTestHelper();
         client.createUser(robertPeng, messageHelper.callback());
-        messageHelper.assertReceivedSuccessfulMessage();
+        messageHelper.assertReceivedSuccessfulMessage(robertPeng.getUsername());
         client.createUser(windyChan, messageHelper.callback());
-        messageHelper.assertReceivedSuccessfulMessage();
+        messageHelper.assertReceivedSuccessfulMessage(windyChan.getUsername());
         client.createUser(mrDai, messageHelper.callback());
-        messageHelper.assertReceivedSuccessfulMessage();
+        messageHelper.assertReceivedSuccessfulMessage(mrDai.getUsername());
         client.createUser(littleHearth, messageHelper.callback());
-        messageHelper.assertReceivedSuccessfulMessage();
+        messageHelper.assertReceivedSuccessfulMessage(littleHearth.getUsername());
     }
 
 }

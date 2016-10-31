@@ -1,8 +1,8 @@
 package com.wetrack.test;
 
+import com.wetrack.client.model.User;
 import com.wetrack.client.model.UserToken;
 import com.wetrack.client.test.EntityResponseTestHelper;
-import com.wetrack.client.model.User;
 import org.junit.Before;
 
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class WeTrackIntegrateTestWithUserLoggedIn extends WeTrackIntegrateTestWithUserCreated {
 
-    protected Map<User, String> tokens;
+    private Map<User, String> tokens;
 
     protected String token;
 
@@ -38,6 +38,14 @@ public class WeTrackIntegrateTestWithUserLoggedIn extends WeTrackIntegrateTestWi
         tokens.put(littleHearth, receivedToken.getToken());
 
         token = tokens.get(robertPeng);
+    }
+
+    protected String tokenOf(String username) {
+        return tokenOf(new User(username, null, null));
+    }
+
+    protected String tokenOf(User user) {
+        return tokens.get(user);
     }
 
 }

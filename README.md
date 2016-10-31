@@ -24,8 +24,8 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 - [x] Write integration test cases for user login and management.
 - [x] Modularize the service classes in a more granular manner.
 - [x] Implement Location uploading and query.
-- [ ] Implement Friend adding.
-- [ ] Implement Chat creating.
+- [x] Implement Friend adding.
+- [x] Implement Chat creating.
 - [ ] Implement WebSocket notification pushing.
 - [ ] Implement Message sending.
 - [ ] Implement personal icon uploading.

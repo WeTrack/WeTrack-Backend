@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import com.wetrack.model.User;
 import com.wetrack.test.QueryParam;
 import com.wetrack.test.WeTrackServerTestWithUserLoggedIn;
+
 import javax.ws.rs.core.Response;
 import java.util.List;
 

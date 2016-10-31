@@ -13,8 +13,8 @@ public class Chat {
 
     public Chat() {}
 
-    public Chat(String chatId, String name) {
-        this.chatId = chatId;
+    public Chat(String name) {
+        this.chatId = "";
         this.name = name;
         this.members = new LinkedList<>();
     }

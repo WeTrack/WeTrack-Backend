@@ -1,7 +1,6 @@
 package com.wetrack.client;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.wetrack.client.model.Message;
 import com.wetrack.client.test.EntityResponseTestHelper;

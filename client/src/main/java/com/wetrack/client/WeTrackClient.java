@@ -100,8 +100,8 @@ public class WeTrackClient {
 
     /**
      * Creates a user with the fields provided in the given {@link User} instance synchronously.
-     * The {@link ResultMessageCallback#onSuccess(String)} method will be invoked if the creation is
-     * successful; otherwise, the {@link ResultMessageCallback#onFail(String, int)} method will be invoked.
+     * The {@link CreatedMessageCallback#onSuccess(String, String)} method will be invoked if the creation is
+     * successful; otherwise, the {@link CreatedMessageCallback#onFail(String, int)} method will be invoked.
      * <br><br>
      * Possible error response status code includes:
      *
@@ -114,15 +114,15 @@ public class WeTrackClient {
      * @param newUser the given {@code User} instance.
      * @param callback callback object which defines how to handle different result.
      */
-    public void createUser(User newUser, final ResultMessageCallback callback) {
+    public void createUser(User newUser, final CreatedMessageCallback callback) {
         userService.createUser(newUser).subscribe(observer(callback));
     }
 
     /**
      * Creates a user with the fields provided in the given {@link User} instance asynchronously.
      * The method will use the provided {@link Scheduler} to execute the network request.
-     * The {@link ResultMessageCallback#onSuccess(String)} method will be invoked if the creation is
-     * successful; otherwise, the {@link ResultMessageCallback#onFail(String, int)} method will be invoked.
+     * The {@link CreatedMessageCallback#onSuccess(String, String)} method will be invoked if the creation is
+     * successful; otherwise, the {@link CreatedMessageCallback#onFail(String, int)} method will be invoked.
      * <br><br>
      * Possible error response status code includes:
      *
@@ -136,49 +136,7 @@ public class WeTrackClient {
      * @param callback callback object which defines how to handle different result.
      * @param scheduler the provided {@code Scheduler} on which the method will execute network request.
      */
-    public void createUser(User newUser, final ResultMessageCallback callback, Scheduler scheduler) {
-        userService.createUser(newUser).subscribeOn(scheduler).subscribe(observer(callback));
-    }
-
-    /**
-     * Creates a user with the fields provided in the given {@link User} instance synchronously.
-     * The {@link Callback#onReceive(Object)} method will be invoked if the creation is successful;
-     * otherwise, the {@link Callback#onErrorResponse(Response)} method will be invoked.
-     * <br><br>
-     * Possible error response status code includes:
-     *
-     * <table>
-     *     <tr><th>Status Code</th><th>Meaning</th></tr>
-     *     <tr><td>{@code 400}</td><td>Fields in the provided {@code User} instance are invalid.</td></tr>
-     *     <tr><td>{@code 403}</td><td>User with same username already exist.</td></tr>
-     * </table>
-     *
-     * @param newUser the given {@code User} instance.
-     * @param callback callback object which defines how to handle different result.
-     */
-    public void createUser(User newUser, final Callback<Message> callback) {
-        userService.createUser(newUser).subscribe(observer(callback));
-    }
-
-    /**
-     * Creates a user with the fields provided in the given {@link User} instance asynchronously.
-     * The method will use the given {@link Scheduler} to execute network request.
-     * The {@link Callback#onReceive(Object)} method will be invoked if the creation is successful;
-     * otherwise, the {@link Callback#onErrorResponse(Response)} method will be invoked.
-     * <br><br>
-     * Possible error response status code includes:
-     *
-     * <table>
-     *     <tr><th>Status Code</th><th>Meaning</th></tr>
-     *     <tr><td>{@code 400}</td><td>Fields in the provided {@code User} instance are invalid.</td></tr>
-     *     <tr><td>{@code 403}</td><td>User with same username already exist.</td></tr>
-     * </table>
-     *
-     * @param newUser the given {@code User} instance.
-     * @param callback callback object which defines how to handle different result.
-     * @param scheduler the given {@code Scheduler} on which the method should execute network request.
-     */
-    public void createUser(User newUser, final Callback<Message> callback, Scheduler scheduler) {
+    public void createUser(User newUser, final CreatedMessageCallback callback, Scheduler scheduler) {
         userService.createUser(newUser).subscribeOn(scheduler).subscribe(observer(callback));
     }
 
@@ -449,19 +407,11 @@ public class WeTrackClient {
         locationService.getLatestLocation(username).subscribeOn(scheduler).subscribe(observer(callback));
     }
 
-    public void createChat(String token, Chat chat, final ResultMessageCallback callback) {
+    public void createChat(String token, Chat chat, final CreatedMessageCallback callback) {
         chatService.createChat(token, serializeChat(chat)).subscribe(observer(callback));
     }
 
-    public void createChat(String token, Chat chat, final Callback<Message> callback) {
-        chatService.createChat(token, serializeChat(chat)).subscribe(observer(callback));
-    }
-
-    public void createChat(String token, Chat chat, final ResultMessageCallback callback, Scheduler scheduler) {
-        chatService.createChat(token, serializeChat(chat)).subscribeOn(scheduler).subscribe(observer(callback));
-    }
-
-    public void createChat(String token, Chat chat, final Callback<Message> callback, Scheduler scheduler) {
+    public void createChat(String token, Chat chat, final CreatedMessageCallback callback, Scheduler scheduler) {
         chatService.createChat(token, serializeChat(chat)).subscribeOn(scheduler).subscribe(observer(callback));
     }
 
@@ -721,8 +671,8 @@ public class WeTrackClient {
         locationService = retrofit.create(LocationService.class);
     }
 
-    private Observer<Response<Message>> observer(final ResultMessageCallback callback) {
-        return new Observer<Response<Message>>() {
+    private Observer<Response<CreatedMessage>> observer(final CreatedMessageCallback callback) {
+        return new Observer<Response<CreatedMessage>>() {
             @Override
             public void onCompleted() {}
 
@@ -732,19 +682,48 @@ public class WeTrackClient {
             }
 
             @Override
-            public void onNext(Response<Message> messageResponse) {
-                if (messageResponse.code() == callback.getSuccessStatusCode()) {
-                    callback.onSuccess(messageResponse.body().getMessage());
+            public void onNext(Response<CreatedMessage> response) {
+                if (response.code() == 201) { // Created
+                    String newEntityUrl = response.body().getEntityUrl();
+                    String[] splitResult = newEntityUrl.split("/");
+                    callback.onSuccess(splitResult[splitResult.length - 1], response.body().getMessage());
                 } else {
-                    if (messageResponse.body() != null) {
-                        callback.onFail(messageResponse.body().getMessage(), messageResponse.code());
+                    try (ResponseBody errorBody = response.errorBody()) {
+                        String errorResponse = errorBody.string();
+                        Message message = gson.fromJson(errorResponse, Message.class);
+                        callback.onFail(message.getMessage(), response.code());
+                    } catch (IOException e) {
+                        callback.onFail(response.message(), response.code());
+                    }
+                }
+            }
+        };
+    }
+
+    private <T extends Message> Observer<Response<T>> observer(final ResultMessageCallback callback) {
+        return new Observer<Response<T>>() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                callback.onError(e);
+            }
+
+            @Override
+            public void onNext(Response<T> response) {
+                if (response.code() == callback.getSuccessStatusCode()) {
+                    callback.onSuccess(response.body().getMessage());
+                } else {
+                    if (response.body() != null) {
+                        callback.onFail(response.body().getMessage(), response.code());
                     } else {
-                        try (ResponseBody errorBody = messageResponse.errorBody()) {
+                        try (ResponseBody errorBody = response.errorBody()) {
                             String errorResponse = errorBody.string();
                             Message message = gson.fromJson(errorResponse, Message.class);
-                            callback.onFail(message.getMessage(), messageResponse.code());
+                            callback.onFail(message.getMessage(), response.code());
                         } catch (IOException e) {
-                            callback.onFail(messageResponse.message(), messageResponse.code());
+                            callback.onFail(response.message(), response.code());
                         }
                     }
                 }

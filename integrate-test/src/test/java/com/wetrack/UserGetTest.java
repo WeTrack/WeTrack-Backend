@@ -3,7 +3,6 @@ package com.wetrack;
 import com.wetrack.client.model.User;
 import com.wetrack.client.test.EntityResponseTestHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithUserCreated;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;

@@ -1,6 +1,7 @@
 package com.wetrack.service;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.wetrack.dao.ChatRepository;
 import com.wetrack.dao.FriendRepository;

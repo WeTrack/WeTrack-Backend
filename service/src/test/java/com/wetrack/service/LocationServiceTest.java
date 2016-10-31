@@ -7,8 +7,6 @@ import com.wetrack.test.QueryParam;
 import com.wetrack.test.WeTrackServerTestWithUserLoggedIn;
 import org.junit.Test;
 
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;

@@ -2,6 +2,7 @@ package com.wetrack.client;
 
 import com.google.gson.JsonObject;
 import com.wetrack.client.model.Chat;
+import com.wetrack.client.model.CreatedMessage;
 import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
 import retrofit2.Response;
@@ -13,7 +14,7 @@ import java.util.List;
 interface ChatService {
 
     @POST("/chats")
-    Observable<Response<Message>> createChat(@Query("token") String token, @Body JsonObject chatEntity);
+    Observable<Response<CreatedMessage>> createChat(@Query("token") String token, @Body JsonObject chatEntity);
 
     @POST("/chats/{chatId}/members")
     Observable<Response<Message>> addChatMembers(@Path("chatId") String chatId,
