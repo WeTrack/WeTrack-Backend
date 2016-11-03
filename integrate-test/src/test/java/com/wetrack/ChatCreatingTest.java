@@ -1,17 +1,10 @@
 package com.wetrack;
 
-import com.google.gson.JsonObject;
 import com.wetrack.client.model.Chat;
 import com.wetrack.client.test.CreatedResponseTestHelper;
-import com.wetrack.client.model.User;
-import com.wetrack.test.QueryParam;
 import com.wetrack.test.WeTrackIntegrateTestWithFriendAdded;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ChatCreatingTest extends WeTrackIntegrateTestWithFriendAdded {
 
@@ -24,7 +17,7 @@ public class ChatCreatingTest extends WeTrackIntegrateTestWithFriendAdded {
         super.setUp();
 
         testChat = new Chat("Robert & Windy");
-        testChat.getMembers().add(windyChan);
+        testChat.getMemberNames().add(windyChan.getUsername());
     }
 
     @Test
@@ -47,14 +40,14 @@ public class ChatCreatingTest extends WeTrackIntegrateTestWithFriendAdded {
 
     @Test
     public void testChatCreatingWithNotExistUser() {
-        testChat.getMembers().add(new User("BlahBlahBlahNotExist", null, null));
+        testChat.getMemberNames().add("BlahBlahBlahNotExist");
         client.createChat(tokenOf(robertPeng), testChat, messageHelper.callback());
         messageHelper.assertReceivedFailedMessage(404);
     }
 
     @Test
     public void testChatCreatingWithNotFriend() {
-        testChat.getMembers().add(littleHearth);
+        testChat.getMemberNames().add(littleHearth.getUsername());
         client.createChat(tokenOf(robertPeng), testChat, messageHelper.callback());
         messageHelper.assertReceivedFailedMessage(403);
     }

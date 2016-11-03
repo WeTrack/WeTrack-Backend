@@ -1,7 +1,7 @@
 package com.wetrack;
 
-import com.wetrack.client.test.EntityResponseTestHelper;
 import com.wetrack.client.model.User;
+import com.wetrack.client.test.EntityResponseTestHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithChatCreated;
 import org.junit.Test;
 

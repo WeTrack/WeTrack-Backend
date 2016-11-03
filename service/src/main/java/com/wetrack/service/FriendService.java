@@ -5,6 +5,7 @@ import com.wetrack.dao.FriendRepository;
 import com.wetrack.dao.UserRepository;
 import com.wetrack.dao.UserTokenRepository;
 import com.wetrack.model.Friend;
+import com.wetrack.model.User;
 import com.wetrack.model.UserToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +15,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-import static com.wetrack.util.RsResponseUtils.*;
+import static com.wetrack.util.ResponseUtils.*;
 
 @Path("/users/{username}/friends")
 @Produces(MediaType.APPLICATION_JSON)
@@ -50,7 +54,21 @@ public class FriendService {
             friendRepository.insert(friend);
         }
 
-        return ok(gson.toJson(friend.getFriends()));
+        List<User> friends = new ArrayList<>(friend.getFriendNames().size());
+        List<String> deletedNames = new LinkedList<>();
+        for (String friendName : friend.getFriendNames()) {
+            User user = userRepository.findByUsername(friendName);
+            if (user == null) {
+                LOG.warn("Friend `" + friendName + "` no longer exists.");
+                deletedNames.add(friendName);
+            } else
+                friends.add(user);
+        }
+
+        if (friend.getFriendNames().removeAll(deletedNames))
+            friendRepository.update(friend);
+
+        return ok(gson.toJson(friends));
     }
 
     @POST
@@ -76,13 +94,13 @@ public class FriendService {
         Friend friend = friendRepository.findById(username);
         if (friend == null)
             friend = new Friend(username);
-        friend.getFriends().add(userRepository.findByUsername(friendName));
+        friend.getFriendNames().add(friendName);
         friendRepository.insert(friend);
 
         friend = friendRepository.findById(friendName);
         if (friend == null)
             friend = new Friend(friendName);
-        friend.getFriends().add(userRepository.findByUsername(username));
+        friend.getFriendNames().add(username);
         friendRepository.insert(friend);
 
         return okMessage("You have added `" + friendName + "` as your friend.");
@@ -114,9 +132,8 @@ public class FriendService {
             friend = new Friend(username);
             friendRepository.insert(friend);
         }
-        if (friend.getFriends().stream().filter((u) -> u.getUsername().equals(friendName)).count() == 0)
+        if (!friend.getFriendNames().remove(friendName))
             return notFound("User with username `" + friendName + "` is not your friend.");
-        friend.getFriends().removeIf((u) -> u.getUsername().equals(friendName));
         friendRepository.update(friend);
 
         friend = friendRepository.findById(friendName);
@@ -124,8 +141,8 @@ public class FriendService {
             friend = new Friend(friendName);
             friendRepository.insert(friend);
         }
-        friend.getFriends().removeIf((u) -> u.getUsername().equals(username));
-        friendRepository.update(friend);
+        if (friend.getFriendNames().remove(username))
+            friendRepository.update(friend);
 
         return okMessage("You have deleted `" + friendName + "` from your friend list.");
     }
@@ -142,10 +159,7 @@ public class FriendService {
             return notFound();
 
         Friend friend = friendRepository.findById(username);
-        long count = friend.getFriends().stream().filter((u) -> u.getUsername().equals(friendName)).count();
-        if (count == 0)
-            return notFound();
-        return ok();
+        return friend.getFriendNames().contains(friendName) ? ok() : notFound();
     }
 
 }

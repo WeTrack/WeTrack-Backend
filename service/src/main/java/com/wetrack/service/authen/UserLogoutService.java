@@ -11,8 +11,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static com.wetrack.util.RsResponseUtils.badRequest;
-import static com.wetrack.util.RsResponseUtils.ok;
+import static com.wetrack.util.ResponseUtils.badRequest;
+import static com.wetrack.util.ResponseUtils.ok;
 
 @Path("/logout")
 @Produces(MediaType.APPLICATION_JSON)

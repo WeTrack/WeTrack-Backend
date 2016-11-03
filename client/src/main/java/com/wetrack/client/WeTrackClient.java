@@ -1,7 +1,6 @@
 package com.wetrack.client;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.wetrack.client.model.*;
 import com.wetrack.util.CryptoUtils;
 import okhttp3.MediaType;
@@ -408,21 +407,11 @@ public class WeTrackClient {
     }
 
     public void createChat(String token, Chat chat, final CreatedMessageCallback callback) {
-        chatService.createChat(token, serializeChat(chat)).subscribe(observer(callback));
+        chatService.createChat(token, chat).subscribe(observer(callback));
     }
 
     public void createChat(String token, Chat chat, final CreatedMessageCallback callback, Scheduler scheduler) {
-        chatService.createChat(token, serializeChat(chat)).subscribeOn(scheduler).subscribe(observer(callback));
-    }
-
-    private JsonObject serializeChat(Chat chat) {
-        JsonObject requestEntity = new JsonObject();
-        requestEntity.addProperty("name", chat.getName());
-        List<String> memberNames = new ArrayList<>(chat.getMembers().size());
-        for (User member : chat.getMembers())
-            memberNames.add(member.getUsername());
-        requestEntity.add("members", gson.toJsonTree(memberNames));
-        return requestEntity;
+        chatService.createChat(token, chat).subscribeOn(scheduler).subscribe(observer(callback));
     }
 
     public void addChatMembers(String chatId, String token, List<User> newMembers,

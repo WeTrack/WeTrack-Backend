@@ -7,6 +7,7 @@ import org.junit.Test;
 import javax.ws.rs.core.Response;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class UserGetTest extends WeTrackServerTestWithUserCreated {
@@ -30,7 +31,7 @@ public class UserGetTest extends WeTrackServerTestWithUserCreated {
         assertThat(user.getNickname(), is(robertPeng.getNickname()));
         assertThat(user.getEmail(), is(robertPeng.getEmail()));
         assertThat(user.getGender(), is(robertPeng.getGender()));
-        assertThat(user.getPassword().isEmpty(), is(true));
+        assertThat(user.getPassword(), nullValue());
     }
 
     @Test

@@ -64,15 +64,15 @@ public class ChatRepositoryTest {
     @Test
     public void testGetChatList() {
         Chat chat = new Chat(chatName);
-        chat.getMembers().add(userA);
-        chat.getMembers().add(userB);
-        chat.getMembers().add(userC);
-        chat.getMembers().add(userD);
+        chat.addMember(userA);
+        chat.addMember(userB);
+        chat.addMember(userC);
+        chat.addMember(userD);
         chatRepository.insert(chat);
 
         chat = new Chat(anotherChatName);
-        chat.getMembers().add(userA);
-        chat.getMembers().add(userC);
+        chat.addMember(userA);
+        chat.addMember(userC);
         chatRepository.insert(chat);
 
         assertThat(chatRepository.getChatListByUsername(userA.getUsername()).size(), is(2));
@@ -84,8 +84,8 @@ public class ChatRepositoryTest {
     @Test
     public void testIsMember() {
         Chat chat = new Chat(chatName);
-        chat.getMembers().add(userA);
-        chat.getMembers().add(userC);
+        chat.addMember(userA);
+        chat.addMember(userC);
         chatRepository.insert(chat);
 
         assertThat(chatRepository.isMember(chat.getId(), userA.getUsername()), is(true));
@@ -97,13 +97,13 @@ public class ChatRepositoryTest {
     @Test
     public void testChatInsert() {
         Chat chat = new Chat(chatName);
-        chat.getMembers().add(userA);
+        chat.getMemberNames().add(userA.getUsername());
         chatRepository.insert(chat);
 
         Document chatInDB = chats.find(new Document("name", chatName)).first();
         assertThat(chatInDB, notNullValue());
         assertThat(chatInDB.getString("name"), is(chatName));
-        ArrayList<String> membersInDoc = chatInDB.get("members", ArrayList.class);
+        ArrayList<String> membersInDoc = chatInDB.get("memberNames", ArrayList.class);
         assertThat(membersInDoc.size(), is(1));
         assertThat(membersInDoc.get(0), is(userA.getUsername()));
     }
@@ -111,39 +111,39 @@ public class ChatRepositoryTest {
     @Test
     public void testChatDuplicateInsert() {
         Chat chat = new Chat(chatName);
-        chat.getMembers().add(userA);
-        chat.getMembers().add(userB);
-        chat.getMembers().add(userC);
-        chat.getMembers().add(userD);
+        chat.addMember(userA);
+        chat.addMember(userB);
+        chat.addMember(userC);
+        chat.addMember(userD);
 
-        chat.getMembers().add(userA);
+        chat.addMember(userA);
 
         chatRepository.insert(chat);
         Document chatInDB = chats.find(new Document("name", chatName)).first();
-        ArrayList<String> membersInDoc = chatInDB.get("members", ArrayList.class);
+        ArrayList<String> membersInDoc = chatInDB.get("memberNames", ArrayList.class);
         assertThat(membersInDoc.size(), is(4));
     }
 
     @Test
     public void testChatUpdate() {
         Chat chat = new Chat(chatName);
-        chat.getMembers().add(userA);
+        chat.addMember(userA);
         chatRepository.insert(chat);
 
         // Incremental Update
-        chat.getMembers().add(userB);
+        chat.addMember(userB);
         chatRepository.update(chat);
         Document chatInDB = chats.find(new Document("name", chatName)).first();
-        ArrayList<String> membersInDoc = chatInDB.get("members", ArrayList.class);
+        ArrayList<String> membersInDoc = chatInDB.get("memberNames", ArrayList.class);
         assertThat(membersInDoc.size(), is(2));
         assertThat(membersInDoc.get(0), is(userA.getUsername()));
         assertThat(membersInDoc.get(1), is(userB.getUsername()));
 
         // Decremental Update
-        chat.getMembers().remove(userA);
+        chat.removeMember(userA);
         chatRepository.update(chat);
         chatInDB = chats.find(new Document("name", chatName)).first();
-        membersInDoc = chatInDB.get("members", ArrayList.class);
+        membersInDoc = chatInDB.get("memberNames", ArrayList.class);
         assertThat(membersInDoc.size(), is(1));
         assertThat(membersInDoc.get(0), is(userB.getUsername()));
     }

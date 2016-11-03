@@ -9,11 +9,11 @@ import java.time.LocalDate;
 @Indexes({
         @Index(fields = @Field(value = "nickname", type = IndexType.TEXT))
 })
-public class User implements DbEntity<String> {
+public class User extends DbEntity<String> {
 
     @Id
     private String username = "";
-    private String password = "";
+    private String password = null;
     private String nickname = "";
     private String iconUrl = "";
     private String email = "";

@@ -12,12 +12,17 @@ public class ChatRepositoryImpl extends MorphiaRepository<String, Chat> implemen
     }
 
     @Override
+    public boolean chatExists(String chatId) {
+        return createQuery().field("_id").equal(chatId).countAll() > 0;
+    }
+
+    @Override
     public List<Chat> getChatListByUsername(String username) {
-        return createQuery().field("members").hasThisOne(username).asList();
+        return createQuery().field("memberNames").hasThisOne(username).asList();
     }
 
     @Override
     public boolean isMember(String chatId, String username) {
-        return createQuery().field("_id").equal(chatId).field("members").hasThisOne(username).countAll() > 0;
+        return createQuery().field("_id").equal(chatId).field("memberNames").hasThisOne(username).countAll() > 0;
     }
 }

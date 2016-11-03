@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.wetrack.util.RsResponseUtils.*;
+import static com.wetrack.util.ResponseUtils.*;
 
 @Path("/users/{username}/chats")
 @Produces(MediaType.APPLICATION_JSON)
@@ -66,7 +66,7 @@ public class UserChatService {
         if (chat == null)
             return notFound("Chat with given chat id does not exist.");
 
-        chat.getMembers().removeIf((u) -> u.getUsername().equals(username));
+        chat.getMemberNames().remove(username);
         chatRepository.update(chat);
         return okMessage("You have exited chat `" + chat.getName() + "`.");
     }

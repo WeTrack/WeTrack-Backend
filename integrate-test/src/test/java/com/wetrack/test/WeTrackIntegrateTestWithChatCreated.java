@@ -7,7 +7,10 @@ import com.wetrack.client.test.EntityResponseTestHelper;
 import com.wetrack.client.test.MessageResponseTestHelper;
 import org.junit.Before;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -36,7 +39,7 @@ public class WeTrackIntegrateTestWithChatCreated extends WeTrackIntegrateTestWit
     protected String createChatWithAssertion(String token, String chatName, User... members) {
         CreatedResponseTestHelper messageHelper = new CreatedResponseTestHelper();
         Chat chat = new Chat(chatName);
-        chat.setMembers(Arrays.asList(members));
+        chat.setMemberNames(Arrays.stream(members).map(User::getUsername).collect(Collectors.toList()));
         client.createChat(token, chat, messageHelper.callback());
         messageHelper.assertReceivedSuccessfulMessage();
         return messageHelper.getReceivedNewEntityId();

@@ -1,9 +1,6 @@
 package com.wetrack.config;
 
-import com.wetrack.service.ChatService;
-import com.wetrack.service.FriendService;
-import com.wetrack.service.LocationService;
-import com.wetrack.service.UserChatService;
+import com.wetrack.service.*;
 import com.wetrack.service.authen.UserLoginService;
 import com.wetrack.service.authen.UserLogoutService;
 import com.wetrack.service.authen.UserTokenVerificationService;
@@ -28,6 +25,7 @@ public class WeTrackApplication extends ResourceConfig {
         register(FriendService.class);
         register(ChatService.class);
         register(UserChatService.class);
+        register(ChatMessageService.class);
         register(GsonJerseyProvider.class);
     }
 

@@ -1,6 +1,5 @@
 package com.wetrack.service.chat;
 
-import com.google.gson.reflect.TypeToken;
 import com.wetrack.json.GsonTypes;
 import com.wetrack.model.Chat;
 import com.wetrack.model.User;
@@ -8,7 +7,6 @@ import com.wetrack.test.QueryParam;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;
-import java.lang.reflect.Type;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;

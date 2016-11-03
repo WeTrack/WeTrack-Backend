@@ -11,7 +11,7 @@ import java.time.temporal.TemporalUnit;
         @Index(fields = @Field("expireTime"), options = @IndexOptions(expireAfterSeconds = 0)),
         @Index(fields = @Field("username"), options = @IndexOptions(unique = true))
 })
-public class UserToken implements DbEntity<String> {
+public class UserToken extends DbEntity<String> {
 
     @Id
     private String token;

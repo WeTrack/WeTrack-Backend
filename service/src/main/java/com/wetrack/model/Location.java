@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
     @Index(fields = @Field(value = "point", type = IndexType.GEO2DSPHERE)),
     @Index(fields = @Field(value = "time", type = IndexType.DESC))
 })
-public class Location implements DbEntity<String> {
+public class Location extends DbEntity<String> {
     @Id
     private String id;
 

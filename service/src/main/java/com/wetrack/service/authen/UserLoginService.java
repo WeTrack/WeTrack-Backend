@@ -18,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.temporal.ChronoUnit;
 
-import static com.wetrack.util.RsResponseUtils.*;
+import static com.wetrack.util.ResponseUtils.*;
 
 @Path("/login")
 @Consumes(MediaType.APPLICATION_JSON)

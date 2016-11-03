@@ -11,6 +11,6 @@ public class FriendRepositoryImpl extends MorphiaRepository<String, Friend> impl
 
     @Override
     public boolean isFriend(String usernameA, String usernameB) {
-        return createQuery().field("_id").equal(usernameA).field("friends").hasThisOne(usernameB).countAll() > 0;
+        return createQuery().field("_id").equal(usernameA).field("friendNames").hasThisOne(usernameB).countAll() > 0;
     }
 }

@@ -12,8 +12,8 @@ import java.net.URISyntaxException;
 /**
  * Util class for generating {@link Response}s.
  */
-public abstract class RsResponseUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(RsResponseUtils.class);
+public abstract class ResponseUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(ResponseUtils.class);
 
     private static final String NOT_FOUND = "Not Found";
 

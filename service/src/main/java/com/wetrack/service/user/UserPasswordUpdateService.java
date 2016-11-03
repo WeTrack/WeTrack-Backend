@@ -14,7 +14,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static com.wetrack.util.RsResponseUtils.*;
+import static com.wetrack.util.ResponseUtils.*;
 
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)

@@ -1,20 +1,17 @@
 package com.wetrack.model;
 
+import com.google.gson.annotations.SerializedName;
 import com.wetrack.util.HashedIDGenerator;
-import org.mongodb.morphia.annotations.*;
-import org.mongodb.morphia.utils.IndexType;
+import org.mongodb.morphia.annotations.Id;
 
 import java.time.LocalDateTime;
 
-@Entity("notifications")
-@Indexes({
-    @Index(fields = @Field(value = "sendTime", type = IndexType.DESC))
-})
-public abstract class Notification implements DbEntity<String> {
+public abstract class Notification extends DbEntity<String> {
 
     @Id
     private String id;
     private String content;
+    @SerializedName("send_time")
     private LocalDateTime sendTime;
 
     protected Notification() {}

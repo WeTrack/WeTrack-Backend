@@ -5,10 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.mongodb.MongoClient;
 import com.wetrack.dao.*;
 import com.wetrack.dao.morphia.*;
-import com.wetrack.json.LocalDateTimeTypeAdapter;
-import com.wetrack.json.LocalDateTypeAdapter;
-import com.wetrack.json.LocationTypeAdapter;
+import com.wetrack.json.*;
 import com.wetrack.model.Location;
+import com.wetrack.model.Notification;
+import com.wetrack.model.User;
 import com.wetrack.morphia.converter.EnumOrdinalConverter;
 import com.wetrack.morphia.converter.Java8TimeConverter;
 import org.mongodb.morphia.Datastore;
@@ -46,6 +46,8 @@ public class SpringConfig {
                 .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
                 .registerTypeAdapter(Location.class, new LocationTypeAdapter())
+                .registerTypeAdapter(Notification.class, new NotificationAdapter())
+                .registerTypeAdapter(User.class, new UserSerializer())
                 .create();
     }
 
@@ -94,5 +96,12 @@ public class SpringConfig {
         ChatRepositoryImpl chatRepository = new ChatRepositoryImpl();
         chatRepository.setDatastore(datastore);
         return chatRepository;
+    }
+
+    @Bean
+    public ChatMessageRepository chatMessageRepository(Datastore datastore) {
+        ChatMessageRepositoryImpl chatMessageRepository = new ChatMessageRepositoryImpl();
+        chatMessageRepository.setDatastore(datastore);
+        return chatMessageRepository;
     }
 }

@@ -1,22 +1,21 @@
 package com.wetrack.client.model;
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class Chat {
-    @Expose(serialize = false)
     private String chatId;
     private String name;
-    private List<User> members;
+    @SerializedName("members") private List<String> memberNames;
 
     public Chat() {}
 
     public Chat(String name) {
         this.chatId = "";
         this.name = name;
-        this.members = new LinkedList<>();
+        this.memberNames = new LinkedList<>();
     }
 
     public String getChatId() {
@@ -31,10 +30,10 @@ public class Chat {
     public void setName(String name) {
         this.name = name;
     }
-    public List<User> getMembers() {
-        return members;
+    public List<String> getMemberNames() {
+        return memberNames;
     }
-    public void setMembers(List<User> members) {
-        this.members = members;
+    public void setMemberNames(List<String> memberNames) {
+        this.memberNames = memberNames;
     }
 }

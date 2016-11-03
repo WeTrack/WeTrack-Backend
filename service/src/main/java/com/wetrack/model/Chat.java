@@ -10,23 +10,38 @@ import java.util.Set;
 
 @Entity("chats")
 @Indexes({
-    @Index(fields = @Field("members"))
+    @Index(fields = @Field("memberNames"))
 })
-public class Chat implements DbEntity<String> {
+public class Chat extends DbEntity<String> {
     @Id
     private String id;
     private String name;
 
-    @Reference(idOnly = true, lazy = true)
     @Expose(serialize = false, deserialize = false)
-    private Set<User> members;
+    private Set<String> memberNames;
 
     public Chat() {}
 
     public Chat(String name) {
         this.name = name;
         this.id = HashedIDGenerator.get(name, LocalDateTime.now().toString());
-        this.members = new HashSet<>();
+        this.memberNames = new HashSet<>();
+    }
+
+    public boolean addMember(User user) {
+        return memberNames.add(user.getUsername());
+    }
+
+    public boolean addMember(String username) {
+        return memberNames.add(username);
+    }
+
+    public boolean removeMember(User user) {
+        return memberNames.remove(user.getUsername());
+    }
+
+    public boolean removeMember(String username) {
+        return memberNames.remove(username);
     }
 
     @Override
@@ -43,10 +58,10 @@ public class Chat implements DbEntity<String> {
     public void setName(String name) {
         this.name = name;
     }
-    public Set<User> getMembers() {
-        return members;
+    public Set<String> getMemberNames() {
+        return memberNames;
     }
-    public void setMembers(Set<User> members) {
-        this.members = members;
+    public void setMemberNames(Set<String> memberNames) {
+        this.memberNames = memberNames;
     }
 }

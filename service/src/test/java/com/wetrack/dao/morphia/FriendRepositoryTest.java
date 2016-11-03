@@ -63,8 +63,8 @@ public class FriendRepositoryTest {
     @Test
     public void testIsFriend() {
         Friend friend = new Friend(userA.getUsername());
-        friend.getFriends().add(userB);
-        friend.getFriends().add(userC);
+        friend.addFriend(userB);
+        friend.addFriend(userC);
         friendRepository.insert(friend);
 
         assertThat(friendRepository.isFriend(userA.getUsername(), userB.getUsername()), is(true));
@@ -76,12 +76,12 @@ public class FriendRepositoryTest {
     @Test
     public void testFriendInsert() {
         Friend friend = new Friend(userA.getUsername());
-        friend.getFriends().add(userB);
+        friend.addFriend(userB);
         friendRepository.insert(friend);
 
         Document friendInDB = friends.find(new Document("_id", userA.getUsername())).first();
-        assertThat(friendInDB.containsKey("friends"), is(true));
-        ArrayList<String> friendsInDoc = friendInDB.get("friends", ArrayList.class);
+        assertThat(friendInDB.containsKey("friendNames"), is(true));
+        ArrayList<String> friendsInDoc = friendInDB.get("friendNames", ArrayList.class);
         assertThat(friendsInDoc.size(), is(1));
         assertThat(friendsInDoc.get(0), is(userB.getUsername()));
     }
@@ -89,41 +89,41 @@ public class FriendRepositoryTest {
     @Test
     public void testFriendDuplicateInsert() {
         Friend friend = new Friend(userA.getUsername());
-        friend.getFriends().add(userB);
-        friend.getFriends().add(userC);
-        friend.getFriends().add(userD);
+        friend.addFriend(userB);
+        friend.addFriend(userC);
+        friend.addFriend(userD);
 
-        friend.getFriends().add(userB);
+        friend.addFriend(userB);
 
         friendRepository.insert(friend);
         Document friendInDB = friends.find(new Document("_id", userA.getUsername())).first();
-        assertThat(friendInDB.containsKey("friends"), is(true));
-        ArrayList<String> friendsInDoc = friendInDB.get("friends", ArrayList.class);
+        assertThat(friendInDB.containsKey("friendNames"), is(true));
+        ArrayList<String> friendsInDoc = friendInDB.get("friendNames", ArrayList.class);
         assertThat(friendsInDoc.size(), is(3));
     }
 
     @Test
     public void testFriendUpdate() {
         Friend friend = new Friend(userA.getUsername());
-        friend.getFriends().add(userB);
+        friend.addFriend(userB);
         friendRepository.insert(friend);
 
         // Incremental update
-        friend.getFriends().add(userC);
+        friend.addFriend(userC);
         friendRepository.update(friend);
         Document friendInDB = friends.find(new Document("_id", userA.getUsername())).first();
-        assertThat(friendInDB.containsKey("friends"), is(true));
-        ArrayList<String> friendsInDoc = friendInDB.get("friends", ArrayList.class);
+        assertThat(friendInDB.containsKey("friendNames"), is(true));
+        ArrayList<String> friendsInDoc = friendInDB.get("friendNames", ArrayList.class);
         assertThat(friendsInDoc.size(), is(2));
         assertThat(friendsInDoc.get(0), is(userB.getUsername()));
         assertThat(friendsInDoc.get(1), is(userC.getUsername()));
 
         // Decremental update
-        friend.getFriends().remove(userB);
+        friend.removeFriend(userB);
         friendRepository.update(friend);
         friendInDB = friends.find(new Document("_id", userA.getUsername())).first();
-        assertThat(friendInDB.containsKey("friends"), is(true));
-        friendsInDoc = friendInDB.get("friends", ArrayList.class);
+        assertThat(friendInDB.containsKey("friendNames"), is(true));
+        friendsInDoc = friendInDB.get("friendNames", ArrayList.class);
         assertThat(friendsInDoc.size(), is(1));
         assertThat(friendsInDoc.get(0), is(userC.getUsername()));
     }

@@ -1,20 +1,11 @@
 package com.wetrack;
 
-import com.wetrack.client.model.Chat;
-import com.wetrack.client.model.User;
-import com.wetrack.client.test.EntityResponseTestHelper;
 import com.wetrack.client.test.MessageResponseTestHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithChatCreated;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 public class ChatMemberAddingTest extends WeTrackIntegrateTestWithChatCreated {
 

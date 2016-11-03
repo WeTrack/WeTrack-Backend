@@ -27,8 +27,8 @@ public class ChatCreateTest extends WeTrackClientTest {
         server.enqueue(response);
 
         Chat chat = new Chat("Chat chat");
-        chat.getMembers().add(robertPeng);
-        chat.getMembers().add(windyChan);
+        chat.getMemberNames().add(robertPeng.getUsername());
+        chat.getMemberNames().add(windyChan.getUsername());
 
         client.createChat(dummyToken, chat, messageHelper.callback());
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);

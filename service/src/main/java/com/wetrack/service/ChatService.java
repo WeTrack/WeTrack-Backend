@@ -20,9 +20,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import static com.wetrack.util.RsResponseUtils.*;
+import static com.wetrack.util.ResponseUtils.*;
 
 @Path("/chats")
 @Produces(MediaType.APPLICATION_JSON)
@@ -47,8 +49,6 @@ public class ChatService {
         if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now()))
             return unauthorized("The given token is invalid or has expired. Please log in again.");
 
-        User loggedInUser = userRepository.findByUsername(tokenInDB.getUsername());
-
         try {
             ChatCreateRequest request = gson.fromJson(requestBody, ChatCreateRequest.class);
             if (request.name == null || request.name.trim().isEmpty())
@@ -60,11 +60,11 @@ public class ChatService {
             for (String memberName : request.memberNames) {
                 if (userRepository.countByUsername(memberName) == 0)
                     return notFound("User with given username `" + memberName + "` does not exist.");
-                if (!friendRepository.isFriend(loggedInUser.getUsername(), memberName))
+                if (!friendRepository.isFriend(tokenInDB.getUsername(), memberName))
                     return forbidden("User with given username `" + memberName + "` is not your friend.");
-                chat.getMembers().add(userRepository.findByUsername(memberName));
+                chat.getMemberNames().add(memberName);
             }
-            chat.getMembers().add(loggedInUser);
+            chat.getMemberNames().add(tokenInDB.getUsername());
             chatRepository.insert(chat);
             return created("/chats/" + chat.getId(), "Chat `" + chat.getName() + "` created.");
         } catch (JsonSyntaxException | NullPointerException | IllegalStateException | ClassCastException ex) {
@@ -90,7 +90,7 @@ public class ChatService {
         Chat chat = chatRepository.findById(chatId);
         if (chat == null)
             return notFound("Chat with given chat id does not exist.");
-        if (chat.getMembers().stream().filter((u) -> u.getUsername().equals(tokenInDB.getUsername())).count() == 0)
+        if (!chat.getMemberNames().contains(tokenInDB.getUsername()))
             return unauthorized("You are not a member of the specified chat.");
 
         try {
@@ -100,7 +100,7 @@ public class ChatService {
                     return notFound("User with given username `" + newMemberName + "` does not exist.");
                 if (!friendRepository.isFriend(tokenInDB.getUsername(), newMemberName))
                     return forbidden("User with username `" + newMemberName + "` is not your friend.");
-                chat.getMembers().add(userRepository.findByUsername(newMemberName));
+                chat.getMemberNames().add(newMemberName);
                 chatRepository.update(chat);
             }
             return okMessage("Users " + StringUtils.join(newMemberNames, ", ") + " are added to chat " + chat.getName());
@@ -117,8 +117,21 @@ public class ChatService {
         Chat chat = chatRepository.findById(chatId);
         if (chat == null)
             return notFound("Chat with given chat id does not exist.");
+        List<User> members = new ArrayList<>(chat.getMemberNames().size());
+        List<String> deletedNames = new LinkedList<>();
+        for (String memberName : chat.getMemberNames()) {
+            User user = userRepository.findByUsername(memberName);
+            if (user == null) {
+                LOG.warn("Chat member `" + memberName + "` does not exist.");
+                deletedNames.add(memberName);
+            } else
+                members.add(user);
+        }
 
-        return ok(gson.toJson(chat.getMembers()));
+        if (chat.getMemberNames().removeAll(deletedNames))
+            chatRepository.update(chat);
+
+        return ok(gson.toJson(members));
     }
 
     @DELETE
@@ -138,10 +151,10 @@ public class ChatService {
         Chat chat = chatRepository.findById(chatId);
         if (chat == null)
             return notFound("Chat with given chat id does not exist.");
-        if (chat.getMembers().stream().filter((u) -> u.getUsername().equals(tokenInDB.getUsername())).count() == 0)
+        if (!chat.getMemberNames().contains(tokenInDB.getUsername()))
             return unauthorized("You are not a member of the specified chat.");
 
-        chat.getMembers().removeIf((u) -> u.getUsername().equals(memberName));
+        chat.getMemberNames().remove(memberName);
         chatRepository.update(chat);
         return okMessage("User " + memberName + " is removed from chat " + chat.getName() + ".");
     }
