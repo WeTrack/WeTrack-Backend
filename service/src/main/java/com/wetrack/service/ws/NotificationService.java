@@ -11,14 +11,15 @@ import com.wetrack.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
-import javax.websocket.*;
-import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
 import java.time.LocalDateTime;
 
-@ServerEndpoint("/notifications")
-public class NotificationService {
+public class NotificationService extends AbstractWebSocketHandler {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationService.class);
 
     private static final String TOKEN_PREFIX = "Token:";
@@ -28,89 +29,123 @@ public class NotificationService {
     @Autowired private ChatRepository chatRepository;
     @Autowired private ChatMessageRepository chatMessageRepository;
 
-    private BiMap<Session, String> sessionUsername = HashBiMap.create();
+    private BiMap<WebSocketSession, String> sessionUsername = HashBiMap.create();
 
-    @OnOpen
-    public void openSession(Session session) {
-        try {
-            session.getBasicRemote().sendText("Hello, anonymous user! Please provide your token for authentication.");
-        } catch (IOException ex) {
-            LOG.warn("Exception occurred when a new session open: ", ex);
-        }
+    private WebSocketMessage<String> sessionHello
+            = new TextMessage("Hello, anonymous user! Please provide your token for authentication.");
+    private WebSocketMessage<String> invalidMessage
+            = new TextMessage("The message is not in valid format. Please try again.");
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        session.sendMessage(sessionHello);
     }
 
-    @OnMessage
-    public String receiveMessage(String message, Session session) {
-        if (message.startsWith(TOKEN_PREFIX))
-            return onTokenAuthenticate(message.substring(TOKEN_PREFIX.length()), session);
+    @Override
+    public void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws Exception {
+        String message = textMessage.getPayload();
+        if (LOG.isDebugEnabled()) {
+            if (sessionUsername.containsKey(session))
+                LOG.debug("Received message `{}` from user `{}`.", message, sessionUsername.get(session));
+            else
+                LOG.debug("Received message `{}` from anonymous session `{}`.", message, session.hashCode());
+        }
+        if (message.startsWith(TOKEN_PREFIX)) {
+            LOG.debug("Token messaged detected! Handling to corresponding method...");
+            onTokenAuthenticate(message.substring(TOKEN_PREFIX.length()), session);
+            return;
+        }
         Notification notification;
         try {
             notification = gson.fromJson(message, Notification.class);
         } catch (JsonParseException ex) {
-            return "The message is not in valid format. Please try again.";
+            session.sendMessage(invalidMessage);
+            return;
         }
-        if (notification instanceof ChatMessage)
-            return onChatMessage((ChatMessage) notification, session);
-        return "The message is not in valid format. Please try again.";
+        if (notification instanceof ChatMessage) {
+            onChatMessage((ChatMessage) notification, session);
+            return;
+        }
+        session.sendMessage(invalidMessage);
     }
 
-    private String onChatMessage(ChatMessage message, Session session) {
-        if (!sessionUsername.containsKey(session))
-            return response(401, "You must authenticate before sending any message.");
+    private void onChatMessage(ChatMessage message, WebSocketSession session) throws Exception {
+        if (!sessionUsername.containsKey(session)) {
+            session.sendMessage(response(401, "You must authenticate before sending any message."));
+            return;
+        }
 
         String authenticatedUsername = sessionUsername.get(session);
         Chat chat = chatRepository.findById(message.getChatId());
-        if (chat == null)
-            return response(404, "Chat with given ID `" + message.getChatId() + "` does not exist.");
-        if (!chat.getMemberNames().contains(authenticatedUsername))
-            return response(401, "You are not a member of this group.");
+        if (chat == null) {
+            session.sendMessage(response(404, "Chat with given ID `" + message.getChatId() + "` does not exist."));
+            return;
+        }
+        if (!chat.getMemberNames().contains(authenticatedUsername)) {
+            session.sendMessage(response(401, "You are not a member of this group."));
+            return;
+        }
 
         message.setFromUsername(sessionUsername.get(session));
         message.setSendTime(LocalDateTime.now());
         chatMessageRepository.insert(message);
 
         for (String memberName : chat.getMemberNames()) {
-            Session memberSession = sessionUsername.inverse().get(memberName);
+            WebSocketSession memberSession = sessionUsername.inverse().get(memberName);
             if (memberSession != null)
-                sendText(memberSession, gson.toJson(message));
+                memberSession.sendMessage(new TextMessage(gson.toJson(message)));
         }
 
-        return response(200, "Message sent.");
+        session.sendMessage(response(200, "Message Sent."));
     }
 
-    private String onTokenAuthenticate(String token, Session session) {
+    private void onTokenAuthenticate(String token, WebSocketSession session) throws Exception {
+        LOG.debug("Received token `{}` from session `{}`", token, session.hashCode());
         UserToken tokenInDB = userTokenRepository.findByTokenStr(token);
-        if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now()))
-            return response(401, "The given token `" + token + "` is invalid or has expired.");
+        if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now())) {
+            LOG.debug("Token is invalid or has expired. Returning 401 Unauthorized...");
+            session.sendMessage(response(401, "The given token `" + token + "` is invalid or has expired."));
+            return;
+        }
 
         String username = tokenInDB.getUsername();
         if (sessionUsername.containsValue(username)) {
-            Session oldSession = sessionUsername.inverse().get(tokenInDB.getUsername());
-            sendText(oldSession, response(401, "You has logged in another session."));
+            LOG.debug("Token has already logged in another session. Logging out the old session...");
+            WebSocketSession oldSession = sessionUsername.inverse().get(tokenInDB.getUsername());
+            oldSession.sendMessage(response(401, "You has logged in another session."));
         }
 
         sessionUsername.forcePut(session, username);
-        return response(200, "Authentication successful. Welcome, " + username + ".");
+        LOG.debug("Token authenticated. Returning 200 OK...");
+        session.sendMessage(response(200, "Authentication successful. Welcome, " + username + "."));
     }
 
-    @OnClose
-    public void closeSession(Session session, CloseReason closeReason) {
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         if (sessionUsername.containsKey(session))
             LOG.info("WebSocket session of user `" + sessionUsername.get(session)
-                    + "` closed: " + closeReason.toString());
+                    + "` closed: " + status.toString());
         else
-            LOG.info("Anonymous WebSocket session `" + session.hashCode() + "` closed: " + closeReason.toString());
+            LOG.info("Anonymous WebSocket session `" + session.hashCode() + "` closed: " + status.toString());
     }
 
-    private void sendText(Session session, String text) {
-        try {
-            session.getBasicRemote().sendText(text);
-        } catch (IOException ex) {
-            LOG.warn("Exception occurred when trying to send text to client: ", ex);
-        }
+    private TextMessage response(int statusCode, String message) {
+        return new TextMessage(gson.toJson(new Message(statusCode, message)));
     }
 
-    private String response(int statusCode, String message) {
-        return gson.toJson(new Message(statusCode, message));
+    public void setGson(Gson gson) {
+        this.gson = gson;
+    }
+
+    public void setUserTokenRepository(UserTokenRepository userTokenRepository) {
+        this.userTokenRepository = userTokenRepository;
+    }
+
+    public void setChatRepository(ChatRepository chatRepository) {
+        this.chatRepository = chatRepository;
+    }
+
+    public void setChatMessageRepository(ChatMessageRepository chatMessageRepository) {
+        this.chatMessageRepository = chatMessageRepository;
     }
 }

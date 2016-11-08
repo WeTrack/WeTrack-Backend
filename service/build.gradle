@@ -7,7 +7,8 @@ dependencies {
     compile "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion"
     compile "org.glassfish.jersey.ext:jersey-spring3:$jerseyVersion"
     compile "org.springframework:spring-web:$springVersion"
-    compile 'javax.websocket:javax.websocket-api:1.1'
+    compile "org.springframework:spring-webmvc:$springVersion"
+    compile "org.springframework:spring-websocket:$springVersion"
     compile 'org.mongodb.morphia:morphia:1.2.1'
     compile group: 'org.mongodb.morphia', name: 'morphia-logging-slf4j', version: '1.2.1'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'

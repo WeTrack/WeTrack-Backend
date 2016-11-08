@@ -14,6 +14,16 @@ The service classes in `service` module should be listening to requests come fro
 
 The project will open a MongoDB connection to `localhost:27017` anonymously and use its `wetrack` database. Make sure your MongoDB instance is correctly configured and running when you start the project.
 
+## Frameworks and Technology
+
+- [Spring](http://projects.spring.io/spring-framework/) for Dependency Injection and Management.
+- [Jersey](https://jersey.java.net/) for RESTful Servlet Implementation.
+- [Tyrus](https://tyrus.java.net/) for WebSocket Servlet Implementation.
+- [Gson](https://github.com/google/gson) for JSON Serialization and Deserialization.
+- [Retrofit](https://square.github.io/retrofit/) and [RxJava](https://github.com/ReactiveX/RxJava) for Asynchronous Client Request.
+- [Guava](https://github.com/google/guava) for Advanced Data Structure.
+- [SLF4J](http://www.slf4j.org/) and [Log4j](https://logging.apache.org/log4j/1.2/) for Logging.
+
 ## Future Task
 
 - [x] Implement service for user login and token management.
@@ -26,11 +36,16 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 - [x] Implement Location uploading and query.
 - [x] Implement Friend adding.
 - [x] Implement Chat creating.
-- [ ] Implement chat message service.
+- [x] Implement chat message service.
 - [ ] Implement WebSocket notification pushing.
 - [ ] Deploy version `0.1`.
+- [ ] Migrate from Jersey to SpringMVC.
 - [ ] Implement file and image uploading.
 - [ ] Implement friend invitation.
 - [ ] Implement group invitation.
 - [ ] Implement permission framework.
+- [ ] Deploy version `0.2`.
 - [ ] Refactor the service classes to add Spring Aspect for logging.
+- [ ] Implement P2P Encryption.
+- [ ] Deploy version `0.3` in `HTTPS` and `TLS`
+
