@@ -1,5 +1,7 @@
 # WeTrack-Backend
 
+[![Build Status](https://travis-ci.org/WeTrack/WeTrack-Backend.svg?branch=master)](https://travis-ci.org/WeTrack/WeTrack-Backend)
+
 Java backend project for WeTrack, our HKUST CSIT 5510 course project.
 
 ## Test Run
