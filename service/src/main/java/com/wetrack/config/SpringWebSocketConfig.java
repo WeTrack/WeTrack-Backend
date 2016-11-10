@@ -1,6 +1,6 @@
 package com.wetrack.config;
 
-import com.wetrack.service.ws.NotificationService;
+import com.wetrack.ws.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;

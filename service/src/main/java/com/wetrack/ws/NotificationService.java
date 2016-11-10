@@ -1,4 +1,4 @@
-package com.wetrack.service.ws;
+package com.wetrack.ws;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -130,22 +130,6 @@ public class NotificationService extends AbstractWebSocketHandler {
     }
 
     private TextMessage response(int statusCode, String message) {
-        return new TextMessage(gson.toJson(new Message(statusCode, message)));
-    }
-
-    public void setGson(Gson gson) {
-        this.gson = gson;
-    }
-
-    public void setUserTokenRepository(UserTokenRepository userTokenRepository) {
-        this.userTokenRepository = userTokenRepository;
-    }
-
-    public void setChatRepository(ChatRepository chatRepository) {
-        this.chatRepository = chatRepository;
-    }
-
-    public void setChatMessageRepository(ChatMessageRepository chatMessageRepository) {
-        this.chatMessageRepository = chatMessageRepository;
+        return new TextMessage(gson.toJson(new WsMessage(statusCode, message)));
     }
 }

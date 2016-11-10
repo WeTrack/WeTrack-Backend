@@ -5,20 +5,22 @@ import org.mongodb.morphia.annotations.Field;
 import org.mongodb.morphia.annotations.Index;
 import org.mongodb.morphia.annotations.Indexes;
 
-@Entity("friend_invitations")
+@Entity("chat_invitations")
 @Indexes({
         @Index(fields = @Field("toUsername"))
 })
-public class FriendInvitation extends Notification {
+public class ChatInvitation extends Notification {
     private String fromUsername;
     private String toUsername;
+    private String chatId;
 
-    public FriendInvitation() {}
+    public ChatInvitation() {}
 
-    public FriendInvitation(String fromUsername, String toUsername, String content) {
+    public ChatInvitation(String fromUsername, String toUsername, String chatId, String content) {
         super(content);
         this.fromUsername = fromUsername;
         this.toUsername = toUsername;
+        this.chatId = chatId;
     }
 
     public String getFromUsername() {
@@ -32,5 +34,11 @@ public class FriendInvitation extends Notification {
     }
     public void setToUsername(String toUsername) {
         this.toUsername = toUsername;
+    }
+    public String getChatId() {
+        return chatId;
+    }
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
     }
 }
