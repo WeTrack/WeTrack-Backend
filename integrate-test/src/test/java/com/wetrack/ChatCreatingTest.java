@@ -1,7 +1,7 @@
 package com.wetrack;
 
 import com.wetrack.client.model.Chat;
-import com.wetrack.client.test.CreatedResponseTestHelper;
+import com.wetrack.client.test.CreatedResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithFriendAdded;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +10,7 @@ public class ChatCreatingTest extends WeTrackIntegrateTestWithFriendAdded {
 
     private Chat testChat;
 
-    private CreatedResponseTestHelper messageHelper = new CreatedResponseTestHelper();
+    private CreatedResponseHelper messageHelper = new CreatedResponseHelper();
 
     @Before
     public void setUp() throws Exception {

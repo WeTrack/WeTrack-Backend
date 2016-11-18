@@ -1,7 +1,7 @@
 package com.wetrack.client;
 
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.CreatedResponseTestHelper;
+import com.wetrack.client.test.CreatedResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -10,14 +10,13 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class UserCreateTest extends WeTrackClientTest {
 
-    private CreatedResponseTestHelper messageHelper = new CreatedResponseTestHelper();
+    private CreatedResponseHelper messageHelper = new CreatedResponseHelper();
 
     @Test
     public void testUserCreateRequestFormat() throws Exception {

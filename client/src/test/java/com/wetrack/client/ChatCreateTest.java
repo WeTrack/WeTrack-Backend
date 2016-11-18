@@ -3,9 +3,8 @@ package com.wetrack.client;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.wetrack.client.model.Chat;
-import com.wetrack.client.test.CreatedResponseTestHelper;
+import com.wetrack.client.test.CreatedResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
-import com.wetrack.util.ResourceUtils;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Test;
@@ -17,12 +16,12 @@ import static org.junit.Assert.assertThat;
 
 public class ChatCreateTest extends WeTrackClientTest {
 
-    private CreatedResponseTestHelper messageHelper = new CreatedResponseTestHelper();
+    private CreatedResponseHelper messageHelper = new CreatedResponseHelper();
 
     @Test
     public void testChatCreateRequestFormat() throws InterruptedException {
         MockResponse response = new MockResponse().setResponseCode(201)
-                .setBody(ResourceUtils.readResource("test_chat_create/201.json"));
+                .setBody(readResource("test_chat_create/201.json"));
         server.enqueue(response);
         server.enqueue(response);
 
@@ -40,5 +39,4 @@ public class ChatCreateTest extends WeTrackClientTest {
         assertThat(requestEntity.get("members").getAsJsonArray().contains(new JsonPrimitive(windyChan.getUsername())), is(true));
         assertThat(requestEntity.has("chatId"), is(false));
     }
-
 }

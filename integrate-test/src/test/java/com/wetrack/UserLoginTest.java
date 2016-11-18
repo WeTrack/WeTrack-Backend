@@ -1,13 +1,13 @@
 package com.wetrack;
 
 import com.wetrack.client.model.UserToken;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithUserCreated;
 import org.junit.Test;
 
 public class UserLoginTest extends WeTrackIntegrateTestWithUserCreated {
 
-    private EntityResponseTestHelper<UserToken> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<UserToken> entityHelper = new EntityResponseHelper<>(gson);
 
     @Test
     public void testLoginWithCorrectCredential() {

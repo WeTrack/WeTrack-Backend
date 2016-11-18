@@ -2,8 +2,8 @@ package com.wetrack.client;
 
 import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.EntityResponseTestHelper;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -21,8 +20,8 @@ public class UserUpdateTest extends WeTrackClientTest {
 
     private String token = "Notmatter";
 
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
-    private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
+    private MessageResponseHelper messageHelper = new MessageResponseHelper(200);
+    private EntityResponseHelper<Message> entityHelper = new EntityResponseHelper<>(gson);
 
     @Test
     public void testUserUpdateRequestFormat() throws Exception {

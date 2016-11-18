@@ -1,11 +1,11 @@
 package com.wetrack;
 
-import com.wetrack.client.test.ResultResponseTestHelper;
+import com.wetrack.client.test.ResultResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithUserCreated;
 import org.junit.Test;
 
 public class UserExistsTest extends WeTrackIntegrateTestWithUserCreated {
-    private ResultResponseTestHelper resultHelper = new ResultResponseTestHelper(200);
+    private ResultResponseHelper resultHelper = new ResultResponseHelper(200);
 
     @Test
     public void testExistedUser() {

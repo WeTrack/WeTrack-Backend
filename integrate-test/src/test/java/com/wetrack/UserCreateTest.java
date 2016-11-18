@@ -1,14 +1,14 @@
 package com.wetrack;
 
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.CreatedResponseTestHelper;
+import com.wetrack.client.test.CreatedResponseHelper;
 import com.wetrack.test.Utils;
 import com.wetrack.test.WeTrackIntegrateTest;
 import org.junit.Test;
 
 public class UserCreateTest extends WeTrackIntegrateTest {
 
-    private CreatedResponseTestHelper messageHelper = new CreatedResponseTestHelper();
+    private CreatedResponseHelper messageHelper = new CreatedResponseHelper();
 
     @Test
     public void testUserCreateWithMessageCallback() throws Exception {

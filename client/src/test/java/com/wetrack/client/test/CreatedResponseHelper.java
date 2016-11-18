@@ -2,7 +2,7 @@ package com.wetrack.client.test;
 
 import com.wetrack.client.CreatedMessageCallback;
 
-public class CreatedResponseTestHelper {
+public class CreatedResponseHelper {
 
     private boolean successful;
     private int receivedStatusCode;

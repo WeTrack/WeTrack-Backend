@@ -1,7 +1,7 @@
 package com.wetrack.client;
 
 import com.wetrack.client.model.UserToken;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -20,7 +19,7 @@ public class UserTokenValidateTest extends WeTrackClientTest {
     private String username = "robert-peng";
     private String token = "12345678absd";
 
-    private EntityResponseTestHelper<UserToken> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<UserToken> entityHelper = new EntityResponseHelper<>(gson);
 
     @Test
     public void testTokenValidateRequestFormat() throws InterruptedException {

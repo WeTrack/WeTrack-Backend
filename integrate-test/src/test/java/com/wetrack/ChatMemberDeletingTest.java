@@ -1,13 +1,13 @@
 package com.wetrack;
 
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithChatCreated;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ChatMemberDeletingTest extends WeTrackIntegrateTestWithChatCreated {
 
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
+    private MessageResponseHelper messageHelper = new MessageResponseHelper(200);
 
     @Before
     public void setUp() throws Exception {

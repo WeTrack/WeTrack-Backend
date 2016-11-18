@@ -1,13 +1,13 @@
 package com.wetrack.client.test;
 
 import com.google.gson.Gson;
-import com.wetrack.client.Callback;
+import com.wetrack.client.EntityCallback;
 import com.wetrack.client.model.Message;
 import retrofit2.Response;
 
 import java.io.IOException;
 
-public class EntityResponseTestHelper<T> {
+public class EntityResponseHelper<T> {
     private Gson gson;
 
     private T receivedEntity;
@@ -15,7 +15,7 @@ public class EntityResponseTestHelper<T> {
     private Throwable receivedException;
     private Message receivedErrorMessage;
 
-    public EntityResponseTestHelper(Gson gson) {
+    public EntityResponseHelper(Gson gson) {
         this.gson = gson;
     }
 
@@ -37,9 +37,23 @@ public class EntityResponseTestHelper<T> {
     }
 
     public void assertReceivedErrorMessage(int receivedStatusCode) {
-        if (this.receivedStatusCode != receivedStatusCode)
-            throw new AssertionError("Expected received status code: " + receivedStatusCode +
-                    "\nActual received status code: " + this.receivedStatusCode);
+        if (this.receivedStatusCode != receivedStatusCode) {
+            if (receivedErrorMessage != null)
+                throw new AssertionError("Expected received status code: " + receivedStatusCode +
+                        "\nActual received status code: " + this.receivedStatusCode +
+                        "\nwith error message " + receivedErrorMessage);
+            else if (receivedException != null)
+                throw new AssertionError("Expected received status code: " + receivedStatusCode +
+                        "\nActual received status code: " + this.receivedStatusCode +
+                        "\nwith exception " + receivedException.getClass().getName(), receivedException);
+            else if (receivedEntity != null)
+                throw new AssertionError("Expected received status code: " + receivedStatusCode +
+                        "\nActual received status code: " + this.receivedStatusCode +
+                        "\nwith entity " + receivedEntity);
+            else
+                throw new AssertionError("Expected received status code: " + receivedStatusCode +
+                        "\nActual received status code: " + this.receivedStatusCode);
+        }
         assertReceivedErrorMessage();
     }
 
@@ -69,25 +83,21 @@ public class EntityResponseTestHelper<T> {
         }
     }
 
-    public Callback<T> callback(final int successStatusCode) {
-        return new Callback<T>() {
+    public EntityCallback<T> callback(final int successStatusCode) {
+        return new EntityCallback<T>() {
             @Override
             protected void onReceive(T entity) {
                 receivedEntity = entity;
                 receivedStatusCode = successStatusCode;
+                receivedErrorMessage = null;
                 receivedException = null;
             }
 
             @Override
-            protected void onErrorResponse(Response response) {
-                try {
-                    String receivedErrorBody = response.errorBody().string();
-                    receivedErrorMessage = gson.fromJson(receivedErrorBody, Message.class);
-                } catch (IOException e) {
-                    receivedErrorMessage = null;
-                }
+            protected void onErrorMessage(Message message) {
                 receivedEntity = null;
-                receivedStatusCode = response.code();
+                receivedStatusCode = message.getStatusCode();
+                receivedErrorMessage = message;
                 receivedException = null;
             }
 
@@ -95,6 +105,7 @@ public class EntityResponseTestHelper<T> {
             protected void onException(Throwable ex) {
                 receivedEntity = null;
                 receivedStatusCode = -1;
+                receivedErrorMessage = null;
                 receivedException = ex;
             }
         };

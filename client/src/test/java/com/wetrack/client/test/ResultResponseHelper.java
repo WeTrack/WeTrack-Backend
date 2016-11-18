@@ -2,7 +2,7 @@ package com.wetrack.client.test;
 
 import com.wetrack.client.ResultCallback;
 
-public class ResultResponseTestHelper {
+public class ResultResponseHelper {
 
     private final int successfulStatusCode;
 
@@ -10,7 +10,7 @@ public class ResultResponseTestHelper {
     private int receivedStatusCode;
     private Throwable receivedException;
 
-    public ResultResponseTestHelper(int successfulStatusCode) {
+    public ResultResponseHelper(int successfulStatusCode) {
         this.successfulStatusCode = successfulStatusCode;
     }
 

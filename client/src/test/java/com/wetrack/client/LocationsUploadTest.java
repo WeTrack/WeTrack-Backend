@@ -2,9 +2,8 @@ package com.wetrack.client;
 
 import com.google.gson.reflect.TypeToken;
 import com.wetrack.client.model.Location;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
-import com.wetrack.util.ResourceUtils;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Test;
@@ -21,7 +20,7 @@ import static org.junit.Assert.assertThat;
 public class LocationsUploadTest extends WeTrackClientTest {
 
     private Type locationListType = new TypeToken<List<Location>>(){}.getType();
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
+    private MessageResponseHelper messageHelper = new MessageResponseHelper(200);
 
     private String username = "robert-peng";
     private String token = "Not matter";
@@ -29,7 +28,7 @@ public class LocationsUploadTest extends WeTrackClientTest {
     @Test
     public void testLocationUploadRequestFormat() throws InterruptedException {
         List<Location> testLocations =
-                gson.fromJson(ResourceUtils.readResource("test_location_upload/example_locations.json"), locationListType);
+                gson.fromJson(readResource("test_location_upload/example_locations.json"), locationListType);
 
         server.enqueue(new MockResponse().setResponseCode(200));
         client.uploadLocations(username, token, testLocations, messageHelper.callback());
@@ -57,7 +56,7 @@ public class LocationsUploadTest extends WeTrackClientTest {
     @Test
     public void testLocationUploadWithOkResponse() {
         server.enqueue(new MockResponse().setResponseCode(200)
-                .setBody(ResourceUtils.readResource("test_location_upload/200.json")));
+                .setBody(readResource("test_location_upload/200.json")));
         client.uploadLocations(username, token, Collections.<Location>emptyList(), messageHelper.callback());
 
         messageHelper.assertReceivedSuccessfulMessage();
@@ -66,7 +65,7 @@ public class LocationsUploadTest extends WeTrackClientTest {
     @Test
     public void testLocationUploadWithErrorResponse() {
         server.enqueue(new MockResponse().setResponseCode(401)
-                .setBody(ResourceUtils.readResource("test_location_upload/401.json")));
+                .setBody(readResource("test_location_upload/401.json")));
         client.uploadLocations(username, token, Collections.<Location>emptyList(), messageHelper.callback());
 
         messageHelper.assertReceivedFailedMessage(401);

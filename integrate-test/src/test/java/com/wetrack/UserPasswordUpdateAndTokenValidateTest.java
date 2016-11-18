@@ -2,16 +2,16 @@ package com.wetrack;
 
 import com.wetrack.client.model.Message;
 import com.wetrack.client.model.UserToken;
-import com.wetrack.client.test.EntityResponseTestHelper;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithUserLoggedIn;
 import org.junit.Test;
 
 public class UserPasswordUpdateAndTokenValidateTest extends WeTrackIntegrateTestWithUserLoggedIn {
 
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
-    private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
-    private EntityResponseTestHelper<UserToken> tokenHelper = new EntityResponseTestHelper<>(gson);
+    private MessageResponseHelper messageHelper = new MessageResponseHelper(200);
+    private EntityResponseHelper<Message> entityHelper = new EntityResponseHelper<>(gson);
+    private EntityResponseHelper<UserToken> tokenHelper = new EntityResponseHelper<>(gson);
 
     private String username = robertPeng.getUsername();
     private String password = robertPeng.getPassword();

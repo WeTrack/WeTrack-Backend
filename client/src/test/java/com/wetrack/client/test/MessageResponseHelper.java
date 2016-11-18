@@ -1,9 +1,8 @@
 package com.wetrack.client.test;
 
-import com.wetrack.client.ResultMessageCallback;
+import com.wetrack.client.MessageCallback;
 
-public class MessageResponseTestHelper {
-
+public class MessageResponseHelper {
     private final int successfulStatusCode;
 
     private boolean successful;
@@ -11,7 +10,7 @@ public class MessageResponseTestHelper {
     private String receivedMessage;
     private Throwable receivedException;
 
-    public MessageResponseTestHelper(int successfulStatusCode) {
+    public MessageResponseHelper(int successfulStatusCode) {
         this.successfulStatusCode = successfulStatusCode;
     }
 
@@ -50,8 +49,8 @@ public class MessageResponseTestHelper {
         }
     }
 
-    public ResultMessageCallback callback() {
-        return new ResultMessageCallback(successfulStatusCode) {
+    public MessageCallback callback() {
+        return new MessageCallback(successfulStatusCode) {
             @Override
             protected void onSuccess(String message) {
                 successful = true;

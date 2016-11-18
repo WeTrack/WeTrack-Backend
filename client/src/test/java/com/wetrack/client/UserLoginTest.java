@@ -1,10 +1,8 @@
 package com.wetrack.client;
 
-import com.wetrack.client.config.Config;
 import com.wetrack.client.model.UserToken;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
-import com.wetrack.util.CryptoUtils;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.json.JSONObject;
@@ -12,7 +10,6 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -22,7 +19,7 @@ public class UserLoginTest extends WeTrackClientTest {
     private String username = "robert-peng";
     private String password = "Not matter";
 
-    private EntityResponseTestHelper<UserToken> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<UserToken> entityHelper = new EntityResponseHelper<>(gson);
 
     @Test
     public void testUserLoginRequestFormat() throws InterruptedException {
@@ -39,7 +36,7 @@ public class UserLoginTest extends WeTrackClientTest {
 
         UserService.UserLoginRequest expectedRequestBody =
                 new UserService.UserLoginRequest(username, CryptoUtils.md5Digest(password));
-        assertThat(request.getBody().readUtf8(), is(Config.gson().toJson(expectedRequestBody)));
+        assertThat(request.getBody().readUtf8(), is(gson.toJson(expectedRequestBody)));
     }
 
     @Test

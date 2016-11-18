@@ -1,6 +1,6 @@
 package com.wetrack;
 
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithChatCreated;
 import org.junit.Test;
 
@@ -9,7 +9,7 @@ import java.util.Collections;
 
 public class ChatMemberAddingTest extends WeTrackIntegrateTestWithChatCreated {
 
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
+    private MessageResponseHelper messageHelper = new MessageResponseHelper(200);
 
     @Test
     public void testChatMemberAdding() {

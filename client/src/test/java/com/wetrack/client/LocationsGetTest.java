@@ -2,9 +2,8 @@ package com.wetrack.client;
 
 import com.google.gson.reflect.TypeToken;
 import com.wetrack.client.model.Location;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
-import com.wetrack.util.ResourceUtils;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.joda.time.LocalDateTime;
@@ -19,7 +18,7 @@ import static org.junit.Assert.assertThat;
 
 public class LocationsGetTest extends WeTrackClientTest {
 
-    private EntityResponseTestHelper<List<Location>> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<List<Location>> entityHelper = new EntityResponseHelper<>(gson);
 
     private String username = "robert-peng";
     private LocalDateTime sinceTime = LocalDateTime.parse("2016-10-24T12:00:00.000");
@@ -38,7 +37,7 @@ public class LocationsGetTest extends WeTrackClientTest {
 
     @Test
     public void testLocationsGetOnOkResponse() {
-        String testResponse = ResourceUtils.readResource("test_locations_get/200.json");
+        String testResponse = readResource("test_locations_get/200.json");
         server.enqueue(new MockResponse().setResponseCode(200).setBody(testResponse));
         client.getUserLocationsSince(username, sinceTime, entityHelper.callback(200));
 

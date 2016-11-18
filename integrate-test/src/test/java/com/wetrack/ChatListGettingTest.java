@@ -1,7 +1,7 @@
 package com.wetrack;
 
 import com.wetrack.client.model.Chat;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithChatCreated;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 
 public class ChatListGettingTest extends WeTrackIntegrateTestWithChatCreated {
 
-    private EntityResponseTestHelper<List<Chat>> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<List<Chat>> entityHelper = new EntityResponseHelper<>(gson);
 
     @Test
     public void testChatListGetting() {

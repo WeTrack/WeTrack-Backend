@@ -2,7 +2,7 @@ package com.wetrack;
 
 import com.google.gson.reflect.TypeToken;
 import com.wetrack.client.model.Location;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithUserLoggedIn;
 import com.wetrack.util.ResourceUtils;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 public class LocationUploadTest extends WeTrackIntegrateTestWithUserLoggedIn {
 
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
+    private MessageResponseHelper messageHelper = new MessageResponseHelper(200);
 
     private List<Location> testLocations;
 

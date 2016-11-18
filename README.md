@@ -39,8 +39,9 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 - [x] Implement Friend adding.
 - [x] Implement Chat creating.
 - [x] Implement chat message service.
-- [ ] Implement WebSocket notification pushing.
+- [x] Implement WebSocket notification pushing.
 - [ ] Deploy version `0.1`.
+- [ ] Write test cases for WebSocket service.
 - [ ] Migrate from Jersey to SpringMVC.
 - [ ] Implement file and image uploading.
 - [ ] Implement friend invitation.

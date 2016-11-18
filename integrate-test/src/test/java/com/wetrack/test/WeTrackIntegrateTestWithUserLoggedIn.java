@@ -2,7 +2,7 @@ package com.wetrack.test;
 
 import com.wetrack.client.model.User;
 import com.wetrack.client.model.UserToken;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import org.junit.Before;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class WeTrackIntegrateTestWithUserLoggedIn extends WeTrackIntegrateTestWi
         super.setUp();
 
         tokens = new HashMap<>();
-        EntityResponseTestHelper<UserToken> entityHelper = new EntityResponseTestHelper<>(gson);
+        EntityResponseHelper<UserToken> entityHelper = new EntityResponseHelper<>(gson);
         client.userLogin(robertPeng.getUsername(), robertPeng.getPassword(), entityHelper.callback(200));
         entityHelper.assertReceivedEntity(200);
         UserToken receivedToken = entityHelper.getReceivedEntity();

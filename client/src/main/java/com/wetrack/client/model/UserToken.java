@@ -3,7 +3,6 @@ package com.wetrack.client.model;
 import org.joda.time.LocalDateTime;
 
 public class UserToken {
-
     private String token;
     private String username;
     private LocalDateTime expireTime;

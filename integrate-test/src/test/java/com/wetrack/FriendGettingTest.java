@@ -1,7 +1,7 @@
 package com.wetrack;
 
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithFriendAdded;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 
 public class FriendGettingTest extends WeTrackIntegrateTestWithFriendAdded {
 
-    private EntityResponseTestHelper<List<User>> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<List<User>> entityHelper = new EntityResponseHelper<>(gson);
 
     @Test
     public void testGetFriendList() {

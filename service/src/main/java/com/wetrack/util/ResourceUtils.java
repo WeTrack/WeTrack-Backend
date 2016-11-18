@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public abstract class ResourceUtils {
-
     public static String readResource(String fileName) {
         URL resourceUrl = ResourceUtils.class.getClassLoader().getResource(fileName);
         if (resourceUrl == null)
@@ -20,5 +19,4 @@ public abstract class ResourceUtils {
             throw new AssertionError("Failed to read from `" + resourceUrl.toString() + "`.", ex);
         }
     }
-
 }

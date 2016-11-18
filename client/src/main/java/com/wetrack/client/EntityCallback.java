@@ -1,5 +1,6 @@
 package com.wetrack.client;
 
+import com.wetrack.client.model.Message;
 import retrofit2.Response;
 
 /**
@@ -10,15 +11,15 @@ import retrofit2.Response;
  * @see #onReceive(Object)
  * @see #onResponse(Response)
  * @see #onException(Throwable)
- * @see #onErrorResponse(Response)
+ * @see #onErrorMessage(Response)
  *
  * @param <T> the expected type of the response entity
  */
-public class Callback<T> {
+public class EntityCallback<T> {
 
     /**
      * Invoked on entity successfully received from response body. This method will be invoked
-     * after {@link #onResponse(Response)} if the status code of the response if {@code 200}.
+     * after {@link #onResponse(Response)} if the status code of the response was {@code 200}.
      *
      * @param value the received entity.
      */
@@ -45,6 +46,6 @@ public class Callback<T> {
      *
      * @param response the received raw response.
      */
-    protected void onErrorResponse(Response<T> response) {}
+    protected void onErrorMessage(Message response) {}
 
 }

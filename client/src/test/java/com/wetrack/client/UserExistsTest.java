@@ -1,6 +1,6 @@
 package com.wetrack.client;
 
-import com.wetrack.client.test.ResultResponseTestHelper;
+import com.wetrack.client.test.ResultResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 public class UserExistsTest extends WeTrackClientTest {
 
     private String username = "robert-peng";
-    private ResultResponseTestHelper resultHelper = new ResultResponseTestHelper(200);
+    private ResultResponseHelper resultHelper = new ResultResponseHelper(200);
 
     @Test
     public void testUserExistsRequestFormat() throws InterruptedException {

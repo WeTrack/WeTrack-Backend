@@ -1,7 +1,7 @@
 package com.wetrack;
 
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithUserCreated;
 import org.junit.Test;
 
@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 
 public class UserGetTest extends WeTrackIntegrateTestWithUserCreated {
 
-    private EntityResponseTestHelper<User> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<User> entityHelper = new EntityResponseHelper<>(gson);
 
     @Test
     public void testGetExistedUser() {

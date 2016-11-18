@@ -2,7 +2,7 @@ package com.wetrack.client;
 
 import com.google.gson.JsonParseException;
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
-import static com.wetrack.util.ResourceUtils.readResource;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
@@ -23,7 +22,7 @@ public class UserGetTest extends WeTrackClientTest {
 
     private String username = "windy-chan";
 
-    private EntityResponseTestHelper<User> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<User> entityHelper = new EntityResponseHelper<>(gson);
 
     @Test
     public void testUserGetRequestFormat() throws InterruptedException {

@@ -2,8 +2,8 @@ package com.wetrack;
 
 import com.wetrack.client.model.Chat;
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.EntityResponseTestHelper;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithChatCreated;
 import org.junit.Test;
 
@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 
 public class ChatExitingTest extends WeTrackIntegrateTestWithChatCreated {
 
-    private EntityResponseTestHelper<List<Chat>> entityHelper = new EntityResponseTestHelper<>(gson);
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
+    private EntityResponseHelper<List<Chat>> entityHelper = new EntityResponseHelper<>(gson);
+    private MessageResponseHelper messageHelper = new MessageResponseHelper(200);
 
     @Test
     public void testChatExiting() {

@@ -1,12 +1,12 @@
 package com.wetrack;
 
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithFriendAdded;
 import org.junit.Test;
 
 public class FriendAddingTest extends WeTrackIntegrateTestWithFriendAdded {
 
-    MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
+    MessageResponseHelper messageHelper = new MessageResponseHelper(200);
 
     @Test
     public void testAddFriend() {

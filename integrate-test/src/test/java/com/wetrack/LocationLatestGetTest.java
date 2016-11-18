@@ -2,8 +2,8 @@ package com.wetrack;
 
 import com.google.gson.reflect.TypeToken;
 import com.wetrack.client.model.Location;
-import com.wetrack.client.test.EntityResponseTestHelper;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.test.WeTrackIntegrateTestWithUserLoggedIn;
 import com.wetrack.util.ResourceUtils;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 public class LocationLatestGetTest extends WeTrackIntegrateTestWithUserLoggedIn {
 
-    private EntityResponseTestHelper<Location> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<Location> entityHelper = new EntityResponseHelper<>(gson);
 
     @Test
     public void testLocationLatestGetWithErrorResponse() {
@@ -27,7 +27,7 @@ public class LocationLatestGetTest extends WeTrackIntegrateTestWithUserLoggedIn 
     public void testLocationLatestGet() {
         List<Location> testLocations = gson.fromJson(ResourceUtils.readResource("example_locations.json"),
                 new TypeToken<List<Location>>() {}.getType());
-        MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
+        MessageResponseHelper messageHelper = new MessageResponseHelper(200);
         client.uploadLocations(username, token, testLocations, messageHelper.callback());
         messageHelper.assertReceivedSuccessfulMessage();
 

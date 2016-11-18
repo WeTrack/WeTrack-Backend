@@ -2,8 +2,8 @@ package com.wetrack;
 
 import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.EntityResponseTestHelper;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import com.wetrack.test.Utils;
 import com.wetrack.test.WeTrackIntegrateTestWithUserLoggedIn;
 import org.junit.Before;
@@ -14,9 +14,9 @@ import static org.junit.Assert.assertThat;
 
 public class UserUpdateTest extends WeTrackIntegrateTestWithUserLoggedIn {
 
-    private MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
-    private EntityResponseTestHelper<Message> entityHelper = new EntityResponseTestHelper<>(gson);
-    private EntityResponseTestHelper<User> userHelper = new EntityResponseTestHelper<>(gson);
+    private MessageResponseHelper messageHelper = new MessageResponseHelper(200);
+    private EntityResponseHelper<Message> entityHelper = new EntityResponseHelper<>(gson);
+    private EntityResponseHelper<User> userHelper = new EntityResponseHelper<>(gson);
 
     private User newUser;
 

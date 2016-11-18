@@ -1,9 +1,8 @@
 package com.wetrack.client;
 
 import com.wetrack.client.model.Location;
-import com.wetrack.client.test.EntityResponseTestHelper;
+import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.client.test.WeTrackClientTest;
-import com.wetrack.util.ResourceUtils;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Test;
@@ -16,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 public class LocationLatestGetTest extends WeTrackClientTest {
 
-    private EntityResponseTestHelper<Location> entityHelper = new EntityResponseTestHelper<>(gson);
+    private EntityResponseHelper<Location> entityHelper = new EntityResponseHelper<>(gson);
 
     private String username = "robert-peng";
 
@@ -34,7 +33,7 @@ public class LocationLatestGetTest extends WeTrackClientTest {
 
     @Test
     public void testLocationLatestGetOnOkResponse() {
-        String testResponse = ResourceUtils.readResource("test_location_latest_get/200.json");
+        String testResponse = readResource("test_location_latest_get/200.json");
         server.enqueue(new MockResponse().setResponseCode(200).setBody(testResponse));
         client.getUserLatestLocation(username, entityHelper.callback(200));
 
@@ -51,7 +50,7 @@ public class LocationLatestGetTest extends WeTrackClientTest {
     @Test
     public void testLocationLatestGetOnErrorResponse() {
         server.enqueue(new MockResponse().setResponseCode(404)
-                .setBody(ResourceUtils.readResource("test_location_latest_get/404.json")));
+                .setBody(readResource("test_location_latest_get/404.json")));
         client.getUserLatestLocation(username, entityHelper.callback(200));
 
         entityHelper.assertReceivedErrorMessage(404);

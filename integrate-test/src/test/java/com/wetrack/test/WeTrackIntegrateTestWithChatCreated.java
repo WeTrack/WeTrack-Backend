@@ -2,9 +2,9 @@ package com.wetrack.test;
 
 import com.wetrack.client.model.Chat;
 import com.wetrack.client.model.User;
-import com.wetrack.client.test.CreatedResponseTestHelper;
-import com.wetrack.client.test.EntityResponseTestHelper;
-import com.wetrack.client.test.MessageResponseTestHelper;
+import com.wetrack.client.test.CreatedResponseHelper;
+import com.wetrack.client.test.EntityResponseHelper;
+import com.wetrack.client.test.MessageResponseHelper;
 import org.junit.Before;
 
 import java.util.Arrays;
@@ -37,7 +37,7 @@ public class WeTrackIntegrateTestWithChatCreated extends WeTrackIntegrateTestWit
     }
 
     protected String createChatWithAssertion(String token, String chatName, User... members) {
-        CreatedResponseTestHelper messageHelper = new CreatedResponseTestHelper();
+        CreatedResponseHelper messageHelper = new CreatedResponseHelper();
         Chat chat = new Chat(chatName);
         chat.setMemberNames(Arrays.stream(members).map(User::getUsername).collect(Collectors.toList()));
         client.createChat(token, chat, messageHelper.callback());
@@ -46,7 +46,7 @@ public class WeTrackIntegrateTestWithChatCreated extends WeTrackIntegrateTestWit
     }
 
     protected void addChatMemberWithAssertion(String chatId, String token, User... newMembers) {
-        MessageResponseTestHelper messageHelper = new MessageResponseTestHelper(200);
+        MessageResponseHelper messageHelper = new MessageResponseHelper(200);
         client.addChatMembers(chatId, token, Arrays.asList(newMembers), messageHelper.callback());
         messageHelper.assertReceivedSuccessfulMessage();
     }
@@ -57,7 +57,7 @@ public class WeTrackIntegrateTestWithChatCreated extends WeTrackIntegrateTestWit
 
     protected void assertChatMember(String chatId, String token,
                                   int expectedMemberNum, User... expectedMembers) {
-        EntityResponseTestHelper<List<User>> entityHelper = new EntityResponseTestHelper<>(gson);
+        EntityResponseHelper<List<User>> entityHelper = new EntityResponseHelper<>(gson);
         client.getChatMembers(chatId, token, entityHelper.callback(200));
         entityHelper.assertReceivedEntity(200);
         List<User> members = entityHelper.getReceivedEntity();
