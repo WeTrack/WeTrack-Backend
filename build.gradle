@@ -1,25 +1,40 @@
-allprojects {
-    apply plugin: 'maven'
-    apply plugin: 'idea'
-    group = 'com.wetrack'
-    version = '0.1'
-}
+apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'war'
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+
+group = 'com.wetrack'
+version = '0.1'
 
 ext {
     jerseyVersion = '2.23.2'
     springVersion = '4.3.3.RELEASE'
 }
 
-subprojects {
-    apply plugin: 'java'
+repositories {
+    mavenCentral()
+}
 
-    repositories {
-        mavenCentral()
-    }
+dependencies {
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion"
+    compile "org.glassfish.jersey.ext:jersey-spring3:$jerseyVersion"
+    compile "org.springframework:spring-web:$springVersion"
+    compile "org.springframework:spring-webmvc:$springVersion"
+    compile "org.springframework:spring-websocket:$springVersion"
+    compile 'org.mongodb.morphia:morphia:1.2.1'
+    compile group: 'org.mongodb.morphia', name: 'morphia-logging-slf4j', version: '1.2.1'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.21'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.0'
+    compile group: 'com.google.guava', name: 'guava', version: '20.0'
 
-    dependencies {
-        compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 
-        testCompile group: 'junit', name: 'junit', version: '4.12'
-    }
+    testCompile "org.glassfish.jersey.test-framework:jersey-test-framework-core:$jerseyVersion"
+    testCompile "org.springframework:spring-test:$springVersion"
+    testCompile 'com.github.fakemongo:fongo:2.0.7'
+
+    testRuntime "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty:$jerseyVersion"
 }
