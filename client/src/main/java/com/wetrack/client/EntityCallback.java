@@ -11,7 +11,7 @@ import retrofit2.Response;
  * @see #onReceive(Object)
  * @see #onResponse(Response)
  * @see #onException(Throwable)
- * @see #onErrorMessage(Response)
+ * @see #onErrorMessage(Message)
  *
  * @param <T> the expected type of the response entity
  */

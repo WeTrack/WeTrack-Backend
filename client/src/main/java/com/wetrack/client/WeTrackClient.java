@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Client classes for Android client of WeTrack, with all the necessary methods for network connection.
  * <p>
- * During instantiation, customized RxJava {@link Scheduler} can be provided for subscription and observation.
+ * During instantiation, customized RxJava {@link Scheduler}s can be provided for both subscription and observation.
  *
  * @see #WeTrackClient(String, int, Scheduler, Scheduler)
  */
@@ -107,8 +107,8 @@ public class WeTrackClient {
      *
      * <table>
      *     <tr><th>Status Code</th><th>Meaning</th></tr>
-     *     <tr><td>{@code 400}</td><td>Fields in the provided {@code User} instance are invalid.</td></tr>
-     *     <tr><td>{@code 403}</td><td>User with same username already exist.</td></tr>
+     *     <tr><td>{@code 400}</td><td>Some fields in the provided {@code User} instance are invalid.</td></tr>
+     *     <tr><td>{@code 403}</td><td>User with the same username already exist.</td></tr>
      * </table>
      *
      * @param newUser the given {@code User} instance.
@@ -131,12 +131,12 @@ public class WeTrackClient {
      *
      * <table>
      *     <tr><th>Status Code</th><th>Meaning</th></tr>
-     *     <tr><td>{@code 400}</td><td>Fields in the provided {@code User} instance are invalid.</td></tr>
+     *     <tr><td>{@code 400}</td><td>Some fields in the provided {@code User} instance are invalid.</td></tr>
      *     <tr>
      *         <td>{@code 401}</td>
      *         <td>
      *             The provided token is invalid or has expired; or the logged-in user has no permission for
-     *             updating this user.
+     *             this operation.
      *         </td>
      *     </tr>
      *     <tr><td>{@code 404}</td><td>User with the given username does not exist.</td></tr>
@@ -148,40 +148,6 @@ public class WeTrackClient {
      * @param callback callback object which defines how to handle different result.
      */
     public void updateUser(String username, String token, User updatedUser, final MessageCallback callback) {
-        updatedUser.setPassword(null);
-        userService.updateUser(username, token, updatedUser)
-                .subscribeOn(subscribeScheduler)
-                .observeOn(observeScheduler)
-                .subscribe(observer(callback));
-    }
-
-    /**
-     * Updates the user with the given username with the fields provided in the given {@link User} instance.
-     * <p>
-     * The {@link EntityCallback#onReceive(Object)} method will be invoked if the update is successful;
-     * otherwise, the {@link EntityCallback#onErrorMessage(Message)} method will be invoked.
-     * <p>
-     * Possible error response status code includes:
-     *
-     * <table>
-     *     <tr><th>Status Code</th><th>Meaning</th></tr>
-     *     <tr><td>{@code 400}</td><td>Fields in the provided {@code User} instance are invalid.</td></tr>
-     *     <tr>
-     *         <td>{@code 401}</td>
-     *         <td>
-     *             The provided token is invalid or has expired; or the logged-in user has no permission for
-     *             updating this user.
-     *         </td>
-     *     </tr>
-     *     <tr><td>{@code 404}</td><td>User with the given username does not exist.</td></tr>
-     * </table>
-     *
-     * @param username the given username.
-     * @param token given token for authentication and permission authorization.
-     * @param updatedUser the given {@code User} instance.
-     * @param callback callback object which defines how to handle different result.
-     */
-    public void updateUser(String username, String token, User updatedUser, final EntityCallback<Message> callback) {
         updatedUser.setPassword(null);
         userService.updateUser(username, token, updatedUser)
                 .subscribeOn(subscribeScheduler)
@@ -202,9 +168,9 @@ public class WeTrackClient {
      *
      * <table>
      *     <tr><th>Status Code</th><th>Meaning</th></tr>
-     *     <tr><td>{@code 400}</td><td>Provided old or/and new password is/are empty or invalid.</td></tr>
-     *     <tr><td>{@code 401}</td><td>Provided old password is incorrect.</td></tr>
-     *     <tr><td>{@code 404}</td><td>User with provided username does not exist.</td></tr>
+     *     <tr><td>{@code 400}</td><td>Given old or/and new password is/are empty or invalid.</td></tr>
+     *     <tr><td>{@code 401}</td><td>Given old password is incorrect.</td></tr>
+     *     <tr><td>{@code 404}</td><td>User with the given username does not exist.</td></tr>
      * </table>
      *
      * @param username the given username.
@@ -222,37 +188,12 @@ public class WeTrackClient {
     }
 
     /**
-     * Updates the password of the user with the given username.
-     * <p>
-     * The user's original password and new password must be provided in plain text.
-     * <p>
-     * The {@link EntityCallback#onReceive(Object)} method will be invoked if the update is successful, and any
-     * formerly logged-in token of this user will be invalidated. Otherwise, the
-     * {@link EntityCallback#onErrorMessage(Message)} method will be invoked.
-     * <p>
-     * Possible error response status code includes:
+     * Fetches the list of locations of the designated user since the given time.
      *
-     * <table>
-     *     <tr><th>Status Code</th><th>Meaning</th></tr>
-     *     <tr><td>{@code 400}</td><td>Provided old or/and new password is/are empty or invalid.</td></tr>
-     *     <tr><td>{@code 401}</td><td>Provided old password is incorrect.</td></tr>
-     *     <tr><td>{@code 404}</td><td>User with provided username does not exist.</td></tr>
-     * </table>
-     *
-     * @param username the given username.
-     * @param oldPassword the provided original password of the user in plain text.
-     * @param newPassword the new password of the user in plain text.
+     * @param username the given username of the designated user.
+     * @param sinceTime the given since time.
      * @param callback callback object which defines how to handle different result.
      */
-    public void updateUserPassword(String username, String oldPassword, String newPassword,
-                                   final EntityCallback<Message> callback) {
-        oldPassword = CryptoUtils.md5Digest(oldPassword);
-        userService.updateUserPassword(username, new UserService.PasswordUpdateRequest(oldPassword, newPassword))
-                .subscribeOn(subscribeScheduler)
-                .observeOn(observeScheduler)
-                .subscribe(observer(callback));
-    }
-
     public void getUserLocationsSince(String username, LocalDateTime sinceTime,
                                       final EntityCallback<List<Location>> callback) {
         locationService.getLocationSince(username, sinceTime.toString())
@@ -261,14 +202,30 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
+    /**
+     * Uploads the given list of locations for the designated user.
+     *
+     * @param username the given username of the designated user.
+     * @param token token of the current logged-in user.
+     * @param locations the given list of locations.
+     * @param callback callback object which defines how to handle different result.
+     */
     public void uploadLocations(String username, String token, List<Location> locations,
                                 final MessageCallback callback) {
+        for (Location location : locations)
+            location.setUsername(username);
         locationService.uploadLocations(username, new LocationService.LocationsUploadRequest(token, locations))
                 .subscribeOn(subscribeScheduler)
                 .observeOn(observeScheduler)
                 .subscribe(observer(callback));
     }
 
+    /**
+     * Gets the latest location of the designated user.
+     *
+     * @param username the given username of the designated user.
+     * @param callback callback object which defines how to handle different result.
+     */
     public void getUserLatestLocation(String username, final EntityCallback<Location> callback) {
         locationService.getLatestLocation(username)
                 .subscribeOn(subscribeScheduler)
@@ -276,6 +233,13 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
+    /**
+     * Creates a chat group with the fields of the given {@link Chat} object.
+     *
+     * @param token token of the current logged-in user.
+     * @param chat the given {@code Chat}.
+     * @param callback callback object which defines how to handle different result.
+     */
     public void createChat(String token, Chat chat, final CreatedMessageCallback callback) {
         chatService.createChat(token, chat)
                 .subscribeOn(subscribeScheduler)
@@ -283,6 +247,14 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
+    /**
+     * Adds the given list of user to the chat group with the given id.
+     *
+     * @param chatId the given chat id.
+     * @param token token of the current logged-in user.
+     * @param newMembers the given list of new members.
+     * @param callback callback object which defines how to handle different result.
+     */
     public void addChatMembers(String chatId, String token, List<User> newMembers,
                                final MessageCallback callback) {
         chatService.addChatMembers(chatId, token, usersToUsernames(newMembers))
@@ -298,6 +270,13 @@ public class WeTrackClient {
         return usernames;
     }
 
+    /**
+     * Gets the list of members of the chat with given id.
+     *
+     * @param chatId the given chat id.
+     * @param token token of the current logged-in user.
+     * @param callback callback object which defines how to handle different result.
+     */
     public void getChatMembers(String chatId, String token, final EntityCallback<List<User>> callback) {
         chatService.getChatMembers(chatId, token)
                 .subscribeOn(subscribeScheduler)
@@ -305,13 +284,28 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
-    public void removeChatMember(String chatId, String token, User member, final MessageCallback callback) {
-        chatService.removeChatMember(chatId, member.getUsername(), token)
+    /**
+     * Removes the designated member from the chat with the given id.
+     *
+     * @param chatId the given chat id.
+     * @param token token of the current logged-in user.
+     * @param memberName the given name of the designated member.
+     * @param callback callback object which defines how to handle different result.
+     */
+    public void removeChatMember(String chatId, String token, String memberName, final MessageCallback callback) {
+        chatService.removeChatMember(chatId, memberName, token)
                 .subscribeOn(subscribeScheduler)
                 .observeOn(observeScheduler)
                 .subscribe(observer(callback));
     }
 
+    /**
+     * Fetches the list of chats of the designated user.
+     *
+     * @param username the given username of the designated user.
+     * @param token token of the current logged-in user.
+     * @param callback callback object which defines how to handle different result.
+     */
     public void getUserChatList(String username, String token, final EntityCallback<List<Chat>> callback) {
         chatService.getUserChatList(username, token)
                 .subscribeOn(subscribeScheduler)
@@ -319,6 +313,14 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
+    /**
+     * Exits the chat with the given id.
+     *
+     * @param username username of the current logged-in user.
+     * @param token token of the current logged-in user.
+     * @param chatId the given chat id.
+     * @param callback callback object which defines how to handle different result.
+     */
     public void exitChat(String username, String token, String chatId, final MessageCallback callback) {
         chatService.exitChat(username, chatId, token)
                 .subscribeOn(subscribeScheduler)
@@ -326,6 +328,13 @@ public class WeTrackClient {
                 .subscribe(observer(callback));
     }
 
+    /**
+     * Fetches the list of friend of the designated user.
+     *
+     * @param username the given username of the designated user.
+     * @param token token of the current logged-in user.
+     * @param callback callback object which defines how to handle different result.
+     */
     public void getUserFriendList(String username, String token, final EntityCallback<List<User>> callback) {
         friendService.getUserFriendList(username, token)
                 .subscribeOn(subscribeScheduler)
@@ -479,7 +488,7 @@ public class WeTrackClient {
 
             @Override
             public void onNext(Response response) {
-                if (response.code() == callback.getSuccessStatusCode())
+                if (response.code() == callback.getSuccessfulStatusCode())
                     callback.onSuccess();
                 else
                     callback.onFail(response.code());

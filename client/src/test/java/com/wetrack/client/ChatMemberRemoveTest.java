@@ -23,7 +23,7 @@ public class ChatMemberRemoveTest extends WeTrackClientTest {
                 .setBody(readResource("test_chat_member_delete/200.json"));
         server.enqueue(response);
 
-        client.removeChatMember(dummyChatId, dummyToken, robertPeng, helper.callback());
+        client.removeChatMember(dummyChatId, dummyToken, robertPeng.getUsername(), helper.callback());
         String expectedPath = "/chats/" + dummyChatId + "/members/" + robertPeng.getUsername() + "?token=" + dummyToken;
         RecordedRequest request = server.takeRequest(3, TimeUnit.SECONDS);
         assertThat(request.getMethod(), is("DELETE"));

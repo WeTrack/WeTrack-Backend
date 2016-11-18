@@ -1,6 +1,5 @@
 package com.wetrack;
 
-import com.wetrack.client.model.Message;
 import com.wetrack.client.model.User;
 import com.wetrack.client.test.EntityResponseHelper;
 import com.wetrack.client.test.MessageResponseHelper;
@@ -15,7 +14,6 @@ import static org.junit.Assert.assertThat;
 public class UserUpdateTest extends WeTrackIntegrateTestWithUserLoggedIn {
 
     private MessageResponseHelper messageHelper = new MessageResponseHelper(200);
-    private EntityResponseHelper<Message> entityHelper = new EntityResponseHelper<>(gson);
     private EntityResponseHelper<User> userHelper = new EntityResponseHelper<>(gson);
 
     private User newUser;
@@ -30,11 +28,11 @@ public class UserUpdateTest extends WeTrackIntegrateTestWithUserLoggedIn {
 
     @Test
     public void testInvalidUserUpdate() {
-        client.updateUser(username, "", newUser, entityHelper.callback(201));
-        entityHelper.assertReceivedErrorMessage(400);
+        client.updateUser(username, "", newUser, messageHelper.callback());
+        messageHelper.assertReceivedFailedMessage(400);
 
-        client.updateUser("Something Strange", token, new User(), entityHelper.callback(201));
-        entityHelper.assertReceivedErrorMessage(404);
+        client.updateUser("Something Strange", token, new User(), messageHelper.callback());
+        messageHelper.assertReceivedFailedMessage(404);
     }
 
     @Test
@@ -55,8 +53,8 @@ public class UserUpdateTest extends WeTrackIntegrateTestWithUserLoggedIn {
 
     @Test
     public void testValidUserUpdateWithEntityCallback() {
-        client.updateUser(username, token, newUser, entityHelper.callback(201));
-        entityHelper.assertReceivedEntity(201);
+        client.updateUser(username, token, newUser, messageHelper.callback());
+        messageHelper.assertReceivedSuccessfulMessage();
 
         client.getUserInfo(username, userHelper.callback(200));
         userHelper.assertReceivedEntity(200);

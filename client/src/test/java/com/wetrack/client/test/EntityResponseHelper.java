@@ -3,9 +3,6 @@ package com.wetrack.client.test;
 import com.google.gson.Gson;
 import com.wetrack.client.EntityCallback;
 import com.wetrack.client.model.Message;
-import retrofit2.Response;
-
-import java.io.IOException;
 
 public class EntityResponseHelper<T> {
     private Gson gson;
