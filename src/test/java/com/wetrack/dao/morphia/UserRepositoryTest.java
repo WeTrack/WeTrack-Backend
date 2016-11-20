@@ -40,7 +40,7 @@ public class UserRepositoryTest {
 
     @Before
     public void setUp() {
-        users = client.getDatabase(SpringConfig.DATABASE_NAME).getCollection("users");
+        users = client.getDatabase(SpringConfig.DEFAULT_DATABASE).getCollection("users");
     }
 
     @After

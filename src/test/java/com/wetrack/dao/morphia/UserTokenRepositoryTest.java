@@ -12,6 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mongodb.morphia.Datastore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,7 +36,7 @@ public class UserTokenRepositoryTest {
 
     @Before
     public void setUp() {
-        tokens = client.getDatabase(SpringConfig.DATABASE_NAME).getCollection("tokens");
+        tokens = client.getDatabase(SpringConfig.DEFAULT_DATABASE).getCollection("tokens");
     }
 
     @After

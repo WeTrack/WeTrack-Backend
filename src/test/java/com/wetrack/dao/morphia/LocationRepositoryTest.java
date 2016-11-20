@@ -50,7 +50,7 @@ public class LocationRepositoryTest {
 
     @Before
     public void setUp() {
-        locations = client.getDatabase(SpringConfig.DATABASE_NAME).getCollection("locations");
+        locations = client.getDatabase(SpringConfig.DEFAULT_DATABASE).getCollection("locations");
     }
 
     @After

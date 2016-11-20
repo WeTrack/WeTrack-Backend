@@ -40,7 +40,7 @@ public class FriendRepositoryTest {
 
     @Before
     public void setUp() {
-        friends = client.getDatabase(SpringConfig.DATABASE_NAME).getCollection("friends");
+        friends = client.getDatabase(SpringConfig.DEFAULT_DATABASE).getCollection("friends");
         userRepository.insert(userA);
         userRepository.insert(userB);
         userRepository.insert(userC);

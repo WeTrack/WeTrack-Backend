@@ -43,7 +43,7 @@ public class ChatRepositoryTest {
 
     @Before
     public void setUp() {
-        chats = client.getDatabase(SpringConfig.DATABASE_NAME).getCollection("chats");
+        chats = client.getDatabase(SpringConfig.DEFAULT_DATABASE).getCollection("chats");
         userRepository.insert(userA);
         userRepository.insert(userB);
         userRepository.insert(userC);
