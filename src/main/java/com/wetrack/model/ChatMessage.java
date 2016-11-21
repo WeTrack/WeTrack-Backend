@@ -14,8 +14,7 @@ import org.mongodb.morphia.utils.IndexType;
 })
 public class ChatMessage extends Notification {
     private String chatId;
-    @SerializedName("from")
-    private String fromUsername;
+    @SerializedName("from") private String fromUsername;
 
     public ChatMessage() {}
 

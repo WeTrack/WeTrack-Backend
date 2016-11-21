@@ -1,6 +1,6 @@
 package com.wetrack.model;
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.wetrack.util.HashedIDGenerator;
 import org.mongodb.morphia.annotations.*;
 
@@ -17,8 +17,7 @@ public class Chat extends DbEntity<String> {
     private String id;
     private String name;
 
-    @Expose(serialize = false, deserialize = false)
-    private Set<String> memberNames;
+    @SerializedName("members") private Set<String> memberNames;
 
     public Chat() {}
 

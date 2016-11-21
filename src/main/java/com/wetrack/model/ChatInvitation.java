@@ -1,5 +1,6 @@
 package com.wetrack.model;
 
+import com.google.gson.annotations.SerializedName;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Field;
 import org.mongodb.morphia.annotations.Index;
@@ -10,8 +11,8 @@ import org.mongodb.morphia.annotations.Indexes;
         @Index(fields = @Field("toUsername"))
 })
 public class ChatInvitation extends Notification {
-    private String fromUsername;
-    private String toUsername;
+    @SerializedName("from") private String fromUsername;
+    @SerializedName("to") private String toUsername;
     private String chatId;
 
     public ChatInvitation() {}

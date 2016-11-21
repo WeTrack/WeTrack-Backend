@@ -30,9 +30,10 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 - [x] Implement Chat creating.
 - [x] Implement chat message service.
 - [x] Implement WebSocket notification pushing.
-- [x] Deploy version `0.1`. [http://www.robertshome.com.cn/](http://www.robertshome.com.cn/)
+- [x] Deploy version `0.1`.
 - [ ] Write test cases for WebSocket service.
 - [ ] Migrate from Jersey to SpringMVC.
+- [ ] Migrate from MongoDB to MySQL and MyBatis
 - [ ] Implement file and image uploading.
 - [ ] Implement friend invitation.
 - [ ] Implement group invitation.

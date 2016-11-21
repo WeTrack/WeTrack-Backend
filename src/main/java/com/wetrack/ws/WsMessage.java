@@ -1,10 +1,8 @@
 package com.wetrack.ws;
 
-import com.google.gson.annotations.SerializedName;
 import com.wetrack.model.Notification;
 
 public class WsMessage extends Notification {
-    @SerializedName("status_code")
     private int statusCode;
 
     public WsMessage() {}

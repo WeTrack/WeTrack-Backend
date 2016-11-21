@@ -1,6 +1,5 @@
 package com.wetrack.model;
 
-import com.google.gson.annotations.SerializedName;
 import com.wetrack.util.HashedIDGenerator;
 import org.mongodb.morphia.annotations.Id;
 
@@ -11,7 +10,6 @@ public abstract class Notification extends DbEntity<String> {
     @Id
     private String id;
     private String content;
-    @SerializedName("send_time")
     private LocalDateTime sendTime;
 
     protected Notification() {}
