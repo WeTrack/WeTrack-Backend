@@ -16,16 +16,6 @@ The service classes in `service` module should be listening to requests come fro
 
 The project will open a MongoDB connection to `localhost:27017` anonymously and use its `wetrack` database. Make sure your MongoDB instance is correctly configured and running when you start the project.
 
-## Frameworks and Technology
-
-- [Spring](http://projects.spring.io/spring-framework/) for Dependency Injection and Management.
-- [Jersey](https://jersey.java.net/) for RESTful Servlet Implementation.
-- [Tyrus](https://tyrus.java.net/) for WebSocket Servlet Implementation.
-- [Gson](https://github.com/google/gson) for JSON Serialization and Deserialization.
-- [Retrofit](https://square.github.io/retrofit/) and [RxJava](https://github.com/ReactiveX/RxJava) for Asynchronous Client Request.
-- [Guava](https://github.com/google/guava) for Advanced Data Structure.
-- [SLF4J](http://www.slf4j.org/) and [Log4j](https://logging.apache.org/log4j/1.2/) for Logging.
-
 ## Future Task
 
 - [x] Implement service for user login and token management.
@@ -40,7 +30,7 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 - [x] Implement Chat creating.
 - [x] Implement chat message service.
 - [x] Implement WebSocket notification pushing.
-- [ ] Deploy version `0.1`.
+- [x] Deploy version `0.1`. [http://www.robertshome.com.cn/](http://www.robertshome.com.cn/)
 - [ ] Write test cases for WebSocket service.
 - [ ] Migrate from Jersey to SpringMVC.
 - [ ] Implement file and image uploading.

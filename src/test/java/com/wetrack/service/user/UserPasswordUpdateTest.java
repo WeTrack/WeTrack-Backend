@@ -37,8 +37,8 @@ public class UserPasswordUpdateTest extends WeTrackServerTestWithUserLoggedIn {
 
     private Response passwordUpdate(String username, String oldPassword, String newPassword) {
         JsonObject requestEntity = new JsonObject();
-        requestEntity.addProperty("oldPassword", CryptoUtils.md5Digest(oldPassword));
-        requestEntity.addProperty("newPassword", newPassword);
+        requestEntity.addProperty("old_password", CryptoUtils.md5Digest(oldPassword));
+        requestEntity.addProperty("new_password", newPassword);
         return put("/users/" + username + "/password", requestEntity);
     }
 
