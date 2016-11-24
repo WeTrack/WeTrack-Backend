@@ -8,7 +8,7 @@ import org.mongodb.morphia.utils.IndexType;
 
 import java.time.LocalDateTime;
 
-@Entity("locations")
+@Entity(value = "locations", noClassnameStored = true)
 @Indexes({
     @Index(fields = @Field("username")),
     @Index(fields = @Field(value = "point", type = IndexType.GEO2DSPHERE)),

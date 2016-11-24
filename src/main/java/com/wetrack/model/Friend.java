@@ -6,7 +6,7 @@ import org.mongodb.morphia.annotations.Id;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity("friends")
+@Entity(value = "friends", noClassnameStored = true)
 public class Friend extends DbEntity<String> {
     @Id
     private String ownerUsername;

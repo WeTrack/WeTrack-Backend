@@ -7,7 +7,7 @@ import org.mongodb.morphia.annotations.Index;
 import org.mongodb.morphia.annotations.Indexes;
 import org.mongodb.morphia.utils.IndexType;
 
-@Entity("messages")
+@Entity(value = "messages", noClassnameStored = true)
 @Indexes({
         @Index(fields = @Field("chatId")),
         @Index(fields = @Field(value = "sendTime", type = IndexType.DESC))
