@@ -37,6 +37,28 @@ public class ChatService {
     @Autowired private UserTokenRepository userTokenRepository;
     @Autowired private ChatRepository chatRepository;
 
+    // TODO Write test cases for this method
+    @GET
+    @Path("/{chatId}")
+    public Response getChatInfo(@QueryParam("token") @DefaultValue("") String token,
+                                @PathParam("chatId") String chatId) {
+        LOG.debug("GET /chats/" + chatId);
+        if (token.trim().isEmpty())
+            return badRequest("Token must be provided as query parameter.");
+
+        UserToken tokenInDB = userTokenRepository.findByTokenStr(token);
+        if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now()))
+            return unauthorized("The given token is invalid or has expired. Please log in again.");
+
+        Chat chat = chatRepository.findById(chatId);
+        if (chat == null)
+            return notFound("Chat with given chat id does not exist.");
+        if (!chat.getMemberNames().contains(tokenInDB.getUsername()))
+            return unauthorized("You are not a member of the specified chat.");
+
+        return ok(gson.toJson(chat));
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createChat(@QueryParam("token") @DefaultValue("") String token,

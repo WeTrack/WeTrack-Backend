@@ -1,10 +1,7 @@
 package com.wetrack.model;
 
 import com.google.gson.annotations.SerializedName;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Field;
-import org.mongodb.morphia.annotations.Index;
-import org.mongodb.morphia.annotations.Indexes;
+import org.mongodb.morphia.annotations.*;
 import org.mongodb.morphia.utils.IndexType;
 
 @Entity(value = "messages", noClassnameStored = true)

@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import com.wetrack.dao.ChatMessageRepository;
 import com.wetrack.dao.ChatRepository;
 import com.wetrack.dao.UserTokenRepository;
@@ -11,6 +12,7 @@ import com.wetrack.model.Chat;
 import com.wetrack.model.ChatMessage;
 import com.wetrack.model.Notification;
 import com.wetrack.model.UserToken;
+import com.wetrack.util.CryptoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +22,13 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class NotificationService extends AbstractWebSocketHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(NotificationService.class);
+import static com.wetrack.ws.WsResponse.*;
+
+public class WebSocketService extends AbstractWebSocketHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(WebSocketService.class);
 
     private static final String TOKEN_PREFIX = "Token:";
 
@@ -35,9 +40,8 @@ public class NotificationService extends AbstractWebSocketHandler {
     private BiMap<WebSocketSession, String> sessionUsername = HashBiMap.create();
 
     private WebSocketMessage<String> sessionHello
-            = new TextMessage("Hello, anonymous user! Please provide your token for authentication.");
-    private WebSocketMessage<String> invalidMessage
-            = new TextMessage("The message is not in valid format. Please try again.");
+            = hello("Hello, anonymous user! Please provide your token for authentication.");
+    private WebSocketMessage<String> invalidMessage = invalidMessage("The message is not in valid format.");
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -47,59 +51,67 @@ public class NotificationService extends AbstractWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws Exception {
         String message = textMessage.getPayload();
+
         if (LOG.isDebugEnabled()) {
             if (sessionUsername.containsKey(session))
                 LOG.debug("Received message `{}` from user `{}`.", message, sessionUsername.get(session));
             else
                 LOG.debug("Received message `{}` from anonymous session `{}`.", message, session.hashCode());
         }
+
         if (message.startsWith(TOKEN_PREFIX)) {
             LOG.debug("Token messaged detected! Handling to corresponding method...");
             onTokenAuthenticate(message.substring(TOKEN_PREFIX.length()), session);
             return;
         }
-        Notification notification;
-        try {
-            notification = gson.fromJson(message, Notification.class);
-        } catch (JsonParseException ex) {
-            session.sendMessage(invalidMessage);
+
+        if (message.startsWith(WsResponse.TYPE_CHAT_MESSAGE)) {
+            ChatMessage chatMessage;
+            try {
+                chatMessage = gson.fromJson(message.substring(WsResponse.TYPE_CHAT_MESSAGE.length()), ChatMessage.class);
+            } catch (Exception ex) {
+                session.sendMessage(invalidMessage);
+                return;
+            }
+            onChatMessage(chatMessage, session);
             return;
         }
-        if (notification instanceof ChatMessage) {
-            onChatMessage((ChatMessage) notification, session);
-            return;
-        }
+
         session.sendMessage(invalidMessage);
     }
 
     private void onChatMessage(ChatMessage message, WebSocketSession session) throws Exception {
         if (!sessionUsername.containsKey(session)) {
-            session.sendMessage(response(401, "You must authenticate before sending any message."));
+            session.sendMessage(notAuthenticated("You must log in first."));
             return;
         }
 
         String authenticatedUsername = sessionUsername.get(session);
         Chat chat = chatRepository.findById(message.getChatId());
         if (chat == null) {
-            session.sendMessage(response(404, "Chat with given ID `" + message.getChatId() + "` does not exist."));
+            session.sendMessage(invalidChatId("Chat with given ID `" + message.getChatId() + "` does not exist."));
             return;
         }
         if (!chat.getMemberNames().contains(authenticatedUsername)) {
-            session.sendMessage(response(401, "You are not a member of this group."));
+            session.sendMessage(notChatMember("You are not a member of this chat."));
             return;
         }
 
+        String providedId = message.getId();
+        message.setId(CryptoUtils.md5Digest(String.format("%s:%s:%s", message.getChatId(), message.getFromUsername(), message.getSendTime().toString())));
         message.setFromUsername(sessionUsername.get(session));
         message.setSendTime(LocalDateTime.now());
         chatMessageRepository.insert(message);
 
+        session.sendMessage(messageAck(providedId, message.getSendTime()));
+
         for (String memberName : chat.getMemberNames()) {
+            if (memberName.equals(authenticatedUsername))
+                continue;
             WebSocketSession memberSession = sessionUsername.inverse().get(memberName);
             if (memberSession != null)
-                memberSession.sendMessage(new TextMessage(gson.toJson(message)));
+                memberSession.sendMessage(chatMessage(message));
         }
-
-        session.sendMessage(response(200, "Message Sent."));
     }
 
     private void onTokenAuthenticate(String token, WebSocketSession session) throws Exception {
@@ -107,7 +119,7 @@ public class NotificationService extends AbstractWebSocketHandler {
         UserToken tokenInDB = userTokenRepository.findByTokenStr(token);
         if (tokenInDB == null || tokenInDB.getExpireTime().isBefore(LocalDateTime.now())) {
             LOG.debug("Token is invalid or has expired. Returning 401 Unauthorized...");
-            session.sendMessage(response(401, "The given token `" + token + "` is invalid or has expired."));
+            session.sendMessage(invalidToken("The given token `" + token + "` is invalid or has expired."));
             return;
         }
 
@@ -115,12 +127,21 @@ public class NotificationService extends AbstractWebSocketHandler {
         if (sessionUsername.containsValue(username)) {
             LOG.debug("Token has already logged in another session. Logging out the old session...");
             WebSocketSession oldSession = sessionUsername.inverse().get(tokenInDB.getUsername());
-            oldSession.sendMessage(response(401, "You has logged in another session."));
+            if (oldSession == session) {
+                LOG.debug("Token authenticated. Returning 200 OK...");
+                session.sendMessage(tokenVerified("Authentication successful. Welcome, " + username + "."));
+                return;
+            }
+            try {
+                oldSession.sendMessage(tokenUsedInOtherSession("You has logged in another session."));
+            } catch (IOException ex) {
+                // TODO Implement this
+            }
         }
 
         sessionUsername.forcePut(session, username);
         LOG.debug("Token authenticated. Returning 200 OK...");
-        session.sendMessage(response(200, "Authentication successful. Welcome, " + username + "."));
+        session.sendMessage(tokenVerified("Authentication successful. Welcome, " + username + "."));
     }
 
     @Override
@@ -130,9 +151,5 @@ public class NotificationService extends AbstractWebSocketHandler {
                     + "` closed: " + status.toString());
         else
             LOG.info("Anonymous WebSocket session `" + session.hashCode() + "` closed: " + status.toString());
-    }
-
-    private TextMessage response(int statusCode, String message) {
-        return new TextMessage(gson.toJson(new WsMessage(statusCode, message)));
     }
 }

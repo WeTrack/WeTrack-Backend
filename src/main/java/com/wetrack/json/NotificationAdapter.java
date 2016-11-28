@@ -7,7 +7,6 @@ import com.wetrack.model.ChatInvitation;
 import com.wetrack.model.ChatMessage;
 import com.wetrack.model.FriendInvitation;
 import com.wetrack.model.Notification;
-import com.wetrack.ws.WsMessage;
 
 import java.lang.reflect.Type;
 
@@ -15,14 +14,12 @@ public class NotificationAdapter implements JsonSerializer<Notification>, JsonDe
     private static final String TYPE_CHAT_MESSAGE = "chat_message";
     private static final String TYPE_FRIEND_INVITATION = "friend_invitation";
     private static final String TYPE_CHAT_INVITATION = "chat_invitation";
-    private static final String TYPE_WS_MESSAGE = "message";
 
     private static final BiMap<Class, String> types = HashBiMap.create();
     static {
         types.forcePut(ChatMessage.class, TYPE_CHAT_MESSAGE);
         types.forcePut(FriendInvitation.class, TYPE_FRIEND_INVITATION);
         types.forcePut(ChatInvitation.class, TYPE_CHAT_INVITATION);
-        types.forcePut(WsMessage.class, TYPE_WS_MESSAGE);
     }
 
     @Override
@@ -42,7 +39,7 @@ public class NotificationAdapter implements JsonSerializer<Notification>, JsonDe
 
     @Override
     public JsonElement serialize(Notification src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject result = context.serialize(typeOfSrc).getAsJsonObject();
+        JsonObject result = context.serialize(src).getAsJsonObject();
         String type = types.get(src.getClass());
         if (type == null)
             throw new IllegalArgumentException("NotificationAdapter does not support serialization "

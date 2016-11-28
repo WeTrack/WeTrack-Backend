@@ -98,7 +98,6 @@ public class SpringConfig {
                 .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
                 .registerTypeAdapter(Location.class, new LocationTypeAdapter())
-                .registerTypeAdapter(Notification.class, new NotificationAdapter())
                 .registerTypeAdapter(User.class, new UserSerializer())
                 .setPrettyPrinting()
                 .create();

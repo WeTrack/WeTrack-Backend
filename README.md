@@ -18,9 +18,9 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 
 ## Future Task
 
+- [ ] Refactor `Notification` framework.
 - [ ] Write test cases for WebSocket service.
 - [ ] Migrate from Jersey to SpringMVC.
-- [ ] Migrate from MongoDB to MySQL and MyBatis. (Should we?)
 - [ ] Implement cache-aware single-entity `GET` for all entities (new `createdAt` and `updatedAt` field).
 - [ ] Implement file and image uploading.
 - [ ] Implement friend invitation.
