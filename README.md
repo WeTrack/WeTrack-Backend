@@ -18,8 +18,9 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 
 ## Future Task
 
-- [ ] Refactor `Notification` framework.
-- [ ] Write test cases for WebSocket service.
+- [x] Deploy version `0.1`.
+- [ ] Enable STOMP protocol for the WebSocket service.
+- [ ] Write test cases for the WebSocket service.
 - [ ] Migrate from Jersey to SpringMVC.
 - [ ] Implement cache-aware single-entity `GET` for all entities (new `createdAt` and `updatedAt` field).
 - [ ] Implement file and image uploading.

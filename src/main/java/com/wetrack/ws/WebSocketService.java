@@ -3,14 +3,11 @@ package com.wetrack.ws;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 import com.wetrack.dao.ChatMessageRepository;
 import com.wetrack.dao.ChatRepository;
 import com.wetrack.dao.UserTokenRepository;
 import com.wetrack.model.Chat;
 import com.wetrack.model.ChatMessage;
-import com.wetrack.model.Notification;
 import com.wetrack.model.UserToken;
 import com.wetrack.util.CryptoUtils;
 import org.slf4j.Logger;
@@ -22,7 +19,6 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 import static com.wetrack.ws.WsResponse.*;
@@ -45,7 +41,9 @@ public class WebSocketService extends AbstractWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        session.sendMessage(sessionHello);
+        LOG.debug("WebSocket session established with `{}:{}`",
+                session.getRemoteAddress().getAddress(), session.getRemoteAddress().getPort());
+        sendMessage(session, sessionHello);
     }
 
     @Override
@@ -70,30 +68,30 @@ public class WebSocketService extends AbstractWebSocketHandler {
             try {
                 chatMessage = gson.fromJson(message.substring(WsResponse.TYPE_CHAT_MESSAGE.length()), ChatMessage.class);
             } catch (Exception ex) {
-                session.sendMessage(invalidMessage);
+                sendMessage(session, invalidMessage);
                 return;
             }
             onChatMessage(chatMessage, session);
             return;
         }
 
-        session.sendMessage(invalidMessage);
+        sendMessage(session, invalidMessage);
     }
 
     private void onChatMessage(ChatMessage message, WebSocketSession session) throws Exception {
         if (!sessionUsername.containsKey(session)) {
-            session.sendMessage(notAuthenticated("You must log in first."));
+            sendMessage(session, notAuthenticated("You must log in first."));
             return;
         }
 
         String authenticatedUsername = sessionUsername.get(session);
         Chat chat = chatRepository.findById(message.getChatId());
         if (chat == null) {
-            session.sendMessage(invalidChatId("Chat with given ID `" + message.getChatId() + "` does not exist."));
+            sendMessage(session, invalidChatId("Chat with given ID `" + message.getChatId() + "` does not exist."));
             return;
         }
         if (!chat.getMemberNames().contains(authenticatedUsername)) {
-            session.sendMessage(notChatMember("You are not a member of this chat."));
+            sendMessage(session, notChatMember("You are not a member of this chat."));
             return;
         }
 
@@ -110,7 +108,7 @@ public class WebSocketService extends AbstractWebSocketHandler {
                 continue;
             WebSocketSession memberSession = sessionUsername.inverse().get(memberName);
             if (memberSession != null)
-                memberSession.sendMessage(chatMessage(message));
+                sendMessage(memberSession, chatMessage(message));
         }
     }
 
@@ -127,21 +125,13 @@ public class WebSocketService extends AbstractWebSocketHandler {
         if (sessionUsername.containsValue(username)) {
             LOG.debug("Token has already logged in another session. Logging out the old session...");
             WebSocketSession oldSession = sessionUsername.inverse().get(tokenInDB.getUsername());
-            if (oldSession == session) {
-                LOG.debug("Token authenticated. Returning 200 OK...");
-                session.sendMessage(tokenVerified("Authentication successful. Welcome, " + username + "."));
-                return;
-            }
-            try {
-                oldSession.sendMessage(tokenUsedInOtherSession("You has logged in another session."));
-            } catch (IOException ex) {
-                // TODO Implement this
-            }
+            if (oldSession != session)
+                sendMessage(oldSession, tokenUsedInOtherSession("You has logged in on another session."));
         }
 
         sessionUsername.forcePut(session, username);
-        LOG.debug("Token authenticated. Returning 200 OK...");
-        session.sendMessage(tokenVerified("Authentication successful. Welcome, " + username + "."));
+        LOG.debug("Token authenticated. User `{}` logged in on session `{}`.", username, session.hashCode());
+        sendMessage(session, tokenVerified("Authentication successful. Welcome, " + username + "."));
     }
 
     @Override
@@ -151,5 +141,25 @@ public class WebSocketService extends AbstractWebSocketHandler {
                     + "` closed: " + status.toString());
         else
             LOG.info("Anonymous WebSocket session `" + session.hashCode() + "` closed: " + status.toString());
+    }
+
+    private void sendMessage(WebSocketSession session, WebSocketMessage<?> message) {
+        try {
+            session.sendMessage(message);
+        } catch (Throwable ex) {
+            // Exception occurred when trying to send message to the session.
+            // Close and unregister the session.
+            tryCloseWithError(session, ex);
+            sessionUsername.remove(session);
+        }
+    }
+
+    private void tryCloseWithError(WebSocketSession session, Throwable exception) {
+        LOG.debug("Closing session `" + session.hashCode() + "` due to exception: ", exception);
+        if (session.isOpen()) {
+            try {
+                session.close(CloseStatus.SERVER_ERROR);
+            } catch (Throwable ex) {}
+        }
     }
 }

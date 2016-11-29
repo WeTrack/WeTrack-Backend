@@ -1,6 +1,8 @@
 package com.wetrack.ws;
 
-import com.google.gson.*;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.wetrack.json.LocalDateTimeTypeAdapter;
 import com.wetrack.model.ChatMessage;
 import org.springframework.web.socket.TextMessage;
@@ -24,9 +26,14 @@ abstract class WsResponse {
     private static final int INVALID_CHAT_ID = 2003;
     private static final int INVALID_TOKEN = 2004;
     private static final int TOKEN_USED_IN_OTHER_SESSION = 2005;
+    private static final int INTERNAL_ERROR = 3000;
 
     static TextMessage hello(String message) {
         return jsonMessage(new WsMessage(HELLO, message));
+    }
+
+    static TextMessage internalError(String message) {
+        return jsonMessage(new WsMessage(INTERNAL_ERROR, message));
     }
 
     static TextMessage chatMessage(ChatMessage message) {
