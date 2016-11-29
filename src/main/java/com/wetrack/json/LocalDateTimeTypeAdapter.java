@@ -4,6 +4,8 @@ import com.google.gson.*;
 
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class LocalDateTimeTypeAdapter implements JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
     @Override
@@ -13,7 +15,7 @@ public class LocalDateTimeTypeAdapter implements JsonSerializer<LocalDateTime>, 
         if (jsonStr == null || jsonStr.trim().isEmpty())
             return null;
         try {
-            return LocalDateTime.parse(jsonStr);
+            return ZonedDateTime.parse(jsonStr).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
         } catch (Throwable ex) {
             throw new JsonParseException("Received illegal date time field: `" + jsonStr + "`", ex);
         }
@@ -21,6 +23,6 @@ public class LocalDateTimeTypeAdapter implements JsonSerializer<LocalDateTime>, 
 
     @Override
     public JsonElement serialize(LocalDateTime src, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(src.toString());
+        return new JsonPrimitive(src.atZone(ZoneId.systemDefault()).toOffsetDateTime().toString());
     }
 }

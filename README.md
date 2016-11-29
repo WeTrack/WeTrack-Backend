@@ -19,6 +19,7 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 ## Future Task
 
 - [x] Deploy version `0.1`.
+- [ ] Update time model to support different time zone.
 - [ ] Enable STOMP protocol for the WebSocket service.
 - [ ] Write test cases for the WebSocket service.
 - [ ] Migrate from Jersey to SpringMVC.

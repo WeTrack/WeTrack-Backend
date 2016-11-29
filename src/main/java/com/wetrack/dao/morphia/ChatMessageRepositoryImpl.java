@@ -17,7 +17,7 @@ public class ChatMessageRepositoryImpl extends MorphiaRepository<String, ChatMes
     @Override
     public List<ChatMessage> getChatMessages(String chatId, LocalDateTime before, int limit) {
         return createQuery().field("chatId").equal(chatId)
-                .field("sendTime").lessThan(before)
+                .field("sendTime").lessThan(before).order("-sendTime")
                 .limit(limit).asList();
     }
 
