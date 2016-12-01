@@ -82,9 +82,6 @@ public class UserUpdateService {
         if (newUser.getNickname() != null && !newUser.getNickname().trim().isEmpty())
             oldUser.setNickname(newUser.getNickname());
 
-        if (newUser.getIconUrl() != null && !newUser.getIconUrl().trim().isEmpty())
-            oldUser.setIconUrl(newUser.getIconUrl());
-
         if (newUser.getEmail() != null && !newUser.getEmail().trim().isEmpty())
             oldUser.setEmail(newUser.getEmail());
 

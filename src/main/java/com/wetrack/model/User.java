@@ -15,7 +15,6 @@ public class User extends DbEntity<String> {
     private String username = "";
     private String password = null;
     private String nickname = "";
-    private String iconUrl = "";
     private String email = "";
     private Gender gender = Gender.Male;
     private LocalDate birthDate;
@@ -53,12 +52,6 @@ public class User extends DbEntity<String> {
     }
     public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-    public String getIconUrl() {
-        return iconUrl;
-    }
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
     }
     public String getUsername() {
         return username;

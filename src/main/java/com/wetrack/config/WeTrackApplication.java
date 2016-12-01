@@ -4,11 +4,9 @@ import com.wetrack.service.*;
 import com.wetrack.service.authen.UserLoginService;
 import com.wetrack.service.authen.UserLogoutService;
 import com.wetrack.service.authen.UserTokenVerificationService;
-import com.wetrack.service.user.UserCreateService;
-import com.wetrack.service.user.UserGetService;
-import com.wetrack.service.user.UserPasswordUpdateService;
-import com.wetrack.service.user.UserUpdateService;
+import com.wetrack.service.user.*;
 import com.wetrack.util.GsonJerseyProvider;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 public class WeTrackApplication extends ResourceConfig {
@@ -26,6 +24,8 @@ public class WeTrackApplication extends ResourceConfig {
         register(ChatService.class);
         register(UserChatService.class);
         register(ChatMessageService.class);
+        register(UserPortraitService.class);
+        register(MultiPartFeature.class);
         register(GsonJerseyProvider.class);
     }
 

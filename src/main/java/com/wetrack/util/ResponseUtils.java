@@ -77,6 +77,10 @@ public abstract class ResponseUtils {
         return response(404, message);
     }
 
+    public static Response notModified() {
+        return Response.notModified().build();
+    }
+
     /**
      * Returns a {@code 400 Response} with JSON object as follows:
      * <pre>
@@ -92,6 +96,10 @@ public abstract class ResponseUtils {
      */
     public static Response badRequest(String message) {
         return response(400, message);
+    }
+
+    public static Response internalError(String message) {
+        return response(500, message);
     }
 
     /**

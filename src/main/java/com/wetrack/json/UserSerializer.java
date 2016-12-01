@@ -14,7 +14,6 @@ public class UserSerializer implements JsonSerializer<User> {
         JsonObject result = new JsonObject();
         result.add("username", context.serialize(src.getUsername()));
         result.add("nickname", context.serialize(src.getNickname()));
-        result.add("iconUrl", context.serialize(src.getIconUrl()));
         result.add("email", context.serialize(src.getEmail()));
         result.add("gender", context.serialize(src.getGender()));
         result.add("birthDate", context.serialize(src.getBirthDate()));

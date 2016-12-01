@@ -44,6 +44,8 @@ public class SpringConfig {
     static final String DEFAULT_HOST = "127.0.0.1";
     static final int DEFAULT_PORT = 12701;
     public static final String DEFAULT_DATABASE = "wetrack";
+    static final String DEFAULT_DATA_FOLDER = "data";
+    static final String PORTRAIT_FOLDER = "portrait";
     static final String DEFAULT_USERNAME = "";
     static final String DEFAULT_PASSWORD = "";
 
@@ -53,7 +55,6 @@ public class SpringConfig {
     @Bean
     public MongoClient mongoClient() {
         String userHome = System.getProperty("user.home");
-        LOG.debug("Fetched user home path `{}`", userHome);
         Path dbConfig = Paths.get(userHome, CONFIG_PATH, DB_CONFIG);
         if (Files.exists(dbConfig)) {
             try {
@@ -80,6 +81,23 @@ public class SpringConfig {
 
         LOG.info("Database config file could not be loaded. Using default setting...");
         return new MongoClient();
+    }
+
+    @Bean
+    public String localPortraitHome() {
+        String userHome = System.getProperty("user.home");
+        Path dbConfig = Paths.get(userHome, CONFIG_PATH, DB_CONFIG);
+        if (Files.exists(dbConfig)) {
+            try {
+                Properties configs = new Properties();
+                configs.load(Files.newInputStream(dbConfig));
+                if (configs.containsKey("LocalPortraitPath"))
+                    return configs.getProperty("LocalPortraitPath");
+            } catch (IOException e) {
+                LOG.warn("Exception occurred when trying to load database config file: ", e);
+            }
+        }
+        return Paths.get(userHome, CONFIG_PATH, DEFAULT_DATA_FOLDER, PORTRAIT_FOLDER).toString();
     }
 
     @Bean
@@ -165,5 +183,12 @@ public class SpringConfig {
         ChatMessageRepositoryImpl chatMessageRepository = new ChatMessageRepositoryImpl();
         chatMessageRepository.setDatastore(datastore);
         return chatMessageRepository;
+    }
+
+    @Bean
+    public UserPortraitRepository userPortraitRepository(Datastore datastore) {
+        UserPortraitRepositoryImpl userPortraitRepository = new UserPortraitRepositoryImpl();
+        userPortraitRepository.setDatastore(datastore);
+        return userPortraitRepository;
     }
 }

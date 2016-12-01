@@ -8,7 +8,7 @@ group = 'com.wetrack'
 version = '0.1'
 
 ext {
-    jerseyVersion = '2.23.2'
+    jerseyVersion = '2.24.1'
     springVersion = '4.3.3.RELEASE'
 }
 
@@ -25,6 +25,7 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
     compile "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion"
     compile "org.glassfish.jersey.ext:jersey-spring3:$jerseyVersion"
+    compile "org.glassfish.jersey.media:jersey-media-multipart:$jerseyVersion"
     compile "org.springframework:spring-web:$springVersion"
     compile "org.springframework:spring-webmvc:$springVersion"
     compile "org.springframework:spring-websocket:$springVersion"
