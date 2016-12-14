@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -100,6 +101,8 @@ public class FriendService {
         friend = friendRepository.findById(friendName);
         if (friend == null)
             friend = new Friend(friendName);
+        if (friend.getFriendNames() == null)
+            friend.setFriendNames(new HashSet<>());
         friend.getFriendNames().add(username);
         friendRepository.insert(friend);
 

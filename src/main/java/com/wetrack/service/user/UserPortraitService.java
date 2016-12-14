@@ -91,7 +91,7 @@ public class UserPortraitService {
         UserPortrait portrait = new UserPortrait(username, fileDetail.getFileName());
         try {
             java.nio.file.Path localFilePath = Paths.get(localPortraitHome, username + portrait.getType().getSuffix());
-            Files.createDirectories(localFilePath);
+            Files.createDirectories(localFilePath.getParent());
             Files.copy(uploadedInputStream, localFilePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ex) {
             LOG.warn("IOException occurred when saving uploaded portrait to local file system: ", ex);
