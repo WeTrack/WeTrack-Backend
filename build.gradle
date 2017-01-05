@@ -2,6 +2,7 @@ apply plugin: 'maven'
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'war'
+apply plugin: 'jacoco'
 apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 
 group = 'com.wetrack'
@@ -14,6 +15,12 @@ ext {
 
 repositories {
     mavenCentral()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
 }
 
 gretty {

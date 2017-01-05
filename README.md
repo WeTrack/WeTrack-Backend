@@ -20,11 +20,12 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 
 - [x] Deploy version `0.1`.
 - [x] Update time model to support different time zone.
-- [ ] Implement user portrait management.
-- [ ] Migrate from Jersey to SpringMVC.
+- [x] Implement user portrait management.
+- [ ] Migrate from Morphia and MongoDB to Hibernate and MySQL.
+- [ ] Implement cache-aware single-entity `GET` for all entities (new `createdAt` and `updatedAt` field).
 - [ ] Enable STOMP protocol for the WebSocket service.
 - [ ] Write test cases for the WebSocket service.
-- [ ] Implement cache-aware single-entity `GET` for all entities (new `createdAt` and `updatedAt` field).
+- [ ] Implement `Check for Update` for client.
 - [ ] Implement file and image uploading.
 - [ ] Implement friend invitation.
 - [ ] Implement chat invitation.
@@ -34,3 +35,10 @@ The project will open a MongoDB connection to `localhost:27017` anonymously and 
 - [ ] Implement P2P Encryption.
 - [ ] Deploy version `0.3` in `HTTPS` and `TLS`.
 - [ ] Implement 3rd-party account sign up and sign in. (QQ, WeChat, Google)
+
+## Technologies
+
+- Spring Core for Dependency Injection
+- Jersey and JAX-RS for RESTful API Endpoints
+- Spring WebSocket for WebSocket
+- Hibernate and MySQL for Relational Data Persistence
