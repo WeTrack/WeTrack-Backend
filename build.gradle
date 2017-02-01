@@ -23,11 +23,6 @@ jacocoTestReport {
     }
 }
 
-gretty {
-	port = 8080
-	contextPath = '/'
-}
-
 dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
     compile "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion"
